@@ -10,6 +10,31 @@ type fileStationClient struct {
 	client *APIClient
 }
 
+func (f *fileStationClient) DeleteStart(paths []string, accurateProgress bool) (*filestation.DeleteStartResponse, error) {
+	return Get[filestation.DeleteStartRequest, filestation.DeleteStartResponse](f.client, &filestation.DeleteStartRequest{
+		Paths:            paths,
+		AccurateProgress: accurateProgress,
+	})
+}
+
+func (f *fileStationClient) DeleteStatus(taskID string) (*filestation.DeleteStatusResponse, error) {
+	return Get[filestation.DeleteStatusRequest, filestation.DeleteStatusResponse](f.client, &filestation.DeleteStatusRequest{
+		TaskID: taskID,
+	})
+}
+
+func (f *fileStationClient) MD5Start(path string) (*filestation.MD5StartResponse, error) {
+	return Get[filestation.MD5StartRequest, filestation.MD5StartResponse](f.client, &filestation.MD5StartRequest{
+		Path: path,
+	})
+}
+
+func (f *fileStationClient) MD5Status(taskID string) (*filestation.MD5StatusResponse, error) {
+	return Get[filestation.MD5StatusRequest, filestation.MD5StatusResponse](f.client, &filestation.MD5StatusRequest{
+		TaskID: taskID,
+	})
+}
+
 // Download implements filestation.FileStationApi.
 func (f *fileStationClient) Download(path string, mode string) (*filestation.DownloadResponse, error) {
 	return Get[filestation.DownloadRequest, filestation.DownloadResponse](f.client, &filestation.DownloadRequest{

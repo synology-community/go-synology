@@ -12,6 +12,10 @@ type FileStationApi interface {
 	Upload(path string, file *form.File, createParents bool, overwrite bool) (*UploadResponse, error)
 	Rename(path string, name string, newName string) (*models.FileList, error)
 	Download(path string, mode string) (*DownloadResponse, error)
+	DeleteStart(paths []string, accurateProgress bool) (*DeleteStartResponse, error)
+	DeleteStatus(taskID string) (*DeleteStatusResponse, error)
+	MD5Start(path string) (*MD5StartResponse, error)
+	MD5Status(taskID string) (*MD5StatusResponse, error)
 }
 
 var API_METHODS = api.APIMethodLookup{
@@ -69,6 +73,18 @@ var API_METHODS = api.APIMethodLookup{
 		API:          "SYNO.FileStation.Download",
 		Version:      2,
 		Method:       "download",
+		ErrorSummary: CommonErrors,
+	},
+	"MD5Start": {
+		API:          "SYNO.FileStation.MD5",
+		Version:      2,
+		Method:       "start",
+		ErrorSummary: CommonErrors,
+	},
+	"MD5Status": {
+		API:          "SYNO.FileStation.MD5",
+		Version:      2,
+		Method:       "status",
 		ErrorSummary: CommonErrors,
 	},
 	"FileStation.BackgroundTask":        {API: "SYNO.FileStation.BackgroundTask", Version: 3},

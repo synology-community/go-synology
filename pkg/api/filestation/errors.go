@@ -1,6 +1,6 @@
 package filestation
 
-import "github.com/synology-community/synology-api/package/api"
+import "github.com/synology-community/synology-api/pkg/api"
 
 var CommonErrors api.ErrorSummary = api.GlobalErrors.Combine(api.ErrorSummary{
 	400: "Invalid parameter of file operation",

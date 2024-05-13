@@ -1,7 +1,7 @@
 package filestation
 
 import (
-	"github.com/synology-community/synology-api/package/api"
+	"github.com/synology-community/synology-api/pkg/api"
 )
 
 type FileStationInfoRequest api.ApiParams

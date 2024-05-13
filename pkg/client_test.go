@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/synology-community/synology-api/package/api"
-	"github.com/synology-community/synology-api/package/util"
+	"github.com/synology-community/synology-api/pkg/api"
+	"github.com/synology-community/synology-api/pkg/util"
 )
 
 type Nil struct{}

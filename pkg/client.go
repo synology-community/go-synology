@@ -8,9 +8,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/synology-community/synology-api/package/api"
-	"github.com/synology-community/synology-api/package/api/filestation"
-	"github.com/synology-community/synology-api/package/api/virtualization"
+	"github.com/synology-community/synology-api/pkg/api"
+	"github.com/synology-community/synology-api/pkg/api/filestation"
+	"github.com/synology-community/synology-api/pkg/api/virtualization"
 	"golang.org/x/net/publicsuffix"
 )
 

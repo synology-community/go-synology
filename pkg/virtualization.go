@@ -1,6 +1,6 @@
 package client
 
-import "github.com/synology-community/synology-api/package/api/virtualization"
+import "github.com/synology-community/synology-api/pkg/api/virtualization"
 
 type virtualizationClient struct {
 	client *APIClient

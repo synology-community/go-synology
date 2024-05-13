@@ -1,7 +1,7 @@
 package filestation
 
 import (
-	"github.com/synology-community/synology-api/package/client/api"
+	"github.com/synology-community/synology-api/pkg/client/api"
 )
 
 type __TEMPLATE_TYPE_PLACEHOLDER__Request struct {

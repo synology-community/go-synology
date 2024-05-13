@@ -3,8 +3,8 @@ package filestation
 import (
 	"net/url"
 
-	"github.com/synology-community/synology-api/package/api"
-	"github.com/synology-community/synology-api/package/util/form"
+	"github.com/synology-community/synology-api/pkg/api"
+	"github.com/synology-community/synology-api/pkg/util/form"
 )
 
 type UploadRequest struct {

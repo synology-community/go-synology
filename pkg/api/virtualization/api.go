@@ -1,6 +1,6 @@
 package virtualization
 
-import "github.com/synology-community/synology-api/package/api"
+import "github.com/synology-community/synology-api/pkg/api"
 
 type VirtualizationAPI interface {
 	GetGuest(name string) (*Guest, error)

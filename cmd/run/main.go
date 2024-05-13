@@ -5,8 +5,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	client "github.com/synology-community/synology-api/package"
-	"github.com/synology-community/synology-api/package/util/form"
+	client "github.com/synology-community/synology-api/pkg"
+	"github.com/synology-community/synology-api/pkg/util/form"
 )
 
 func setupLog() {

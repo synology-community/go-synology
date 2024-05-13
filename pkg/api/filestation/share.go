@@ -3,7 +3,7 @@ package filestation
 import (
 	"net/url"
 
-	"github.com/synology-community/synology-api/package/models"
+	"github.com/synology-community/synology-api/pkg/models"
 )
 
 type CreateShareRequest struct {

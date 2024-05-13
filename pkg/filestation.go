@@ -1,9 +1,9 @@
 package client
 
 import (
-	"github.com/synology-community/synology-api/package/api/filestation"
-	"github.com/synology-community/synology-api/package/models"
-	"github.com/synology-community/synology-api/package/util/form"
+	"github.com/synology-community/synology-api/pkg/api/filestation"
+	"github.com/synology-community/synology-api/pkg/models"
+	"github.com/synology-community/synology-api/pkg/util/form"
 )
 
 type fileStationClient struct {

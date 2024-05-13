@@ -1,7 +1,7 @@
 package filestation
 
 import (
-	"github.com/synology-community/synology-api/package/util/form"
+	"github.com/synology-community/synology-api/pkg/util/form"
 )
 
 type DownloadRequest struct {

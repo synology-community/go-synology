@@ -6,7 +6,7 @@ type DeleteStartRequest struct {
 }
 
 type DeleteStartResponse struct {
-	TaskID string `mapstructure:"taskid" json:"taskid"`
+	TaskID string `json:"taskid"`
 }
 
 type DeleteStatusRequest struct {
@@ -14,14 +14,14 @@ type DeleteStatusRequest struct {
 }
 
 type DeleteStatusResponse struct {
-	Finished       bool   `mapstructure:"finished" json:"finished"`
-	FoundDirNum    int    `mapstructure:"found_dir_num" json:"found_dir_num"`
-	FoundFileNum   int    `mapstructure:"found_file_num" json:"found_file_num"`
-	FoundFileSize  int    `mapstructure:"found_file_size" json:"found_file_size"`
-	HasDir         bool   `mapstructure:"has_dir" json:"has_dir"`
-	Path           string `mapstructure:"path" json:"path"`
-	ProcessedNum   int    `mapstructure:"processed_num" json:"processed_num"`
-	ProcessingPath string `mapstructure:"processing_path" json:"processing_path"`
-	Progress       int    `mapstructure:"progress" json:"progress"`
-	Total          int    `mapstructure:"total" json:"total"`
+	Finished       bool   `json:"finished"`
+	FoundDirNum    int    `json:"found_dir_num"`
+	FoundFileNum   int    `json:"found_file_num"`
+	FoundFileSize  int    `json:"found_file_size"`
+	HasDir         bool   `json:"has_dir"`
+	Path           string `json:"path"`
+	ProcessedNum   int    `json:"processed_num"`
+	ProcessingPath string `json:"processing_path"`
+	Progress       int    `json:"progress"`
+	Total          int    `json:"total"`
 }

@@ -18,9 +18,7 @@ import (
 	"github.com/synology-community/synology-api/pkg/util/form"
 )
 
-type callerKey string
-
-const callerContextKey callerKey = "caller"
+var defaultTimeout = 15 * time.Second
 
 func LookupMethod(callingFunc string) (*api.APIMethod, error) {
 	var api, method string
@@ -59,8 +57,12 @@ func Post[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Co
 	} else {
 		defer w.Close()
 
-		ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
-		defer cancel()
+		// Only set a timeout if one isn't already set
+		var cancel context.CancelFunc
+		if _, ok := ctx.Deadline(); !ok {
+			ctx, cancel = context.WithTimeout(ctx, defaultTimeout)
+			defer cancel()
+		}
 
 		u := c.BaseURL
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), buf)
@@ -113,8 +115,12 @@ func Get[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Con
 
 	u.RawQuery = qu.Encode()
 
-	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
-	defer cancel()
+	// Only set a timeout if one isn't already set
+	var cancel context.CancelFunc
+	if _, ok := ctx.Deadline(); !ok {
+		ctx, cancel = context.WithTimeout(ctx, defaultTimeout)
+		defer cancel()
+	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {

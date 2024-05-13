@@ -5,7 +5,7 @@ type MD5StartRequest struct {
 }
 
 type MD5StartResponse struct {
-	TaskID string `mapstructure:"taskid" json:"taskid"`
+	TaskID string `json:"taskid"`
 }
 
 type MD5StatusRequest struct {
@@ -13,10 +13,10 @@ type MD5StatusRequest struct {
 }
 
 type MD5StatusResponse struct {
-	Finished bool   `mapstructure:"finished" json:"finished"`
-	MD5      string `mapstructure:"md5" json:"md5"`
+	Finished bool   `json:"finished"`
+	MD5      string `json:"md5"`
 }
 
 type MD5Response struct {
-	MD5 string `mapstructure:"md5" json:"md5"`
+	MD5 string `json:"md5"`
 }

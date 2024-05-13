@@ -3,32 +3,32 @@ package virtualization
 import "net/url"
 
 type Guest struct {
-	ID          string `mapstructure:"guest_id" json:"guest_id"`
-	Name        string `mapstructure:"guest_name" json:"guest_name"`
-	Description string `mapstructure:"description" json:"description"`
-	Status      string `mapstructure:"status" json:"status"`
-	StorageID   string `mapstructure:"storage_id" json:"storage_id"`
-	StorageName string `mapstructure:"storage_name" json:"storage_name"`
-	Autorun     int    `mapstructure:"autorun" json:"autorun"`
-	VcpuNum     int    `mapstructure:"vcpu_num" json:"vcpu_num"`
-	VramSize    int    `mapstructure:"vram_size" json:"vram_size"`
+	ID          string `url:"guest_id" json:"guest_id"`
+	Name        string `url:"guest_name" json:"guest_name"`
+	Description string `url:"description" json:"description"`
+	Status      string `url:"status" json:"status"`
+	StorageID   string `url:"storage_id" json:"storage_id"`
+	StorageName string `url:"storage_name" json:"storage_name"`
+	Autorun     int    `url:"autorun" json:"autorun"`
+	VcpuNum     int    `url:"vcpu_num" json:"vcpu_num"`
+	VramSize    int    `url:"vram_size" json:"vram_size"`
 	Disks       []struct {
-		Controller int    `mapstructure:"controller" json:"controller"`
-		Unmap      bool   `mapstructure:"unmap" json:"unmap"`
-		ID         string `mapstructure:"vdisk_id" json:"vdisk_id"`
-		Size       int    `mapstructure:"vdisk_size" json:"vdisk_size"`
-	} `mapstructure:"vdisks" json:"vdisks"`
+		Controller int    `url:"controller" json:"controller"`
+		Unmap      bool   `url:"unmap" json:"unmap"`
+		ID         string `url:"vdisk_id" json:"vdisk_id"`
+		Size       int    `url:"vdisk_size" json:"vdisk_size"`
+	} `url:"vdisks" json:"vdisks"`
 	Networks []struct {
-		ID     string `mapstructure:"network_id" json:"network_id"`
-		Name   string `mapstructure:"network_name" json:"network_name"`
-		Mac    string `mapstructure:"mac" json:"mac"`
-		Model  int    `mapstructure:"model" json:"model"`
-		VnicID string `mapstructure:"vnic_id" json:"vnic_id"`
-	} `mapstructure:"vnics" json:"vnics"`
+		ID     string `url:"network_id" json:"network_id"`
+		Name   string `url:"network_name" json:"network_name"`
+		Mac    string `url:"mac" json:"mac"`
+		Model  int    `url:"model" json:"model"`
+		VnicID string `url:"vnic_id" json:"vnic_id"`
+	} `url:"vnics" json:"vnics"`
 }
 
 type GuestList struct {
-	Guests []Guest `mapstructure:"guests" json:"guests"`
+	Guests []Guest `url:"guests" json:"guests"`
 }
 
 type GetGuest struct {

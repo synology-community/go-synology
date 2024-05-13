@@ -7,10 +7,10 @@ import (
 )
 
 type CreateShareRequest struct {
-	SortBy     string   `query:"sort_by"`
-	FileType   string   `query:"file_type"`
-	CheckDir   bool     `query:"check_dir"`
-	Additional []string `query:"additional" del:","`
+	SortBy     string   `url:"sort_by"`
+	FileType   string   `url:"file_type"`
+	CheckDir   bool     `url:"check_dir"`
+	Additional []string `url:"additional" del:","`
 }
 
 type CreateShareResponse struct {
@@ -20,12 +20,12 @@ type CreateShareResponse struct {
 }
 
 type ListShareRequest struct {
-	SortBy     string   `query:"sort_by"`
-	FileType   string   `query:"file_type"`
-	CheckDir   bool     `query:"check_dir"`
-	Additional []string `query:"additional" del:","`
-	GoToPath   string   `query:"goto_path"`
-	FolderPath string   `query:"folder_path"`
+	SortBy     string   `url:"sort_by"`
+	FileType   string   `url:"file_type"`
+	CheckDir   bool     `url:"check_dir"`
+	Additional []string `url:"additional" del:","`
+	GoToPath   string   `url:"goto_path"`
+	FolderPath string   `url:"folder_path"`
 }
 
 type ListShareResponse struct {
@@ -39,21 +39,3 @@ type ListShareResponse struct {
 func (l ListShareRequest) EncodeValues(_ string, _ *url.Values) error {
 	return nil
 }
-
-// func NewListShareRequest(sortBy string, fileType string, checkDir bool, additional []string, goToPath string, folderPath string) *ListShareRequest {
-//
-// 	if additional == nil {
-// 		additional = []string{"real_path", "owner", "time", "perm", "mount_point_type", "sync_share", "volume_status", "indexed", "hybrid_share", "worm_share"}
-// 	}
-// 	if sortBy == "" {
-// 		sortBy = "name"
-// 	}
-// 	return &ListShareRequest{
-// 		SortBy:     sortBy,
-// 		FileType:   fileType,
-// 		CheckDir:   checkDir,
-// 		Additional: additional,
-// 		GoToPath:   goToPath,
-// 		FolderPath: folderPath,
-// 	}
-// }

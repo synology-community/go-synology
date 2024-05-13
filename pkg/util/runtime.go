@@ -64,6 +64,10 @@ func getMethod(skipFrames int) (string, error) {
 		}
 	}
 
+	if mtd == "" {
+		return "", fmt.Errorf("failed to get method")
+	}
+
 	return mtd, nil
 }
 
@@ -118,7 +122,7 @@ func Sanitize(ctx context.Context, caller string) (string, error) {
 	parts := []string{}
 
 	for i, m := range matches {
-		log.Info("Match %d: %s\n", i, m)
+		log.Infof("Match %d: %s\n", i, m)
 	}
 
 	for i := range re.SubexpNames() {

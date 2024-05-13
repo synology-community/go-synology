@@ -16,6 +16,7 @@ type FileStationApi interface {
 	Download(path string, mode string) (*DownloadResponse, error)
 	DeleteStart(paths []string, accurateProgress bool) (*DeleteStartResponse, error)
 	DeleteStatus(taskID string) (*DeleteStatusResponse, error)
+	MD5(path string) (*MD5Response, error)
 	MD5Start(path string) (*MD5StartResponse, error)
 	MD5Status(taskID string) (*MD5StatusResponse, error)
 }

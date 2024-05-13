@@ -16,3 +16,7 @@ type MD5StatusResponse struct {
 	Finished bool   `mapstructure:"finished" json:"finished"`
 	MD5      string `mapstructure:"md5" json:"md5"`
 }
+
+type MD5Response struct {
+	MD5 string `mapstructure:"md5" json:"md5"`
+}

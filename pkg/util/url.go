@@ -15,7 +15,7 @@ type Collection interface {
 
 func MarshalForm(r any, w *multipart.Writer) error {
 	add := func(key, value string) {
-		w.WriteField(key, value)
+		_ = w.WriteField(key, value)
 	}
 	if err := MarshalCollection(r, add); err != nil {
 		return err

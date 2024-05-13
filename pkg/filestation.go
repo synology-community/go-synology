@@ -1,6 +1,9 @@
 package client
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/synology-community/synology-api/pkg/api/filestation"
 	"github.com/synology-community/synology-api/pkg/models"
 	"github.com/synology-community/synology-api/pkg/util/form"
@@ -65,6 +68,47 @@ func (f *fileStationClient) CreateFolder(paths []string, names []string, forcePa
 // ListShares implements filestation.FileStationApi.
 func (f *fileStationClient) ListShares() (*models.ShareList, error) {
 	return Get[filestation.ListShareRequest, models.ShareList](f.client, &filestation.ListShareRequest{}, filestation.API_METHODS["ListShares"])
+}
+
+func (f *fileStationClient) MD5(path string) (*filestation.MD5Response, error) {
+	var data filestation.MD5Response
+	// Start Delete the file
+	rdel, err := f.client.FileStationAPI().MD5Start(path)
+
+	if err != nil {
+		return nil, fmt.Errorf("Unable to delete file, got error: %s", err)
+	}
+
+	retry := 0
+	completed := false
+	for !completed {
+		// Check the status of the delete operation
+		hstat, err := f.client.FileStationAPI().MD5Status(rdel.TaskID)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to get file hash, got error: %s", err)
+		}
+
+		if hstat.Finished {
+			if hstat.MD5 != "" {
+				data.MD5 = hstat.MD5
+			}
+
+			completed = true
+		}
+
+		if retry > 2 {
+			completed = true
+			continue
+		}
+		retry++
+		time.Sleep(2 * time.Second)
+	}
+
+	if data.MD5 != "" {
+		return nil, fmt.Errorf("Unable to get file hash, retry count exceeded")
+	} else {
+		return &data, nil
+	}
 }
 
 // Upload implements filestation.FileStationApi.

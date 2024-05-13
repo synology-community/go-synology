@@ -32,7 +32,7 @@ func newClient() (SynologyClient, error) {
 	return c, nil
 }
 
-func TestUpload(t *testing.T) {
+func Test_FileStationClient_Upload(t *testing.T) {
 	c, err := newClient()
 	require.NoError(t, err)
 
@@ -42,6 +42,25 @@ func TestUpload(t *testing.T) {
 	}
 
 	_, err = c.FileStationAPI().Upload("/data/foodbar", &file, true, true)
+	require.NoError(t, err)
+}
+
+func Test_FileStationClient_DeleteStart(t *testing.T) {
+	c, err := newClient()
+	require.NoError(t, err)
+
+	_, err = c.FileStationAPI().DeleteStart([]string{"/data/foodbar"}, true)
+	require.NoError(t, err)
+}
+
+func Test_FileStationClient_DeleteStatus(t *testing.T) {
+	c, err := newClient()
+	require.NoError(t, err)
+
+	r, err := c.FileStationAPI().DeleteStart([]string{"/data/foodbar"}, true)
+	require.NoError(t, err)
+
+	_, err = c.FileStationAPI().DeleteStatus(r.TaskID)
 	require.NoError(t, err)
 }
 

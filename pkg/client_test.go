@@ -46,6 +46,22 @@ func Test_FileStationClient_Upload(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func Test_FileStationClient_MD5(t *testing.T) {
+	c, err := newClient()
+	require.NoError(t, err)
+
+	file := form.File{
+		Name:    "test.txt",
+		Content: "Hello, World!",
+	}
+
+	_, err = c.FileStationAPI().Upload(context.Background(), "/data/foo", file, true, true)
+	require.NoError(t, err)
+
+	_, err = c.FileStationAPI().MD5(context.Background(), "/data/foo/test.txt")
+	require.NoError(t, err)
+}
+
 func Test_FileStationClient_DeleteStart(t *testing.T) {
 	c, err := newClient()
 	require.NoError(t, err)

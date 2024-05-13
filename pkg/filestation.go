@@ -120,18 +120,18 @@ func (f *fileStationClient) MD5(ctx context.Context, path string) (*filestation.
 			if hstat.Finished {
 				if hstat.MD5 != "" {
 					data.MD5 = hstat.MD5
+					completed = true
+					continue
 				}
-
-				completed = true
 			}
 		}
 
-		if retry > 5 {
+		if retry > 10 {
 			completed = true
 			continue
 		}
 		retry++
-		time.Sleep(2 * time.Second)
+		time.Sleep(5 * time.Second)
 	}
 
 	if data.MD5 == "" {

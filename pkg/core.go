@@ -5,7 +5,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
+	"log"
 	"maps"
 	"net/http"
 	"strings"
@@ -47,20 +49,30 @@ func Post[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Co
 	if !ok {
 		return nil, errors.New("invalid client")
 	}
+	buf := new(bytes.Buffer)
+
+	//buf.WriteString(fmt.Sprintf("multipart/form-data; boundary=%s\n\n\\--AaB03x", "--AaB03x"))
 
 	// Prepare a form that you will submit to that URL.
-	if b, err := form.Marshal(method.AsApiParams(), r); err != nil {
+	if w, fs, err := form.Marshal(buf, method, r); err != nil {
+		w.Close()
 		return nil, err
 	} else {
+		defer w.Close()
+
+		log.Print(buf.String())
 
 		ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 		defer cancel()
 
 		u := c.BaseURL
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewBuffer(b))
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), buf)
 		if err != nil {
 			return nil, err
 		}
+
+		req.Header.Add("Content-Length", fmt.Sprintf("%d", fs))
+		req.Header.Add("Content-Type", fmt.Sprintf("multipart/form-data; boundary=%s", w.Boundary()))
 
 		return Do[TResp](c.httpClient, req)
 	}
@@ -104,7 +116,7 @@ func Get[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Con
 
 	u.RawQuery = qu.Encode()
 
-	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
@@ -123,7 +135,7 @@ func download(r io.ReadCloser) (interface{}, error) {
 	}
 
 	dlr := filestation.DownloadResponse{
-		File: &form.File{
+		File: form.File{
 			Content: buf.String(),
 			Name:    "download",
 		},
@@ -162,35 +174,24 @@ func Do[TResponse api.Response](client *http.Client, req *http.Request) (*TRespo
 		return nil, err
 	}
 
-	return &synoResponse.Data, nil
+	if synoResponse.Success {
+		return &synoResponse.Data, nil
+	} else {
+		return nil, handleErrors(synoResponse, api.GlobalErrors)
+	}
 
 	// response.SetError(handleErrors(synoResponse, response, api.GlobalErrors))
 	// return nil
 }
 
-func handleErrors[T any | api.ApiError](response api.ApiResponse[T], errorDescriber api.ErrorDescriber, knownErrors api.ErrorSummary) api.ApiError {
-	err := api.ApiError{
-		Code: response.Error.Code,
-	}
+func handleErrors[T any | api.ApiError](response api.ApiResponse[T], knownErrors api.ErrorSummary) error {
 	if response.Error.Code == 0 {
-		return err
+		return nil
 	}
 
-	combinedKnownErrors := append(errorDescriber.ErrorSummaries(), knownErrors)
-	err.Summary = api.DescribeError(err.Code, combinedKnownErrors...)
-	for _, e := range response.Error.Errors {
-		item := api.ErrorItem{
-			Code:    e.Code,
-			Summary: api.DescribeError(e.Code, combinedKnownErrors...),
-		}
-		if len(e.Details) > 0 {
-			item.Details = make(api.ErrorFields)
-			for k, v := range e.Details {
-				item.Details[k] = v
-			}
-		}
-		err.Errors = append(err.Errors, item)
+	if errDesc, ok := knownErrors[response.Error.Code]; ok {
+		return fmt.Errorf("Api Error: %v", errDesc)
+	} else {
+		return fmt.Errorf("Api Error: %v", response.Error)
 	}
-
-	return err
 }

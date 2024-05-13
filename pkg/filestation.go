@@ -144,7 +144,7 @@ func (f *fileStationClient) MD5(ctx context.Context, path string) (*filestation.
 }
 
 // Upload implements filestation.FileStationApi.
-func (f *fileStationClient) Upload(ctx context.Context, path string, file *form.File, createParents bool, overwrite bool) (*filestation.UploadResponse, error) {
+func (f *fileStationClient) Upload(ctx context.Context, path string, file form.File, createParents bool, overwrite bool) (*filestation.UploadResponse, error) {
 	return Post[filestation.UploadRequest, filestation.UploadResponse](f.client, ctx, &filestation.UploadRequest{
 		Path:          path,
 		File:          file,

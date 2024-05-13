@@ -8,10 +8,10 @@ import (
 )
 
 type UploadRequest struct {
-	Path          string     `form:"path" url:"path"`
-	CreateParents bool       `form:"create_parents" url:"create_parents"`
-	Overwrite     bool       `form:"overwrite" url:"overwrite"`
-	File          *form.File `form:"file" kind:"file"`
+	Path          string    `form:"path" url:"path"`
+	CreateParents bool      `form:"create_parents" url:"create_parents"`
+	Overwrite     bool      `form:"overwrite" url:"overwrite"`
+	File          form.File `form:"file" kind:"file"`
 }
 
 func (l UploadRequest) EncodeValues(_ string, _ *url.Values) error {
@@ -23,7 +23,7 @@ type UploadResponse struct {
 
 var _ api.Request = (*UploadRequest)(nil)
 
-func NewUploadRequest(path string, file *form.File) *UploadRequest {
+func NewUploadRequest(path string, file form.File) *UploadRequest {
 	return &UploadRequest{
 		Path: path,
 		File: file,
@@ -35,7 +35,7 @@ func (r *UploadRequest) WithPath(value string) *UploadRequest {
 	return r
 }
 
-func (r *UploadRequest) WithFile(file *form.File) *UploadRequest {
+func (r *UploadRequest) WithFile(file form.File) *UploadRequest {
 	r.File = file
 	return r
 }

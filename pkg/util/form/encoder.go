@@ -24,61 +24,87 @@ type FormValues struct {
 	*url.Values
 }
 
-func (v *FormValues) Encode() ([]byte, error) {
-	return Marshal(v)
+func (v *FormValues) Encode(buf *bytes.Buffer) (*multipart.Writer, int64, error) {
+	return Marshal(buf, v)
 }
 
-func Marshal(input ...any) ([]byte, error) {
-	var b bytes.Buffer
-	w := multipart.NewWriter(&b)
-
+func Marshal(b *bytes.Buffer, input ...any) (*multipart.Writer, int64, error) {
+	w := multipart.NewWriter(b)
 	defer w.Close()
+	fileSize := int64(0)
+
+	_ = w.SetBoundary("AaB03x")
 
 	for _, r := range input {
 
-		v := reflect.Indirect(reflect.ValueOf(r))
+		var v reflect.Value
+
+		if reflect.TypeOf(r).Kind() == reflect.Ptr {
+			v = reflect.Indirect(reflect.ValueOf(r))
+		} else {
+			v = reflect.ValueOf(r)
+		}
 		if v.Kind() != reflect.Struct {
-			return nil, fmt.Errorf("expected type struct, got %T", reflect.TypeOf(r).Name())
+			return nil, fileSize, fmt.Errorf("expected type struct, got %T", reflect.TypeOf(r).Name())
 		}
 		n := v.NumField()
 		vT := v.Type()
 		for i := 0; i < n; i++ {
-			formFieldName := strings.ToLower(vT.Field(i).Name)
+			field := vT.Field(i)
+			fieldType := field.Type
+
+			// if fieldType.Kind() == reflect.Ptr {
+			// 	if v.Field(i).IsNil() {
+			// 		continue
+			// 	}
+			// 	fieldType = fieldType.Elem()
+			// }
+
+			formFieldName := strings.ToLower(field.Name)
 			formKindName := "field"
 			formTags, kindTags := []string{}, []string{}
-			if tags, ok := vT.Field(i).Tag.Lookup("form"); ok {
+			if tags, ok := field.Tag.Lookup("form"); ok {
 				formTags = strings.Split(tags, ",")
 			}
-			if tags, ok := vT.Field(i).Tag.Lookup("kind"); ok {
+			if tags, ok := field.Tag.Lookup("kind"); ok {
 				kindTags = strings.Split(tags, ",")
 			}
-			if !(vT.Field(i).IsExported() || vT.Field(i).Anonymous || len(formTags) > 0) {
+			if !(field.IsExported() || field.Anonymous || len(formTags) > 0) {
 				continue
 			}
 			if len(formTags) > 0 {
 				formFieldName = formTags[0]
+				if formFieldName == "-" {
+					continue
+				}
 			}
 			if len(kindTags) > 0 {
 				formKindName = kindTags[0]
 			}
 
+			formKind := fieldType.Kind()
+
+			if field.Name == "File" {
+				formKind = reflect.Struct
+			}
+
 			// get field type
-			switch vT.Field(i).Type.Kind() {
+			switch formKind {
 			case reflect.String:
 				if err := w.WriteField(formFieldName, v.Field(i).String()); err != nil {
-					return nil, err
+					return nil, fileSize, err
 				}
 			case reflect.Int:
 				if err := w.WriteField(formFieldName, strconv.Itoa(int(v.Field(i).Int()))); err != nil {
-					return nil, err
+					return nil, fileSize, err
 				}
 			case reflect.Bool:
 				if err := w.WriteField(formFieldName, strconv.FormatBool(v.Field(i).Bool())); err != nil {
-					return nil, err
+					return nil, fileSize, err
 				}
 			case reflect.Slice:
 				slice := v.Field(i)
-				switch vT.Field(i).Type.Elem().Kind() {
+				switch fieldType.Elem().Kind() {
 				case reflect.String:
 					res := []string{}
 					for iSlice := 0; iSlice < slice.Len(); iSlice++ {
@@ -86,7 +112,7 @@ func Marshal(input ...any) ([]byte, error) {
 						res = append(res, item.String())
 					}
 					if err := w.WriteField(formFieldName, "[\""+strings.Join(res, "\",\"")+"\"]"); err != nil {
-						return nil, err
+						return nil, fileSize, err
 					}
 				case reflect.Int:
 					res := []string{}
@@ -95,11 +121,11 @@ func Marshal(input ...any) ([]byte, error) {
 						res = append(res, strconv.Itoa(int(item.Int())))
 					}
 					if err := w.WriteField(formFieldName, "["+strings.Join(res, ",")+"]"); err != nil {
-						return nil, err
+						return nil, fileSize, err
 					}
 				}
 			case reflect.Struct:
-				// if !vT.Field(i).Anonymous {
+				// if !field.Anonymous {
 				// 	// support only embedded anonymous structs
 				// 	continue
 				// }
@@ -123,33 +149,59 @@ func Marshal(input ...any) ([]byte, error) {
 								fileName = embStruct.Field(j).String()
 							default:
 								if err := w.WriteField(fieldName, embStruct.Field(j).String()); err != nil {
-									return nil, err
+									return nil, fileSize, err
 								}
 							}
 						default:
 							if err := w.WriteField(fieldName, embStruct.Field(j).String()); err != nil {
-								return nil, err
+								return nil, fileSize, err
 							}
 						}
 					case reflect.Int:
 						if err := w.WriteField(fieldName, strconv.Itoa(int(embStruct.Field(j).Int()))); err != nil {
-							return nil, err
+							return nil, fileSize, err
 						}
 					}
 				}
 
 				if formKindName == "file" {
 					if fw, err := w.CreateFormFile(formFieldName, fileName); err != nil {
-						return nil, err
+						return nil, fileSize, err
 					} else {
-						if _, err := io.Copy(fw, fileReader); err != nil {
-							return nil, err
+
+						if size, err := io.Copy(fw, fileReader); err != nil {
+							return nil, fileSize, err
+						} else {
+							fileSize = size
 						}
+
 					}
 				}
 			}
 		}
 	}
 
-	return b.Bytes(), nil
+	return w, fileSize, nil
+}
+
+// fieldAlias parses a field tag to get a field alias.
+func fieldAlias(field reflect.StructField, tagName string) (alias string, options tagOptions) {
+	if tag := field.Tag.Get(tagName); tag != "" {
+		alias, options = parseTag(tag)
+	}
+	if alias == "" {
+		alias = field.Name
+	}
+	return alias, options
+}
+
+// tagOptions is the string following a comma in a struct field's tag, or
+// the empty string. It does not include the leading comma.
+type tagOptions []string
+
+// parseTag splits a struct field's url tag into its name and comma-separated
+// options.
+func parseTag(tag string) (string, tagOptions) {
+	s := strings.Split(tag, ",")
+	return s[0], s[1:]
 }

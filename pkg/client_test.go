@@ -42,7 +42,7 @@ func Test_FileStationClient_Upload(t *testing.T) {
 		Content: "Hello, World!",
 	}
 
-	_, err = c.FileStationAPI().Upload(context.Background(), "/data/foo/bar", &file, true, true)
+	_, err = c.FileStationAPI().Upload(context.Background(), "/data/foobar2", file, true, true)
 	require.NoError(t, err)
 }
 
@@ -249,7 +249,6 @@ func TestHandleErrors(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			actual := handleErrors(tc.response,
-				errorDescriber(func() []api.ErrorSummary { return tc.responseKnownErrors }),
 				globalErrors,
 			)
 			assert.Equal(t, tc.expected, actual)

@@ -11,7 +11,7 @@ import (
 type FileStationApi interface {
 	CreateFolder(ctx context.Context, paths []string, names []string, forceParent bool) (*models.FolderList, error)
 	ListShares(ctx context.Context) (*models.ShareList, error)
-	Upload(ctx context.Context, path string, file *form.File, createParents bool, overwrite bool) (*UploadResponse, error)
+	Upload(ctx context.Context, path string, file form.File, createParents bool, overwrite bool) (*UploadResponse, error)
 	Rename(ctx context.Context, path string, name string, newName string) (*models.FileList, error)
 	Download(ctx context.Context, path string, mode string) (*DownloadResponse, error)
 	Delete(ctx context.Context, paths []string, accurateProgress bool) (*DeleteStatusResponse, error)
@@ -25,7 +25,7 @@ type FileStationApi interface {
 var API_METHODS = api.APIMethodLookup{
 	"Upload": {
 		API:     "SYNO.FileStation.Upload",
-		Version: 3,
+		Version: 2,
 		Method:  "upload",
 		ErrorSummary: CommonErrors.Combine(api.ErrorSummary{
 			1100: "Failed to create a folder. More information in <errors> object.",

@@ -29,10 +29,12 @@ func (v *virtualizationClient) ImageCreate(ctx context.Context, image virtualiza
 }
 
 // ImageDelete implements virtualization.VirtualizationAPI.
-func (v *virtualizationClient) ImageDelete(ctx context.Context, imageID string) (*virtualization.TaskRef, error) {
-	return Get[virtualization.Image, virtualization.TaskRef](v.client, ctx, &virtualization.Image{
-		ID: imageID,
+func (v *virtualizationClient) ImageDelete(ctx context.Context, imageName string) error {
+	_, err := Get[virtualization.Image, virtualization.TaskRef](v.client, ctx, &virtualization.Image{
+		Name: imageName,
 	}, virtualization.API_METHODS["ImageDelete"])
+
+	return err
 }
 
 // ImageList implements virtualization.VirtualizationAPI.

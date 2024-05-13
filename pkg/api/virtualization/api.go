@@ -12,7 +12,7 @@ type VirtualizationAPI interface {
 
 	ImageList(ctx context.Context) (*ImageList, error)
 	ImageCreate(ctx context.Context, image Image) (*Task, error)
-	ImageDelete(ctx context.Context, imageID string) (*TaskRef, error)
+	ImageDelete(ctx context.Context, imageID string) error
 
 	TaskGet(ctx context.Context, taskID string) (*Task, error)
 
@@ -34,7 +34,7 @@ var API_METHODS = api.APIMethodLookup{
 	},
 	"ImageList": {
 		API:          "SYNO.Virtualization.API.Guest.Image",
-		Version:      2,
+		Version:      1,
 		Method:       "list",
 		ErrorSummary: api.GlobalErrors,
 	},

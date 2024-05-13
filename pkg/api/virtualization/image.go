@@ -20,11 +20,11 @@ func (s ImageType) EncodeValues(k string, v *url.Values) error {
 
 type Image struct {
 	ID          string    `url:"image_id,omitempty" json:"image_id"`
-	Name        string    `url:"image_name" json:"image_name"`
+	Name        string    `url:"image_name,omitempty" json:"image_name"`
 	FilePath    string    `url:"ds_file_path,omitempty" json:"-"`
 	Description string    `url:"description,omitempty" json:"description,omitempty"`
 	Storages    Storages  `url:"storages,omitempty" json:"storages"`
-	Type        ImageType `url:"type" json:"type"`
+	Type        ImageType `url:"type,omitempty" json:"type"`
 	AutoClean   bool      `url:"auto_clean_task,omitempty" json:"-"`
 }
 

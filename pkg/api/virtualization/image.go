@@ -22,10 +22,10 @@ type Image struct {
 	ID          string    `url:"image_id,omitempty" json:"image_id"`
 	Name        string    `url:"image_name" json:"image_name"`
 	FilePath    string    `url:"ds_file_path,omitempty" json:"-"`
-	Description string    `url:"description,omitempty" json:"description"`
+	Description string    `url:"description,omitempty" json:"description,omitempty"`
 	Storages    Storages  `url:"storages,omitempty" json:"storages"`
 	Type        ImageType `url:"type" json:"type"`
-	AutoClean   bool      `url:"auto_clean_task" json:"-"`
+	AutoClean   bool      `url:"auto_clean_task,omitempty" json:"-"`
 }
 
 type ImageList struct {

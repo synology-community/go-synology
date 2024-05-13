@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"maps"
 	"net/http"
 	"strings"
@@ -59,8 +58,6 @@ func Post[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Co
 		return nil, err
 	} else {
 		defer w.Close()
-
-		log.Print(buf.String())
 
 		ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 		defer cancel()

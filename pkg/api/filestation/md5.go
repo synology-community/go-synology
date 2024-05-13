@@ -9,7 +9,7 @@ type MD5StartResponse struct {
 }
 
 type MD5StatusRequest struct {
-	TaskID string `form:"taskid" url:"taskid"`
+	TaskID string `url:"taskid" form:"taskid"`
 }
 
 type MD5StatusResponse struct {

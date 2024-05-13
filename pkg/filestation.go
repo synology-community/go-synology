@@ -105,7 +105,7 @@ func (f *fileStationClient) ListShares(ctx context.Context) (*models.ShareList, 
 func (f *fileStationClient) MD5(ctx context.Context, path string) (*filestation.MD5Response, error) {
 	var data filestation.MD5Response
 	// Start Delete the file
-	rdel, err := f.client.FileStationAPI().MD5Start(ctx, path)
+	rmd5, err := f.client.FileStationAPI().MD5Start(ctx, path)
 
 	if err != nil {
 		return nil, fmt.Errorf("Unable to delete file, got error: %s", err)
@@ -115,20 +115,18 @@ func (f *fileStationClient) MD5(ctx context.Context, path string) (*filestation.
 	completed := false
 	for !completed {
 		// Check the status of the delete operation
-		hstat, err := f.client.FileStationAPI().MD5Status(ctx, rdel.TaskID)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to get file hash, got error: %s", err)
-		}
+		if hstat, err := f.client.FileStationAPI().MD5Status(ctx, rmd5.TaskID); err == nil {
 
-		if hstat.Finished {
-			if hstat.MD5 != "" {
-				data.MD5 = hstat.MD5
+			if hstat.Finished {
+				if hstat.MD5 != "" {
+					data.MD5 = hstat.MD5
+				}
+
+				completed = true
 			}
-
-			completed = true
 		}
 
-		if retry > 2 {
+		if retry > 5 {
 			completed = true
 			continue
 		}
@@ -136,7 +134,7 @@ func (f *fileStationClient) MD5(ctx context.Context, path string) (*filestation.
 		time.Sleep(2 * time.Second)
 	}
 
-	if data.MD5 != "" {
+	if data.MD5 == "" {
 		return nil, fmt.Errorf("Unable to get file hash, retry count exceeded")
 	} else {
 		return &data, nil

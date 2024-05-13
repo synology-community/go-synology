@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net"
@@ -55,19 +56,14 @@ type APIClient struct {
 }
 
 // Login runs a login flow to retrieve session token from Synology.
-func (c *APIClient) Login(user, password string) (*api.LoginResponse, error) {
-	resp, err := Get[api.LoginRequest, api.LoginResponse](c, &api.LoginRequest{
+func (c *APIClient) Login(ctx context.Context, user, password string) (*api.LoginResponse, error) {
+	resp, err := Get[api.LoginRequest, api.LoginResponse](c, ctx, &api.LoginRequest{
 		Account:  user,
 		Password: password,
 		// Session:         sessionName,
 		Format:          "sid", //"cookie",
 		EnableSynoToken: "yes",
-	}, api.APIMethod{
-		API:          "SYNO.API.Auth",
-		Version:      7,
-		Method:       "login",
-		ErrorSummary: api.GlobalErrors,
-	})
+	}, api.API_METHODS["Login"])
 	if err != nil {
 		return nil, err
 	}

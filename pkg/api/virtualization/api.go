@@ -1,10 +1,14 @@
 package virtualization
 
-import "github.com/synology-community/synology-api/pkg/api"
+import (
+	"context"
+
+	"github.com/synology-community/synology-api/pkg/api"
+)
 
 type VirtualizationAPI interface {
-	GetGuest(name string) (*Guest, error)
-	ListGuests() (*GuestList, error)
+	GetGuest(ctx context.Context, name string) (*Guest, error)
+	ListGuests(ctx context.Context) (*GuestList, error)
 }
 
 var API_METHODS = api.APIMethodLookup{

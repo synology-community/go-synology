@@ -1,7 +1,9 @@
 package api
 
+import "context"
+
 type API interface {
-	Login(user, password string) (*LoginResponse, error)
+	Login(ctx context.Context, user, password string) (*LoginResponse, error)
 }
 
 var API_METHODS = APIMethodLookup{

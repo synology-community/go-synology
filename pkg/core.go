@@ -40,7 +40,7 @@ func LookupMethod(callingFunc string) (*api.APIMethod, error) {
 	}
 }
 
-func Post[TReq api.Request, TResp api.Response](s SynologyClient, r *TReq, method api.APIMethod) (*TResp, error) {
+func Post[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Context, r *TReq, method api.APIMethod) (*TResp, error) {
 
 	c, ok := s.(*APIClient)
 
@@ -48,14 +48,12 @@ func Post[TReq api.Request, TResp api.Response](s SynologyClient, r *TReq, metho
 		return nil, errors.New("invalid client")
 	}
 
-	req := api.NewRequest(method.AsApiParams(), r)
-
 	// Prepare a form that you will submit to that URL.
-	if b, err := form.Marshal(req); err != nil {
+	if b, err := form.Marshal(method.AsApiParams(), r); err != nil {
 		return nil, err
 	} else {
 
-		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 		defer cancel()
 
 		u := c.BaseURL
@@ -68,16 +66,16 @@ func Post[TReq api.Request, TResp api.Response](s SynologyClient, r *TReq, metho
 	}
 }
 
-func List[TResp api.Response](c SynologyClient, method api.APIMethod) (*TResp, error) {
+func List[TResp api.Response](c SynologyClient, ctx context.Context, method api.APIMethod) (*TResp, error) {
 
-	return Get[api.Request, TResp](c, nil, method)
+	return Get[api.Request, TResp](c, ctx, nil, method)
 }
 
-func GetEncode[TReq api.EncodeRequest, TResp api.Response](s SynologyClient, r *TReq, method api.APIMethod) (*TResp, error) {
-	return Get[TReq, TResp](s, r, method)
+func GetEncode[TReq api.EncodeRequest, TResp api.Response](s SynologyClient, ctx context.Context, r *TReq, method api.APIMethod) (*TResp, error) {
+	return Get[TReq, TResp](s, ctx, r, method)
 }
 
-func Get[TReq api.Request, TResp api.Response](s SynologyClient, r *TReq, method api.APIMethod) (*TResp, error) {
+func Get[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Context, r *TReq, method api.APIMethod) (*TResp, error) {
 	c, ok := s.(*APIClient)
 	if !ok {
 		return nil, errors.New("invalid client")
@@ -106,7 +104,7 @@ func Get[TReq api.Request, TResp api.Response](s SynologyClient, r *TReq, method
 
 	u.RawQuery = qu.Encode()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)

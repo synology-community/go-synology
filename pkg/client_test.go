@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"net/url"
 	"os"
 	"testing"
@@ -22,7 +23,7 @@ func newClient() (SynologyClient, error) {
 		return nil, err
 	}
 
-	if r, err := c.Login(os.Getenv("SYNOLOGY_USER"), os.Getenv("SYNOLOGY_PASSWORD")); err != nil {
+	if r, err := c.Login(context.Background(), os.Getenv("SYNOLOGY_USER"), os.Getenv("SYNOLOGY_PASSWORD")); err != nil {
 		return nil, err
 	} else {
 		log.Infoln("Login successful")
@@ -41,7 +42,7 @@ func Test_FileStationClient_Upload(t *testing.T) {
 		Content: "Hello, World!",
 	}
 
-	_, err = c.FileStationAPI().Upload("/data/foo/bar", &file, true, true)
+	_, err = c.FileStationAPI().Upload(context.Background(), "/data/foo/bar", &file, true, true)
 	require.NoError(t, err)
 }
 
@@ -49,7 +50,7 @@ func Test_FileStationClient_DeleteStart(t *testing.T) {
 	c, err := newClient()
 	require.NoError(t, err)
 
-	_, err = c.FileStationAPI().DeleteStart([]string{"/data/foodbar"}, true)
+	_, err = c.FileStationAPI().DeleteStart(context.Background(), []string{"/data/foodbar"}, true)
 	require.NoError(t, err)
 }
 
@@ -57,10 +58,10 @@ func Test_FileStationClient_DeleteStatus(t *testing.T) {
 	c, err := newClient()
 	require.NoError(t, err)
 
-	r, err := c.FileStationAPI().DeleteStart([]string{"/data/foodbar"}, true)
+	r, err := c.FileStationAPI().DeleteStart(context.Background(), []string{"/data/foodbar"}, true)
 	require.NoError(t, err)
 
-	_, err = c.FileStationAPI().DeleteStatus(r.TaskID)
+	_, err = c.FileStationAPI().DeleteStatus(context.Background(), r.TaskID)
 	require.NoError(t, err)
 }
 

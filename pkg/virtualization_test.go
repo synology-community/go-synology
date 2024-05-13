@@ -11,17 +11,13 @@ import (
 )
 
 func Test_virtualizationClient_ImageCreate(t *testing.T) {
-	c, err := newClient()
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 
 	defer cancel()
 
 	type fields struct {
-		client SynologyClient
+		client *APIClient
 	}
 	type args struct {
 		ctx context.Context
@@ -36,7 +32,7 @@ func Test_virtualizationClient_ImageCreate(t *testing.T) {
 		{
 			name: "Create image",
 			fields: fields{
-				client: c,
+				client: newClient(t),
 			},
 			args: args{
 				ctx: ctx,
@@ -49,7 +45,7 @@ func Test_virtualizationClient_ImageCreate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			v := tt.fields.client.VirtualizationAPI()
 
-			s, err := c.VirtualizationAPI().StorageList(context.Background())
+			s, err := tt.fields.client.Virtualization.StorageList(context.Background())
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -77,7 +73,7 @@ func Test_virtualizationClient_ImageCreate(t *testing.T) {
 
 func Test_virtualizationClient_ImageDelete(t *testing.T) {
 	type fields struct {
-		client SynologyClient
+		client *APIClient
 	}
 	type args struct {
 		ctx     context.Context
@@ -94,14 +90,11 @@ func Test_virtualizationClient_ImageDelete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			v := tt.fields.client.VirtualizationAPI()
-			got, err := v.ImageDelete(tt.args.ctx, tt.args.imageID)
+			v := tt.fields.client.Virtualization
+			err := v.ImageDelete(tt.args.ctx, tt.args.imageID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("virtualizationClient.ImageDelete() error = %v, wantErr %v", err, tt.wantErr)
 				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("virtualizationClient.ImageDelete() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -174,7 +167,7 @@ func Test_virtualizationClient_TaskGet(t *testing.T) {
 	}
 }
 
-func Test_virtualizationClient_GetGuest(t *testing.T) {
+func Test_virtualizationClient_GuestGet(t *testing.T) {
 	type fields struct {
 		client *APIClient
 	}
@@ -189,14 +182,38 @@ func Test_virtualizationClient_GetGuest(t *testing.T) {
 		want    *virtualization.Guest
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Get guest",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx:  context.Background(),
+				name: "testmantic",
+			},
+			want: &virtualization.Guest{
+				ID:          "1",
+				Name:        "testmantic",
+				Description: "Testmantic",
+				Status:      "stopped",
+				StorageID:   "1",
+				StorageName: "default",
+				Autorun:     0,
+				VcpuNum:     1,
+				VramSize:    512,
+				Disks:       virtualization.VDisks{},
+				Networks:    virtualization.VNICs{},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := &virtualizationClient{
 				client: tt.fields.client,
 			}
-			got, err := v.GetGuest(tt.args.ctx, tt.args.name)
+			got, err := v.GuestGet(tt.args.ctx, virtualization.Guest{
+				Name: tt.args.name,
+			})
 			if (err != nil) != tt.wantErr {
 				t.Errorf("virtualizationClient.GetGuest() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -227,9 +244,9 @@ func Test_virtualizationClient_ListGuests(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := &virtualizationClient{
-				client: tt.fields.client,
+				client: newClient(t),
 			}
-			got, err := v.ListGuests(tt.args.ctx)
+			got, err := v.GuestList(tt.args.ctx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("virtualizationClient.ListGuests() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -262,13 +279,8 @@ func TestNewVirtualizationClient(t *testing.T) {
 }
 
 func Test_virtualizationClient_StorageList(t *testing.T) {
-	c, err := newClient()
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	type fields struct {
-		client SynologyClient
+		client *APIClient
 	}
 	type args struct {
 		ctx context.Context
@@ -283,7 +295,7 @@ func Test_virtualizationClient_StorageList(t *testing.T) {
 		{
 			name: "List storage",
 			fields: fields{
-				client: c,
+				client: newClient(t),
 			},
 			args: args{
 				ctx: context.Background(),

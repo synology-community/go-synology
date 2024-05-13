@@ -17,45 +17,45 @@ import (
 
 type Nil struct{}
 
-func newClient() (SynologyClient, error) {
+func newClient(t *testing.T) *APIClient {
 	c, err := New(os.Getenv("SYNOLOGY_HOST"), true)
 	if err != nil {
-		return nil, err
+		t.Error(err)
+		require.NoError(t, err)
 	}
 
 	if r, err := c.Login(context.Background(), os.Getenv("SYNOLOGY_USER"), os.Getenv("SYNOLOGY_PASSWORD")); err != nil {
-		return nil, err
+		t.Error(err)
+		require.NoError(t, err)
 	} else {
 		log.Infoln("Login successful")
 		log.Infof("[INFO] Session: %s\nDeviceID: %s", r.SessionID, r.DeviceID)
 	}
 
-	return c, nil
+	return c.(*APIClient)
 }
 
 func Test_FileStationClient_Upload(t *testing.T) {
-	c, err := newClient()
-	require.NoError(t, err)
+	c := newClient(t)
 
 	file := form.File{
 		Name:    "test.txt",
 		Content: "Hello, World!",
 	}
 
-	_, err = c.FileStationAPI().Upload(context.Background(), "/data/foo", file, true, true)
+	_, err := c.FileStationAPI().Upload(context.Background(), "/data/foo", file, true, true)
 	require.NoError(t, err)
 }
 
 func Test_FileStationClient_MD5(t *testing.T) {
-	c, err := newClient()
-	require.NoError(t, err)
+	c := newClient(t)
 
 	file := form.File{
 		Name:    "test.txt",
 		Content: "Hello, World!",
 	}
 
-	_, err = c.FileStationAPI().Upload(context.Background(), "/data/foo", file, true, true)
+	_, err := c.FileStationAPI().Upload(context.Background(), "/data/foo", file, true, true)
 	require.NoError(t, err)
 
 	_, err = c.FileStationAPI().MD5(context.Background(), "/data/foo/test.txt")
@@ -63,16 +63,14 @@ func Test_FileStationClient_MD5(t *testing.T) {
 }
 
 func Test_FileStationClient_DeleteStart(t *testing.T) {
-	c, err := newClient()
-	require.NoError(t, err)
+	c := newClient(t)
 
-	_, err = c.FileStationAPI().DeleteStart(context.Background(), []string{"/data/foodbar"}, true)
+	_, err := c.FileStationAPI().DeleteStart(context.Background(), []string{"/data/foodbar"}, true)
 	require.NoError(t, err)
 }
 
 func Test_FileStationClient_DeleteStatus(t *testing.T) {
-	c, err := newClient()
-	require.NoError(t, err)
+	c := newClient(t)
 
 	r, err := c.FileStationAPI().DeleteStart(context.Background(), []string{"/data/foodbar"}, true)
 	require.NoError(t, err)

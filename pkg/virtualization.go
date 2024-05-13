@@ -69,13 +69,35 @@ func (v *virtualizationClient) TaskGet(ctx context.Context, taskID string) (*vir
 }
 
 // GetGuest implements virtualization.VirtualizationAPI.
-func (v *virtualizationClient) GetGuest(ctx context.Context, name string) (*virtualization.Guest, error) {
-	return Get[virtualization.GetGuest, virtualization.Guest](v.client, ctx, &virtualization.GetGuest{Name: name}, virtualization.API_METHODS["GetGuest"])
+func (v *virtualizationClient) GuestGet(ctx context.Context, guest virtualization.Guest) (*virtualization.Guest, error) {
+	return Get[virtualization.Guest, virtualization.Guest](v.client, ctx, &guest, virtualization.API_METHODS["GuestGet"])
 }
 
 // ListGuests implements virtualization.VirtualizationAPI.
-func (v *virtualizationClient) ListGuests(ctx context.Context) (*virtualization.GuestList, error) {
-	return List[virtualization.GuestList](v.client, ctx, virtualization.API_METHODS["ListGuests"])
+func (v *virtualizationClient) GuestList(ctx context.Context) (*virtualization.GuestList, error) {
+	return List[virtualization.GuestList](v.client, ctx, virtualization.API_METHODS["GuestList"])
+}
+
+// GuestCreate implements virtualization.VirtualizationAPI.
+func (v *virtualizationClient) GuestCreate(ctx context.Context, guest virtualization.Guest) (*virtualization.Guest, error) {
+	resp, err := Get[virtualization.Guest, virtualization.TaskRef](v.client, ctx, &guest, virtualization.API_METHODS["GuestCreate"])
+	if err != nil {
+		return nil, err
+	}
+
+	task, err := v.TaskGet(ctx, resp.TaskID)
+	if err != nil {
+		return nil, err
+	}
+
+	guest.ID = task.TaskInfo.GuestID
+
+	return &guest, nil
+}
+
+// GuestDelete implements virtualization.VirtualizationAPI.
+func (v *virtualizationClient) GuestDelete(ctx context.Context, guest virtualization.Guest) error {
+	panic("unimplemented")
 }
 
 func NewVirtualizationClient(client *APIClient) virtualization.VirtualizationAPI {

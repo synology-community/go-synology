@@ -7,8 +7,10 @@ import (
 )
 
 type VirtualizationAPI interface {
-	GetGuest(ctx context.Context, name string) (*Guest, error)
-	ListGuests(ctx context.Context) (*GuestList, error)
+	GuestGet(ctx context.Context, guest Guest) (*Guest, error)
+	GuestList(ctx context.Context) (*GuestList, error)
+	GuestCreate(ctx context.Context, guest Guest) (*Guest, error)
+	GuestDelete(ctx context.Context, guest Guest) error
 
 	ImageList(ctx context.Context) (*ImageList, error)
 	ImageCreate(ctx context.Context, image Image) (*Task, error)
@@ -20,16 +22,28 @@ type VirtualizationAPI interface {
 }
 
 var API_METHODS = api.APIMethodLookup{
-	"GetGuest": {
+	"GuestGet": {
 		API:          "SYNO.Virtualization.API.Guest",
 		Version:      1,
 		Method:       "get",
 		ErrorSummary: api.GlobalErrors,
 	},
-	"ListGuests": {
+	"GuestList": {
 		API:          "SYNO.Virtualization.API.Guest",
 		Version:      1,
 		Method:       "list",
+		ErrorSummary: api.GlobalErrors,
+	},
+	"GuestCreate": {
+		API:          "SYNO.Virtualization.API.Guest",
+		Version:      1,
+		Method:       "create",
+		ErrorSummary: api.GlobalErrors,
+	},
+	"GuestDelete": {
+		API:          "SYNO.Virtualization.API.Guest",
+		Version:      1,
+		Method:       "delete",
 		ErrorSummary: api.GlobalErrors,
 	},
 	"ImageList": {

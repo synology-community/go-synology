@@ -61,11 +61,17 @@ func Marshal(r any) ([]byte, error) {
 		// get field type
 		switch vT.Field(i).Type.Kind() {
 		case reflect.String:
-			w.WriteField(formFieldName, v.Field(i).String())
+			if err := w.WriteField(formFieldName, v.Field(i).String()); err != nil {
+				return nil, err
+			}
 		case reflect.Int:
-			w.WriteField(formFieldName, strconv.Itoa(int(v.Field(i).Int())))
+			if err := w.WriteField(formFieldName, strconv.Itoa(int(v.Field(i).Int()))); err != nil {
+				return nil, err
+			}
 		case reflect.Bool:
-			w.WriteField(formFieldName, strconv.FormatBool(v.Field(i).Bool()))
+			if err := w.WriteField(formFieldName, strconv.FormatBool(v.Field(i).Bool())); err != nil {
+				return nil, err
+			}
 		case reflect.Slice:
 			slice := v.Field(i)
 			switch vT.Field(i).Type.Elem().Kind() {
@@ -75,14 +81,18 @@ func Marshal(r any) ([]byte, error) {
 					item := slice.Index(iSlice)
 					res = append(res, item.String())
 				}
-				w.WriteField(formFieldName, "[\""+strings.Join(res, "\",\"")+"\"]")
+				if err := w.WriteField(formFieldName, "[\""+strings.Join(res, "\",\"")+"\"]"); err != nil {
+					return nil, err
+				}
 			case reflect.Int:
 				res := []string{}
 				for iSlice := 0; iSlice < slice.Len(); iSlice++ {
 					item := slice.Index(iSlice)
 					res = append(res, strconv.Itoa(int(item.Int())))
 				}
-				w.WriteField(formFieldName, "["+strings.Join(res, ",")+"]")
+				if err := w.WriteField(formFieldName, "["+strings.Join(res, ",")+"]"); err != nil {
+					return nil, err
+				}
 			}
 		case reflect.Struct:
 			// if !vT.Field(i).Anonymous {
@@ -108,13 +118,19 @@ func Marshal(r any) ([]byte, error) {
 						case "name":
 							fileName = embStruct.Field(j).String()
 						default:
-							w.WriteField(fieldName, embStruct.Field(j).String())
+							if err := w.WriteField(fieldName, embStruct.Field(j).String()); err != nil {
+								return nil, err
+							}
 						}
 					default:
-						w.WriteField(fieldName, embStruct.Field(j).String())
+						if err := w.WriteField(fieldName, embStruct.Field(j).String()); err != nil {
+							return nil, err
+						}
 					}
 				case reflect.Int:
-					w.WriteField(fieldName, strconv.Itoa(int(embStruct.Field(j).Int())))
+					if err := w.WriteField(fieldName, strconv.Itoa(int(embStruct.Field(j).Int()))); err != nil {
+						return nil, err
+					}
 				}
 			}
 

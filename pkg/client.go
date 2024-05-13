@@ -2,6 +2,7 @@ package client
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
@@ -18,6 +19,14 @@ var MethodLookup = map[string]api.APIMethodLookup{
 	"API":            api.API_METHODS,
 	"Virtualization": virtualization.API_METHODS,
 	"FileStation":    filestation.API_METHODS,
+}
+
+func GetMethod(api, method string) (*api.APIMethod, error) {
+	if res, ok := MethodLookup[api][method]; ok {
+		return &res, nil
+	} else {
+		return nil, fmt.Errorf("method not found: %s.%s", api, method)
+	}
 }
 
 type AuthStorage struct {
@@ -46,13 +55,18 @@ type APIClient struct {
 }
 
 // Login runs a login flow to retrieve session token from Synology.
-func (c *APIClient) Login(user, password, sessionName string) (*api.LoginResponse, error) {
+func (c *APIClient) Login(user, password string) (*api.LoginResponse, error) {
 	resp, err := Get[api.LoginRequest, api.LoginResponse](c, &api.LoginRequest{
 		Account:  user,
 		Password: password,
 		// Session:         sessionName,
 		Format:          "sid", //"cookie",
 		EnableSynoToken: "yes",
+	}, api.APIMethod{
+		API:          "SYNO.API.Auth",
+		Version:      7,
+		Method:       "login",
+		ErrorSummary: api.GlobalErrors,
 	})
 	if err != nil {
 		return nil, err

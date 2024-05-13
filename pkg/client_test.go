@@ -11,17 +11,18 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/synology-community/synology-api/pkg/api"
 	"github.com/synology-community/synology-api/pkg/util"
+	"github.com/synology-community/synology-api/pkg/util/form"
 )
 
 type Nil struct{}
 
 func newClient() (SynologyClient, error) {
-	c, err := New("dev-form:5001", true)
+	c, err := New(os.Getenv("SYNOLOGY_HOST"), true)
 	if err != nil {
 		return nil, err
 	}
 
-	if r, err := c.Login("api-client", os.Getenv("SYNOLOGY_PASSWORD"), "webui"); err != nil {
+	if r, err := c.Login(os.Getenv("SYNOLOGY_USER"), os.Getenv("SYNOLOGY_PASSWORD")); err != nil {
 		return nil, err
 	} else {
 		log.Infoln("Login successful")
@@ -29,6 +30,19 @@ func newClient() (SynologyClient, error) {
 	}
 
 	return c, nil
+}
+
+func TestUpload(t *testing.T) {
+	c, err := newClient()
+	require.NoError(t, err)
+
+	file := form.File{
+		Name:    "test.txt",
+		Content: "Hello, World!",
+	}
+
+	_, err = c.FileStationAPI().Upload("/data/foodbar", &file, true, true)
+	require.NoError(t, err)
 }
 
 func TestMarshalURL(t *testing.T) {

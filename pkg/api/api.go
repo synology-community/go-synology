@@ -1,7 +1,7 @@
 package api
 
 type API interface {
-	Login(user, password, session string) (*LoginResponse, error)
+	Login(user, password string) (*LoginResponse, error)
 }
 
 var API_METHODS = APIMethodLookup{

@@ -8,14 +8,12 @@ import (
 	"io"
 	"maps"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
 	"github.com/google/go-querystring/query"
 	"github.com/synology-community/synology-api/pkg/api"
 	"github.com/synology-community/synology-api/pkg/api/filestation"
-	"github.com/synology-community/synology-api/pkg/util"
 	"github.com/synology-community/synology-api/pkg/util/form"
 )
 
@@ -42,21 +40,12 @@ func LookupMethod(callingFunc string) (*api.APIMethod, error) {
 	}
 }
 
-func Post[TReq api.Request, TResp api.Response](s SynologyClient, r *TReq) (*TResp, error) {
+func Post[TReq api.Request, TResp api.Response](s SynologyClient, r *TReq, method api.APIMethod) (*TResp, error) {
 
 	c, ok := s.(*APIClient)
 
 	if !ok {
 		return nil, errors.New("invalid client")
-	}
-
-	caller, err := util.GetCaller()
-	if err != nil {
-		return nil, err
-	}
-	method, err := LookupMethod(caller)
-	if err != nil {
-		return nil, err
 	}
 
 	req := api.NewRequest(method.AsApiParams(), r)
@@ -66,13 +55,7 @@ func Post[TReq api.Request, TResp api.Response](s SynologyClient, r *TReq) (*TRe
 		return nil, err
 	} else {
 
-		if err != nil {
-			return nil, err
-		}
-
-		ctx := context.WithValue(context.Background(), callerContextKey, caller)
-
-		ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 		defer cancel()
 
 		u := c.BaseURL
@@ -85,29 +68,21 @@ func Post[TReq api.Request, TResp api.Response](s SynologyClient, r *TReq) (*TRe
 	}
 }
 
-func List[TResp api.Response](c SynologyClient) (*TResp, error) {
+func List[TResp api.Response](c SynologyClient, method api.APIMethod) (*TResp, error) {
 
-	return Get[api.Request, TResp](c, nil)
+	return Get[api.Request, TResp](c, nil, method)
 }
 
-func GetEncode[TReq api.EncodeRequest, TResp api.Response](s SynologyClient, r *TReq) (*TResp, error) {
-	return Get[TReq, TResp](s, r)
+func GetEncode[TReq api.EncodeRequest, TResp api.Response](s SynologyClient, r *TReq, method api.APIMethod) (*TResp, error) {
+	return Get[TReq, TResp](s, r, method)
 }
 
-func Get[TReq api.Request, TResp api.Response](s SynologyClient, r *TReq, params ...url.URL) (*TResp, error) {
+func Get[TReq api.Request, TResp api.Response](s SynologyClient, r *TReq, method api.APIMethod) (*TResp, error) {
 	c, ok := s.(*APIClient)
 	if !ok {
 		return nil, errors.New("invalid client")
 	}
 
-	caller, err := util.GetCaller()
-	if err != nil {
-		return nil, err
-	}
-	method, err := LookupMethod(caller)
-	if err != nil {
-		return nil, err
-	}
 	aq, err := query.Values(method) //.AsApiParams())
 	if err != nil {
 		return nil, err
@@ -121,13 +96,13 @@ func Get[TReq api.Request, TResp api.Response](s SynologyClient, r *TReq, params
 	maps.Copy(qu, aq)
 	maps.Copy(qu, dq)
 
-	var u url.URL
+	u := c.BaseURL
 
-	if len(params) > 0 {
-		u = params[0]
-	} else {
-		u = c.BaseURL
-	}
+	// if len(params) > 0 {
+	// 	u = params[0]
+	// } else {
+	// 	u = c.BaseURL
+	// }
 
 	u.RawQuery = qu.Encode()
 

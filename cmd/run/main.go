@@ -32,7 +32,7 @@ func main() {
 		panic(err)
 	}
 
-	r, err := client.Login(user, password, "webui")
+	r, err := client.Login(user, password)
 
 	if err != nil {
 		panic(err)

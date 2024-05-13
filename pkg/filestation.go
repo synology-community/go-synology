@@ -11,28 +11,29 @@ type fileStationClient struct {
 }
 
 func (f *fileStationClient) DeleteStart(paths []string, accurateProgress bool) (*filestation.DeleteStartResponse, error) {
+	method := filestation.API_METHODS["DeleteStart"]
 	return Get[filestation.DeleteStartRequest, filestation.DeleteStartResponse](f.client, &filestation.DeleteStartRequest{
 		Paths:            paths,
 		AccurateProgress: accurateProgress,
-	})
+	}, method)
 }
 
 func (f *fileStationClient) DeleteStatus(taskID string) (*filestation.DeleteStatusResponse, error) {
 	return Get[filestation.DeleteStatusRequest, filestation.DeleteStatusResponse](f.client, &filestation.DeleteStatusRequest{
 		TaskID: taskID,
-	})
+	}, filestation.API_METHODS["DeleteStatus"])
 }
 
 func (f *fileStationClient) MD5Start(path string) (*filestation.MD5StartResponse, error) {
 	return Get[filestation.MD5StartRequest, filestation.MD5StartResponse](f.client, &filestation.MD5StartRequest{
 		Path: path,
-	})
+	}, filestation.API_METHODS["MD5Start"])
 }
 
 func (f *fileStationClient) MD5Status(taskID string) (*filestation.MD5StatusResponse, error) {
 	return Get[filestation.MD5StatusRequest, filestation.MD5StatusResponse](f.client, &filestation.MD5StatusRequest{
 		TaskID: taskID,
-	})
+	}, filestation.API_METHODS["MD5Status"])
 }
 
 // Download implements filestation.FileStationApi.
@@ -40,7 +41,7 @@ func (f *fileStationClient) Download(path string, mode string) (*filestation.Dow
 	return Get[filestation.DownloadRequest, filestation.DownloadResponse](f.client, &filestation.DownloadRequest{
 		Path: path,
 		Mode: mode,
-	})
+	}, filestation.API_METHODS["Download"])
 }
 
 // Rename implements filestation.FileStationApi.
@@ -49,7 +50,7 @@ func (f *fileStationClient) Rename(path string, name string, newName string) (*m
 		Path:    path,
 		Name:    name,
 		NewName: newName,
-	})
+	}, filestation.API_METHODS["Rename"])
 }
 
 // CreateFolder implements filestation.FileStationApi.
@@ -58,12 +59,12 @@ func (f *fileStationClient) CreateFolder(paths []string, names []string, forcePa
 		Paths:       paths,
 		Names:       names,
 		ForceParent: forceParent,
-	})
+	}, filestation.API_METHODS["CreateFolder"])
 }
 
 // ListShares implements filestation.FileStationApi.
 func (f *fileStationClient) ListShares() (*models.ShareList, error) {
-	return Get[filestation.ListShareRequest, models.ShareList](f.client, &filestation.ListShareRequest{})
+	return Get[filestation.ListShareRequest, models.ShareList](f.client, &filestation.ListShareRequest{}, filestation.API_METHODS["ListShares"])
 }
 
 // Upload implements filestation.FileStationApi.
@@ -73,7 +74,7 @@ func (f *fileStationClient) Upload(path string, file *form.File, createParents b
 		File:          file,
 		CreateParents: createParents,
 		Overwrite:     overwrite,
-	})
+	}, filestation.API_METHODS["ListShares"])
 }
 
 func NewFileStationClient(client *APIClient) filestation.FileStationApi {

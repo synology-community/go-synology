@@ -13,6 +13,37 @@ type fileStationClient struct {
 	client *APIClient
 }
 
+func (f *fileStationClient) Delete(paths []string, accurateProgress bool) (*filestation.DeleteStatusResponse, error) {
+	// Start Delete the file
+	rdel, err := f.client.FileStationAPI().DeleteStart(paths, true)
+
+	if err != nil {
+		return nil, fmt.Errorf("Unable to delete file, got error: %s", err)
+	}
+
+	waitUntil := time.Now().Add(60 * time.Second)
+	completed := false
+	for !completed {
+		// Check the status of the delete operation
+		rstat, err := f.client.FileStationAPI().DeleteStatus(rdel.TaskID)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to delete file, got error: %v", err)
+		}
+
+		if rstat.Finished {
+			completed = true
+			return rstat, nil
+		}
+
+		if time.Now().After(waitUntil) {
+			return nil, fmt.Errorf("Timeout waiting for file to be deleted")
+		}
+
+		time.Sleep(2 * time.Second)
+	}
+	return nil, fmt.Errorf("Unable to delete file, retry count exceeded")
+}
+
 func (f *fileStationClient) DeleteStart(paths []string, accurateProgress bool) (*filestation.DeleteStartResponse, error) {
 	method := filestation.API_METHODS["DeleteStart"]
 	return Get[filestation.DeleteStartRequest, filestation.DeleteStartResponse](f.client, &filestation.DeleteStartRequest{
@@ -118,7 +149,7 @@ func (f *fileStationClient) Upload(path string, file *form.File, createParents b
 		File:          file,
 		CreateParents: createParents,
 		Overwrite:     overwrite,
-	}, filestation.API_METHODS["ListShares"])
+	}, filestation.API_METHODS["Upload"])
 }
 
 func NewFileStationClient(client *APIClient) filestation.FileStationApi {

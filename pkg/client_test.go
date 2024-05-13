@@ -41,7 +41,7 @@ func Test_FileStationClient_Upload(t *testing.T) {
 		Content: "Hello, World!",
 	}
 
-	_, err = c.FileStationAPI().Upload("/data/foodbar", &file, true, true)
+	_, err = c.FileStationAPI().Upload("/data/foo/bar", &file, true, true)
 	require.NoError(t, err)
 }
 

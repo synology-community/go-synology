@@ -6,14 +6,13 @@ import (
 	"github.com/synology-community/synology-api/pkg/util/form"
 )
 
-const UploadKey = "Upload"
-
 type FileStationApi interface {
 	CreateFolder(paths []string, names []string, forceParent bool) (*models.FolderList, error)
 	ListShares() (*models.ShareList, error)
 	Upload(path string, file *form.File, createParents bool, overwrite bool) (*UploadResponse, error)
 	Rename(path string, name string, newName string) (*models.FileList, error)
 	Download(path string, mode string) (*DownloadResponse, error)
+	Delete(paths []string, accurateProgress bool) (*DeleteStatusResponse, error)
 	DeleteStart(paths []string, accurateProgress bool) (*DeleteStartResponse, error)
 	DeleteStatus(taskID string) (*DeleteStatusResponse, error)
 	MD5(path string) (*MD5Response, error)
@@ -22,7 +21,7 @@ type FileStationApi interface {
 }
 
 var API_METHODS = api.APIMethodLookup{
-	UploadKey: {
+	"Upload": {
 		API:     "SYNO.FileStation.Upload",
 		Version: 3,
 		Method:  "upload",

@@ -97,7 +97,11 @@ func (v *virtualizationClient) GuestCreate(ctx context.Context, guest virtualiza
 
 // GuestDelete implements virtualization.VirtualizationAPI.
 func (v *virtualizationClient) GuestDelete(ctx context.Context, guest virtualization.Guest) error {
-	panic("unimplemented")
+	_, err := Get[virtualization.Guest, virtualization.TaskRef](v.client, ctx, &virtualization.Guest{
+		Name: guest.Name,
+	}, virtualization.API_METHODS["GuestDelete"])
+
+	return err
 }
 
 func NewVirtualizationClient(client *APIClient) virtualization.VirtualizationAPI {

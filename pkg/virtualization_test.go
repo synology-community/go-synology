@@ -198,7 +198,7 @@ func Test_virtualizationClient_GuestGet(t *testing.T) {
 				Status:      "stopped",
 				StorageID:   "1",
 				StorageName: "default",
-				Autorun:     0,
+				AutoRun:     0,
 				VcpuNum:     1,
 				VramSize:    512,
 				Disks:       virtualization.VDisks{},
@@ -214,6 +214,76 @@ func Test_virtualizationClient_GuestGet(t *testing.T) {
 			got, err := v.GuestGet(tt.args.ctx, virtualization.Guest{
 				Name: tt.args.name,
 			})
+			if (err != nil) != tt.wantErr {
+				t.Errorf("virtualizationClient.GetGuest() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("virtualizationClient.GetGuest() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_virtualizationClient_GuestCreate(t *testing.T) {
+	type fields struct {
+		client *APIClient
+	}
+	type args struct {
+		ctx   context.Context
+		guest virtualization.Guest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *virtualization.Guest
+		wantErr bool
+	}{
+		{
+			name: "Create guest",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx: context.Background(),
+				guest: virtualization.Guest{
+					Name:        "testmantic",
+					StorageName: "default",
+					VcpuNum:     4,
+					VramSize:    4096,
+					Networks: virtualization.VNICs{
+						{Name: "default"},
+					},
+					Disks: virtualization.VDisks{
+						{
+							CreateType: 0,
+							Size:       20000,
+						},
+					},
+				},
+			},
+			want: &virtualization.Guest{
+				ID:          "1",
+				Name:        "testmantic",
+				Description: "Testmantic",
+				Status:      "stopped",
+				StorageID:   "1",
+				StorageName: "default",
+				AutoRun:     0,
+				VcpuNum:     1,
+				VramSize:    512,
+				Disks:       virtualization.VDisks{},
+				Networks:    virtualization.VNICs{},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := &virtualizationClient{
+				client: tt.fields.client,
+			}
+			got, err := v.GuestCreate(tt.args.ctx, tt.args.guest)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("virtualizationClient.GetGuest() error = %v, wantErr %v", err, tt.wantErr)
 				return

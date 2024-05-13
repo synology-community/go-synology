@@ -6,18 +6,21 @@ import (
 )
 
 type VDisk struct {
-	ID         string `url:"vdisk_id" json:"vdisk_id,omitempty"`
-	Controller int    `url:"controller" json:"controller,omitempty"`
-	Unmap      bool   `url:"unmap" json:"unmap,omitempty"`
-	Size       int    `url:"vdisk_size" json:"vdisk_size,omitempty"`
+	ID         string `url:"-" json:"vdisk_id,omitempty"`
+	ImageName  string `url:"image_name" json:"image_name,omitempty"`
+	ImageID    string `url:"image_id" json:"image_id,omitempty"`
+	CreateType int64  `url:"create_type" json:"create_type"`
+	Size       int64  `url:"vdisk_size" json:"vdisk_size,omitempty"`
+	Controller int64  `url:"-" json:"controller,omitempty"`
+	Unmap      bool   `url:"-" json:"unmap,omitempty"`
 }
 
 type VNIC struct {
 	ID     string `url:"network_id" json:"network_id,omitempty"`
 	Name   string `url:"network_name" json:"network_name,omitempty"`
 	Mac    string `url:"mac" json:"mac,omitempty"`
-	Model  int    `url:"model" json:"model,omitempty"`
-	VnicID string `url:"vnic_id" json:"vnic_id,omitempty"`
+	Model  int64  `url:"-" json:"model,omitempty"`
+	VnicID string `url:"-" json:"vnic_id,omitempty"`
 }
 
 type VDisks []VDisk

@@ -309,14 +309,37 @@ func Test_virtualizationClient_ListGuests(t *testing.T) {
 		want    *virtualization.GuestList
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "List guests",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx: context.Background(),
+			},
+			want: &virtualization.GuestList{
+				Guests: []virtualization.Guest{
+					{
+						ID:          "1",
+						Name:        "testmantic",
+						Description: "Testmantic",
+						Status:      "stopped",
+						StorageID:   "1",
+						StorageName: "default",
+						AutoRun:     0,
+						VcpuNum:     1,
+						VramSize:    512,
+						Disks:       virtualization.VDisks{},
+						Networks:    virtualization.VNICs{},
+					},
+				},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			v := &virtualizationClient{
-				client: newClient(t),
-			}
-			got, err := v.GuestList(tt.args.ctx)
+			got, err := tt.fields.client.Virtualization.GuestList(tt.args.ctx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("virtualizationClient.ListGuests() error = %v, wantErr %v", err, tt.wantErr)
 				return

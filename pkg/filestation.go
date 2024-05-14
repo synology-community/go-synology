@@ -25,29 +25,29 @@ func (f *fileStationClient) List(ctx context.Context, folderPath string) (*model
 func (f *fileStationClient) Delete(ctx context.Context, paths []string, accurateProgress bool) (*filestation.DeleteStatusResponse, error) {
 	// Start Delete the file
 	rdel, err := f.client.FileStationAPI().DeleteStart(ctx, paths, true)
-
 	if err != nil {
 		return nil, fmt.Errorf("Unable to delete file, got error: %s", err)
 	}
+	return f.client.FileStationAPI().DeleteStatus(ctx, rdel.TaskID)
 
-	waitUntil := time.Now().Add(60 * time.Second)
-	for {
-		// Check the status of the delete operation
-		rstat, err := f.client.FileStationAPI().DeleteStatus(ctx, rdel.TaskID)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to delete file, got error: %v", err)
-		}
+	// waitUntil := time.Now().Add(60 * time.Second)
+	// for {
+	// 	// Check the status of the delete operation
+	// 	rstat, err := f.client.FileStationAPI().DeleteStatus(ctx, rdel.TaskID)
+	// 	if err != nil {
+	// 		return nil, fmt.Errorf("Unable to delete file, got error: %v", err)
+	// 	}
 
-		if rstat.Finished {
-			return rstat, nil
-		}
+	// 	if rstat.Finished {
+	// 		return rstat, nil
+	// 	}
 
-		if time.Now().After(waitUntil) {
-			return nil, fmt.Errorf("Timeout waiting for file to be deleted")
-		}
+	// 	if time.Now().After(waitUntil) {
+	// 		return nil, fmt.Errorf("Timeout waiting for file to be deleted")
+	// 	}
 
-		time.Sleep(2 * time.Second)
-	}
+	// 	time.Sleep(2 * time.Second)
+	// }
 }
 
 func (f *fileStationClient) DeleteStart(ctx context.Context, paths []string, accurateProgress bool) (*filestation.DeleteStartResponse, error) {
@@ -72,7 +72,7 @@ func (f *fileStationClient) MD5Start(ctx context.Context, path string) (*filesta
 
 func (f *fileStationClient) MD5Status(ctx context.Context, taskID string) (*filestation.MD5StatusResponse, error) {
 	return Get[filestation.MD5StatusRequest, filestation.MD5StatusResponse](f.client, ctx, &filestation.MD5StatusRequest{
-		TaskID: taskID,
+		TaskID: filestation.UrlWrapString(taskID),
 	}, filestation.API_METHODS["MD5Status"])
 }
 
@@ -107,43 +107,47 @@ func (f *fileStationClient) ListShares(ctx context.Context) (*models.ShareList, 
 	return Get[filestation.ListShareRequest, models.ShareList](f.client, ctx, &filestation.ListShareRequest{}, filestation.API_METHODS["ListShares"])
 }
 
-func (f *fileStationClient) MD5(ctx context.Context, path string) (*filestation.MD5Response, error) {
-	var data filestation.MD5Response
+func (f *fileStationClient) MD5(ctx context.Context, path string) (*filestation.MD5StatusResponse, error) {
+	// var data filestation.MD5Response
 	// Start Delete the file
 	rmd5, err := f.client.FileStationAPI().MD5Start(ctx, path)
+
+	time.Sleep(5000 * time.Millisecond)
 
 	if err != nil {
 		return nil, fmt.Errorf("Unable to delete file, got error: %s", err)
 	}
 
-	retry := 0
-	completed := false
-	for !completed {
-		// Check the status of the delete operation
-		if hstat, err := f.client.FileStationAPI().MD5Status(ctx, rmd5.TaskID); err == nil {
+	return f.client.FileStationAPI().MD5Status(ctx, rmd5.TaskID)
 
-			if hstat.Finished {
-				if hstat.MD5 != "" {
-					data.MD5 = hstat.MD5
-					completed = true
-					continue
-				}
-			}
-		}
+	// retry := 0
+	// completed := false
+	// for !completed {
+	// 	// Check the status of the delete operation
+	// 	if hstat, err := f.client.FileStationAPI().MD5Status(ctx, rmd5.TaskID); err == nil {
 
-		if retry > 10 {
-			completed = true
-			continue
-		}
-		retry++
-		time.Sleep(5 * time.Second)
-	}
+	// 		if hstat.Finished {
+	// 			if hstat.MD5 != "" {
+	// 				data.MD5 = hstat.MD5
+	// 				completed = true
+	// 				continue
+	// 			}
+	// 		}
+	// 	}
 
-	if data.MD5 == "" {
-		return nil, fmt.Errorf("Unable to get file hash, retry count exceeded")
-	} else {
-		return &data, nil
-	}
+	// 	if retry > 10 {
+	// 		completed = true
+	// 		continue
+	// 	}
+	// 	retry++
+	// 	time.Sleep(5 * time.Second)
+	// }
+
+	// if data.MD5 == "" {
+	// 	return nil, fmt.Errorf("Unable to get file hash, retry count exceeded")
+	// } else {
+	// 	return &data, nil
+	// }
 }
 
 // Upload implements filestation.FileStationApi.

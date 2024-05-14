@@ -13,6 +13,8 @@ import (
 	"time"
 
 	"github.com/google/go-querystring/query"
+	"github.com/hashicorp/go-multierror"
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/synology-community/synology-api/pkg/api"
 	"github.com/synology-community/synology-api/pkg/api/filestation"
 	"github.com/synology-community/synology-api/pkg/util/form"
@@ -65,7 +67,7 @@ func Post[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Co
 		}
 
 		u := c.BaseURL
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), buf)
+		req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodPost, u.String(), buf)
 		if err != nil {
 			return nil, err
 		}
@@ -122,7 +124,7 @@ func Get[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Con
 		defer cancel()
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+	req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +149,7 @@ func download(r io.ReadCloser) (interface{}, error) {
 	return &dlr, nil
 }
 
-func Do[TResponse api.Response](client *http.Client, req *http.Request) (*TResponse, error) {
+func Do[TResponse api.Response](client *retryablehttp.Client, req *retryablehttp.Request) (*TResponse, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -187,14 +189,56 @@ func Do[TResponse api.Response](client *http.Client, req *http.Request) (*TRespo
 	// return nil
 }
 
+// func Retry(ctx context.Context, delay time.Duration, fn func() error) error {
+// 	deadline, ok := ctx.Deadline()
+// 	if !ok {
+// 		deadline = time.Now().Add(60 * time.Second)
+// 	}
+
+// 	for {
+// 		err := fn()
+// 		if err == nil {
+// 			return nil
+// 		}
+
+// 		delay := 5 * time.Second
+// 		for {
+// 			if err := fn(); err != nil {
+// 				return nil
+// 			}
+// 			if task.Finished {
+// 				return task, nil
+// 			}
+// 			if time.Now().After(deadline.Add(delay)) {
+// 				return nil, fmt.Errorf("Timeout waiting for task to complete")
+// 			}
+// 			time.Sleep(delay)
+// 		}
+// 	}
+// }
+
 func handleErrors[T any | api.ApiError](response api.ApiResponse[T], knownErrors api.ErrorSummary) error {
 	if response.Error.Code == 0 {
 		return nil
 	}
 
+	var result error
+
 	if errDesc, ok := knownErrors[response.Error.Code]; ok {
-		return fmt.Errorf("Api Error: %v", errDesc)
+		result = multierror.Append(result, fmt.Errorf("api response error: response code %d => %v", response.Error.Code, errDesc))
 	} else {
-		return fmt.Errorf("Api Error: %v", response.Error)
+		result = multierror.Append(result, fmt.Errorf("api response error: response code %d => %v", response.Error.Code, response.Error))
 	}
+
+	if response.Error.Errors != nil {
+		for i, err := range response.Error.Errors {
+			if errDesc, ok := knownErrors[err.Code]; ok {
+				result = multierror.Append(result, fmt.Errorf("api response error[%d]: response code %d => %v", i, err.Code, errDesc))
+			} else {
+				result = multierror.Append(result, fmt.Errorf("api response error[%d]: response code %d => %v", i, err.Code, err))
+			}
+		}
+	}
+
+	return result
 }

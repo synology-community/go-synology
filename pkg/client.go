@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/synology-community/synology-api/pkg/api"
 	"github.com/synology-community/synology-api/pkg/api/filestation"
 	"github.com/synology-community/synology-api/pkg/api/virtualization"
@@ -45,7 +46,7 @@ type SynologyClient interface {
 	// get(request api.Request, response api.Response) error
 }
 type APIClient struct {
-	httpClient *http.Client
+	httpClient *retryablehttp.Client
 
 	FileStation    *fileStationClient
 	Virtualization *virtualizationClient
@@ -110,10 +111,10 @@ func New(host string, skipCertificateVerification bool) (SynologyClient, error) 
 	if err != nil {
 		return nil, err
 	}
-	httpClient := &http.Client{
-		Transport: transport,
-		Jar:       jar,
-	}
+
+	c := retryablehttp.NewClient()
+	c.HTTPClient.Jar = jar
+	c.HTTPClient.Transport = transport
 
 	baseURL, err := url.Parse(host)
 
@@ -125,7 +126,7 @@ func New(host string, skipCertificateVerification bool) (SynologyClient, error) 
 	}
 
 	synoClient := &APIClient{
-		httpClient: httpClient,
+		httpClient: c,
 		BaseURL:    *baseURL,
 	}
 

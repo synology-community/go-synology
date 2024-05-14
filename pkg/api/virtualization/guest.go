@@ -1,8 +1,9 @@
 package virtualization
 
 import (
-	"encoding/json"
 	"net/url"
+
+	"github.com/synology-community/synology-api/pkg/util"
 )
 
 type VDisk struct {
@@ -27,25 +28,11 @@ type VDisks []VDisk
 type VNICs []VNIC
 
 func (s VDisks) EncodeValues(k string, v *url.Values) error {
-
-	encoded, err := json.Marshal(s)
-	if err != nil {
-		return err
-	}
-	v.Set(k, string(encoded))
-
-	return nil
+	return util.EncodeValues(s, k, v)
 }
 
 func (s VNICs) EncodeValues(k string, v *url.Values) error {
-
-	encoded, err := json.Marshal(s)
-	if err != nil {
-		return err
-	}
-	v.Set(k, string(encoded))
-
-	return nil
+	return util.EncodeValues(s, k, v)
 }
 
 type Guest struct {

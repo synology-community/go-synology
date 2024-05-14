@@ -183,25 +183,3 @@ func Marshal(b *bytes.Buffer, input ...any) (*multipart.Writer, int64, error) {
 
 	return w, fileSize, nil
 }
-
-// fieldAlias parses a field tag to get a field alias.
-func fieldAlias(field reflect.StructField, tagName string) (alias string, options tagOptions) {
-	if tag := field.Tag.Get(tagName); tag != "" {
-		alias, options = parseTag(tag)
-	}
-	if alias == "" {
-		alias = field.Name
-	}
-	return alias, options
-}
-
-// tagOptions is the string following a comma in a struct field's tag, or
-// the empty string. It does not include the leading comma.
-type tagOptions []string
-
-// parseTag splits a struct field's url tag into its name and comma-separated
-// options.
-func parseTag(tag string) (string, tagOptions) {
-	s := strings.Split(tag, ",")
-	return s[0], s[1:]
-}

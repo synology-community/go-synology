@@ -1,8 +1,20 @@
 package filestation
 
+import (
+	"net/url"
+
+	"github.com/synology-community/synology-api/pkg/util"
+)
+
+type Paths []string
+
+func (s Paths) EncodeValues(k string, v *url.Values) error {
+	return util.EncodeValues(s, k, v)
+}
+
 type DeleteStartRequest struct {
-	Paths            []string `form:"path" url:"path"`
-	AccurateProgress bool     `form:"accurate_progress" url:"accurate_progress"`
+	Paths            Paths `form:"path" url:"path"`
+	AccurateProgress bool  `form:"accurate_progress" url:"accurate_progress"`
 }
 
 type DeleteStartResponse struct {

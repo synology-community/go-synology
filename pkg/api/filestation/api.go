@@ -18,7 +18,7 @@ type FileStationApi interface {
 	Delete(ctx context.Context, paths []string, accurateProgress bool) (*DeleteStatusResponse, error)
 	DeleteStart(ctx context.Context, paths []string, accurateProgress bool) (*DeleteStartResponse, error)
 	DeleteStatus(ctx context.Context, taskID string) (*DeleteStatusResponse, error)
-	MD5(ctx context.Context, path string) (*MD5Response, error)
+	MD5(ctx context.Context, path string) (*MD5StatusResponse, error)
 	MD5Start(ctx context.Context, path string) (*MD5StartResponse, error)
 	MD5Status(ctx context.Context, taskID string) (*MD5StatusResponse, error)
 }

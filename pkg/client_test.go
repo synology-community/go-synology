@@ -32,7 +32,13 @@ func newClient(t *testing.T) *APIClient {
 		log.Infof("[INFO] Session: %s\nDeviceID: %s", r.SessionID, r.DeviceID)
 	}
 
-	return c.(*APIClient)
+	if client, ok := c.(*APIClient); !ok {
+		t.Error("Client is not of type APIClient")
+		require.True(t, ok)
+		return nil
+	} else {
+		return client
+	}
 }
 
 func Test_FileStationClient_Upload(t *testing.T) {
@@ -268,10 +274,4 @@ func TestHandleErrors(t *testing.T) {
 			assert.Equal(t, tc.expected, actual)
 		})
 	}
-}
-
-type errorDescriber func() []api.ErrorSummary
-
-func (d errorDescriber) ErrorSummaries() []api.ErrorSummary {
-	return d()
 }

@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"github.com/synology-community/synology-api/pkg/api/filestation"
 	"github.com/synology-community/synology-api/pkg/models"
 	"github.com/synology-community/synology-api/pkg/util/form"
@@ -157,6 +158,7 @@ func Test_fileStationClient_DeleteStatus(t *testing.T) {
 }
 
 func Test_fileStationClient_MD5Start(t *testing.T) {
+	t.Run("Upload", Test_FileStationClient_Upload)
 	type fields struct {
 		client *APIClient
 	}
@@ -171,7 +173,16 @@ func Test_fileStationClient_MD5Start(t *testing.T) {
 		want    *filestation.MD5StartResponse
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "MD5Start",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx:  context.Background(),
+				path: "/data/foo/test.txt",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -179,13 +190,8 @@ func Test_fileStationClient_MD5Start(t *testing.T) {
 				client: tt.fields.client,
 			}
 			got, err := f.MD5Start(tt.args.ctx, tt.args.path)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("fileStationClient.MD5Start() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("fileStationClient.MD5Start() = %v, want %v", got, tt.want)
-			}
+			require.NoError(t, err)
+			require.NotEmpty(t, got.TaskID)
 		})
 	}
 }
@@ -365,6 +371,7 @@ func Test_fileStationClient_ListShares(t *testing.T) {
 }
 
 func Test_fileStationClient_MD5(t *testing.T) {
+	t.Run("Upload", Test_FileStationClient_Upload)
 	type fields struct {
 		client *APIClient
 	}
@@ -373,13 +380,20 @@ func Test_fileStationClient_MD5(t *testing.T) {
 		path string
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *filestation.MD5Response
-		wantErr bool
+		name   string
+		fields fields
+		args   args
 	}{
-		// TODO: Add test cases.
+		{
+			name: "MD5",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx:  context.Background(),
+				path: "/data/foo/test.txt",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -387,13 +401,8 @@ func Test_fileStationClient_MD5(t *testing.T) {
 				client: tt.fields.client,
 			}
 			got, err := f.MD5(tt.args.ctx, tt.args.path)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("fileStationClient.MD5() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("fileStationClient.MD5() = %v, want %v", got, tt.want)
-			}
+			require.NoError(t, err)
+			require.NotEmpty(t, got.MD5)
 		})
 	}
 }

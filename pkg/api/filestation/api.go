@@ -11,6 +11,7 @@ import (
 type FileStationApi interface {
 	CreateFolder(ctx context.Context, paths []string, names []string, forceParent bool) (*models.FolderList, error)
 	ListShares(ctx context.Context) (*models.ShareList, error)
+	List(ctx context.Context, folderPath string) (*models.FileList, error)
 	Upload(ctx context.Context, path string, file form.File, createParents bool, overwrite bool) (*UploadResponse, error)
 	Rename(ctx context.Context, path string, name string, newName string) (*models.FileList, error)
 	Download(ctx context.Context, path string, mode string) (*DownloadResponse, error)
@@ -31,6 +32,12 @@ var API_METHODS = api.APIMethodLookup{
 			1100: "Failed to create a folder. More information in <errors> object.",
 			1101: "The number of folders to the parent folder would exceed the system limitation.",
 		}),
+	},
+	"List": {
+		API:          "SYNO.FileStation.List",
+		Version:      2,
+		Method:       "list",
+		ErrorSummary: CommonErrors,
 	},
 	"ListShares": {
 		API:          "SYNO.FileStation.List",

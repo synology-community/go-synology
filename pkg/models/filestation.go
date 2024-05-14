@@ -9,6 +9,11 @@ type FolderList struct {
 	Folders []File `json:"folders"`
 }
 
+type FileListRequest struct {
+	FolderPath string    `url:"folder_path" json:"folder_path"`
+	Additional JsonArray `url:"additional" json:"additional"`
+}
+
 type FileList struct {
 	Pagination
 	Files []File `json:"files"`

@@ -14,6 +14,14 @@ type fileStationClient struct {
 	client *APIClient
 }
 
+// List implements filestation.FileStationApi.
+func (f *fileStationClient) List(ctx context.Context, folderPath string) (*models.FileList, error) {
+	return Get[models.FileListRequest, models.FileList](f.client, ctx, &models.FileListRequest{
+		FolderPath: folderPath,
+		Additional: []string{"real_path", "size", "owner", "time", "perm", "mount_point_type", "type", "fileid"},
+	}, filestation.API_METHODS["List"])
+}
+
 func (f *fileStationClient) Delete(ctx context.Context, paths []string, accurateProgress bool) (*filestation.DeleteStatusResponse, error) {
 	// Start Delete the file
 	rdel, err := f.client.FileStationAPI().DeleteStart(ctx, paths, true)
@@ -23,8 +31,7 @@ func (f *fileStationClient) Delete(ctx context.Context, paths []string, accurate
 	}
 
 	waitUntil := time.Now().Add(60 * time.Second)
-	completed := false
-	for !completed {
+	for {
 		// Check the status of the delete operation
 		rstat, err := f.client.FileStationAPI().DeleteStatus(ctx, rdel.TaskID)
 		if err != nil {
@@ -32,7 +39,6 @@ func (f *fileStationClient) Delete(ctx context.Context, paths []string, accurate
 		}
 
 		if rstat.Finished {
-			completed = true
 			return rstat, nil
 		}
 
@@ -42,7 +48,6 @@ func (f *fileStationClient) Delete(ctx context.Context, paths []string, accurate
 
 		time.Sleep(2 * time.Second)
 	}
-	return nil, fmt.Errorf("Unable to delete file, retry count exceeded")
 }
 
 func (f *fileStationClient) DeleteStart(ctx context.Context, paths []string, accurateProgress bool) (*filestation.DeleteStartResponse, error) {

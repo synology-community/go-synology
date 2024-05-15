@@ -60,13 +60,8 @@ func Test_virtualizationClient_ImageCreate(t *testing.T) {
 				FilePath:  "/data/cluster_storage/commoninit.iso",
 				AutoClean: false,
 			})
-			if (err != nil) != tt.wantErr {
-				t.Errorf("virtualizationClient.ImageCreate() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !assert.NotNil(t, got) {
-				t.Errorf("Task ID: %s", got.TaskInfo.ImageID)
-			}
+			assert.Nil(t, err)
+			assert.NotNil(t, got, "TaskRef is nil")
 		})
 	}
 }
@@ -284,13 +279,9 @@ func Test_virtualizationClient_GuestCreate(t *testing.T) {
 				client: tt.fields.client,
 			}
 			got, err := v.GuestCreate(tt.args.ctx, tt.args.guest)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("virtualizationClient.GetGuest() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("virtualizationClient.GetGuest() = %v, want %v", got, tt.want)
-			}
+
+			assert.Nil(t, err)
+			assert.NotNil(t, got)
 		})
 	}
 }

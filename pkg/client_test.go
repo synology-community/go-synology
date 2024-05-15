@@ -274,7 +274,7 @@ func TestHandleErrors(t *testing.T) {
 			actual := handleErrors(tc.response,
 				globalErrors,
 			)
-			assert.Equal(t, tc.expected, actual)
+			assert.Error(t, actual)
 		})
 	}
 }

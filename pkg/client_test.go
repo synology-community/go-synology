@@ -18,7 +18,10 @@ import (
 type Nil struct{}
 
 func newClient(t *testing.T) *APIClient {
-	c, err := New(os.Getenv("SYNOLOGY_HOST"), true)
+	c, err := New(Options{
+		Host:       os.Getenv("SYNOLOGY_HOST"),
+		VerifyCert: false,
+	})
 	if err != nil {
 		t.Error(err)
 		require.NoError(t, err)

@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"crypto/tls"
-	"fmt"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
@@ -16,20 +15,6 @@ import (
 	"github.com/synology-community/synology-api/pkg/api/virtualization"
 	"golang.org/x/net/publicsuffix"
 )
-
-var MethodLookup = map[string]api.APIMethodLookup{
-	"API":            api.API_METHODS,
-	"Virtualization": virtualization.API_METHODS,
-	"FileStation":    filestation.API_METHODS,
-}
-
-func GetMethod(api, method string) (*api.APIMethod, error) {
-	if res, ok := MethodLookup[api][method]; ok {
-		return &res, nil
-	} else {
-		return nil, fmt.Errorf("method not found: %s.%s", api, method)
-	}
-}
 
 type AuthStorage struct {
 	SessionID string `url:"_sid"`
@@ -90,7 +75,7 @@ func (c *APIClient) VirtualizationAPI() virtualization.VirtualizationAPI {
 }
 
 // New initializes "client" instance with minimal input configuration.
-func New(host string, skipCertificateVerification bool) (SynologyClient, error) {
+func New(o Options) (SynologyClient, error) {
 	transport := &http.Transport{
 		DialContext: (&net.Dialer{
 			Timeout:   10 * time.Second,
@@ -102,7 +87,7 @@ func New(host string, skipCertificateVerification bool) (SynologyClient, error) 
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: skipCertificateVerification,
+			InsecureSkipVerify: !o.VerifyCert,
 		},
 	}
 
@@ -113,10 +98,13 @@ func New(host string, skipCertificateVerification bool) (SynologyClient, error) 
 	}
 
 	c := retryablehttp.NewClient()
+	if o.Logger != nil {
+		c.Logger = o.Logger
+	}
 	c.HTTPClient.Jar = jar
 	c.HTTPClient.Transport = transport
 
-	baseURL, err := url.Parse(host)
+	baseURL, err := url.Parse(o.Host)
 
 	baseURL.Scheme = "https"
 	baseURL.Path = "/webapi/entry.cgi"

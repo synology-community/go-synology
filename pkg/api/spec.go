@@ -2,14 +2,14 @@ package api
 
 import "net/url"
 
-type APIMethod struct {
+type Method struct {
 	API          string       `form:"api" url:"api"`
 	Version      int          `form:"version" url:"version"`
 	Method       string       `form:"method" url:"method"`
 	ErrorSummary ErrorSummary `json:"-" form:"-" url:"-"`
 }
 
-func (m APIMethod) AsApiParams() ApiParams {
+func (m Method) AsApiParams() ApiParams {
 	return ApiParams{
 		Version: m.Version,
 		API:     m.API,
@@ -21,9 +21,9 @@ func (l ApiParams) EncodeValues(_ string, _ *url.Values) error {
 	return nil
 }
 
-type APIMethodLookup map[string]APIMethod
+type APIMethodLookup map[string]Method
 
-var Spec = map[string]APIMethod{
+var Spec = map[string]Method{
 	"Login":                                             {API: "SYNO.API.Auth", Version: 7, Method: "login"},
 	"API.Auth.Key":                                      {API: "SYNO.API.Auth.Key", Version: 7},
 	"API.Auth.Key.Code":                                 {API: "SYNO.API.Auth.Key.Code", Version: 7},

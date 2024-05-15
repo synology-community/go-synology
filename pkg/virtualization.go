@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/synology-community/synology-api/pkg/api/virtualization"
+	"github.com/synology-community/synology-api/pkg/api/virtualization/methods"
 )
 
 type virtualizationClient struct {
@@ -14,12 +15,12 @@ type virtualizationClient struct {
 
 // StorageList implements virtualization.VirtualizationAPI.
 func (v *virtualizationClient) StorageList(ctx context.Context) (*virtualization.StorageList, error) {
-	return List[virtualization.StorageList](v.client, ctx, virtualization.API_METHODS["StorageList"])
+	return List[virtualization.StorageList](v.client, ctx, methods.StorageList)
 }
 
 // ImageCreate implements virtualization.VirtualizationAPI.
 func (v *virtualizationClient) ImageCreate(ctx context.Context, image virtualization.Image) (*virtualization.Task, error) {
-	resp, err := Get[virtualization.Image, virtualization.TaskRef](v.client, ctx, &image, virtualization.API_METHODS["ImageCreate"])
+	resp, err := Get[virtualization.Image, virtualization.TaskRef](v.client, ctx, &image, methods.ImageCreate)
 
 	if err != nil {
 		return nil, err
@@ -32,14 +33,14 @@ func (v *virtualizationClient) ImageCreate(ctx context.Context, image virtualiza
 func (v *virtualizationClient) ImageDelete(ctx context.Context, imageName string) error {
 	_, err := Get[virtualization.Image, virtualization.TaskRef](v.client, ctx, &virtualization.Image{
 		Name: imageName,
-	}, virtualization.API_METHODS["ImageDelete"])
+	}, methods.ImageDelete)
 
 	return err
 }
 
 // ImageList implements virtualization.VirtualizationAPI.
 func (v *virtualizationClient) ImageList(ctx context.Context) (*virtualization.ImageList, error) {
-	return List[virtualization.ImageList](v.client, ctx, virtualization.API_METHODS["ImageList"])
+	return List[virtualization.ImageList](v.client, ctx, methods.ImageList)
 }
 
 // TaskGet implements virtualization.VirtualizationAPI.
@@ -54,7 +55,7 @@ func (v *virtualizationClient) TaskGet(ctx context.Context, taskID string) (*vir
 	for {
 		task, err := Get[virtualization.TaskRef, virtualization.Task](v.client, ctx, &virtualization.TaskRef{
 			TaskID: taskID,
-		}, virtualization.API_METHODS["TaskGet"])
+		}, methods.TaskGet)
 		if err != nil && task == nil {
 			return nil, err
 		}
@@ -70,17 +71,17 @@ func (v *virtualizationClient) TaskGet(ctx context.Context, taskID string) (*vir
 
 // GetGuest implements virtualization.VirtualizationAPI.
 func (v *virtualizationClient) GuestGet(ctx context.Context, guest virtualization.Guest) (*virtualization.Guest, error) {
-	return Get[virtualization.Guest, virtualization.Guest](v.client, ctx, &guest, virtualization.API_METHODS["GuestGet"])
+	return Get[virtualization.Guest, virtualization.Guest](v.client, ctx, &guest, methods.GuestGet)
 }
 
 // ListGuests implements virtualization.VirtualizationAPI.
 func (v *virtualizationClient) GuestList(ctx context.Context) (*virtualization.GuestList, error) {
-	return List[virtualization.GuestList](v.client, ctx, virtualization.API_METHODS["GuestList"])
+	return List[virtualization.GuestList](v.client, ctx, methods.GuestList)
 }
 
 // GuestCreate implements virtualization.VirtualizationAPI.
 func (v *virtualizationClient) GuestCreate(ctx context.Context, guest virtualization.Guest) (*virtualization.Guest, error) {
-	resp, err := Get[virtualization.Guest, virtualization.TaskRef](v.client, ctx, &guest, virtualization.API_METHODS["GuestCreate"])
+	resp, err := Get[virtualization.Guest, virtualization.TaskRef](v.client, ctx, &guest, methods.GuestCreate)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +100,7 @@ func (v *virtualizationClient) GuestCreate(ctx context.Context, guest virtualiza
 func (v *virtualizationClient) GuestDelete(ctx context.Context, guest virtualization.Guest) error {
 	_, err := Get[virtualization.Guest, virtualization.TaskRef](v.client, ctx, &virtualization.Guest{
 		Name: guest.Name,
-	}, virtualization.API_METHODS["GuestDelete"])
+	}, methods.GuestDelete)
 
 	return err
 }

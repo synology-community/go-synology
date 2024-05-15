@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/synology-community/synology-api/pkg/api/filestation"
+	"github.com/synology-community/synology-api/pkg/api/filestation/methods"
 	"github.com/synology-community/synology-api/pkg/models"
 	"github.com/synology-community/synology-api/pkg/util/form"
 )
@@ -19,7 +20,7 @@ func (f *fileStationClient) List(ctx context.Context, folderPath string) (*model
 	return Get[models.FileListRequest, models.FileList](f.client, ctx, &models.FileListRequest{
 		FolderPath: folderPath,
 		Additional: []string{"real_path", "size", "owner", "time", "perm", "mount_point_type", "type", "fileid"},
-	}, filestation.API_METHODS["List"])
+	}, methods.List)
 }
 
 func (f *fileStationClient) Delete(ctx context.Context, paths []string, accurateProgress bool) (*filestation.DeleteStatusResponse, error) {
@@ -29,29 +30,10 @@ func (f *fileStationClient) Delete(ctx context.Context, paths []string, accurate
 		return nil, fmt.Errorf("Unable to delete file, got error: %s", err)
 	}
 	return f.client.FileStationAPI().DeleteStatus(ctx, rdel.TaskID)
-
-	// waitUntil := time.Now().Add(60 * time.Second)
-	// for {
-	// 	// Check the status of the delete operation
-	// 	rstat, err := f.client.FileStationAPI().DeleteStatus(ctx, rdel.TaskID)
-	// 	if err != nil {
-	// 		return nil, fmt.Errorf("Unable to delete file, got error: %v", err)
-	// 	}
-
-	// 	if rstat.Finished {
-	// 		return rstat, nil
-	// 	}
-
-	// 	if time.Now().After(waitUntil) {
-	// 		return nil, fmt.Errorf("Timeout waiting for file to be deleted")
-	// 	}
-
-	// 	time.Sleep(2 * time.Second)
-	// }
 }
 
 func (f *fileStationClient) DeleteStart(ctx context.Context, paths []string, accurateProgress bool) (*filestation.DeleteStartResponse, error) {
-	method := filestation.API_METHODS["DeleteStart"]
+	method := methods.DeleteStart
 	return Get[filestation.DeleteStartRequest, filestation.DeleteStartResponse](f.client, ctx, &filestation.DeleteStartRequest{
 		Paths:            paths,
 		AccurateProgress: accurateProgress,
@@ -61,19 +43,19 @@ func (f *fileStationClient) DeleteStart(ctx context.Context, paths []string, acc
 func (f *fileStationClient) DeleteStatus(ctx context.Context, taskID string) (*filestation.DeleteStatusResponse, error) {
 	return Get[filestation.DeleteStatusRequest, filestation.DeleteStatusResponse](f.client, ctx, &filestation.DeleteStatusRequest{
 		TaskID: taskID,
-	}, filestation.API_METHODS["DeleteStatus"])
+	}, methods.DeleteStatus)
 }
 
 func (f *fileStationClient) MD5Start(ctx context.Context, path string) (*filestation.MD5StartResponse, error) {
 	return Get[filestation.MD5StartRequest, filestation.MD5StartResponse](f.client, ctx, &filestation.MD5StartRequest{
 		Path: path,
-	}, filestation.API_METHODS["MD5Start"])
+	}, methods.MD5Start)
 }
 
 func (f *fileStationClient) MD5Status(ctx context.Context, taskID string) (*filestation.MD5StatusResponse, error) {
 	return Get[filestation.MD5StatusRequest, filestation.MD5StatusResponse](f.client, ctx, &filestation.MD5StatusRequest{
 		TaskID: filestation.UrlWrapString(taskID),
-	}, filestation.API_METHODS["MD5Status"])
+	}, methods.MD5Status)
 }
 
 // Download implements filestation.FileStationApi.
@@ -81,7 +63,7 @@ func (f *fileStationClient) Download(ctx context.Context, path string, mode stri
 	return Get[filestation.DownloadRequest, filestation.DownloadResponse](f.client, ctx, &filestation.DownloadRequest{
 		Path: path,
 		Mode: mode,
-	}, filestation.API_METHODS["Download"])
+	}, methods.Download)
 }
 
 // Rename implements filestation.FileStationApi.
@@ -90,7 +72,7 @@ func (f *fileStationClient) Rename(ctx context.Context, path string, name string
 		Path:    path,
 		Name:    name,
 		NewName: newName,
-	}, filestation.API_METHODS["Rename"])
+	}, methods.Rename)
 }
 
 // CreateFolder implements filestation.FileStationApi.
@@ -99,12 +81,12 @@ func (f *fileStationClient) CreateFolder(ctx context.Context, paths []string, na
 		Paths:       paths,
 		Names:       names,
 		ForceParent: forceParent,
-	}, filestation.API_METHODS["CreateFolder"])
+	}, methods.CreateFolder)
 }
 
 // ListShares implements filestation.FileStationApi.
 func (f *fileStationClient) ListShares(ctx context.Context) (*models.ShareList, error) {
-	return Get[filestation.ListShareRequest, models.ShareList](f.client, ctx, &filestation.ListShareRequest{}, filestation.API_METHODS["ListShares"])
+	return Get[filestation.ListShareRequest, models.ShareList](f.client, ctx, &filestation.ListShareRequest{}, methods.ListShares)
 }
 
 func (f *fileStationClient) MD5(ctx context.Context, path string) (*filestation.MD5StatusResponse, error) {
@@ -119,35 +101,6 @@ func (f *fileStationClient) MD5(ctx context.Context, path string) (*filestation.
 	}
 
 	return f.client.FileStationAPI().MD5Status(ctx, rmd5.TaskID)
-
-	// retry := 0
-	// completed := false
-	// for !completed {
-	// 	// Check the status of the delete operation
-	// 	if hstat, err := f.client.FileStationAPI().MD5Status(ctx, rmd5.TaskID); err == nil {
-
-	// 		if hstat.Finished {
-	// 			if hstat.MD5 != "" {
-	// 				data.MD5 = hstat.MD5
-	// 				completed = true
-	// 				continue
-	// 			}
-	// 		}
-	// 	}
-
-	// 	if retry > 10 {
-	// 		completed = true
-	// 		continue
-	// 	}
-	// 	retry++
-	// 	time.Sleep(5 * time.Second)
-	// }
-
-	// if data.MD5 == "" {
-	// 	return nil, fmt.Errorf("Unable to get file hash, retry count exceeded")
-	// } else {
-	// 	return &data, nil
-	// }
 }
 
 // Upload implements filestation.FileStationApi.
@@ -157,7 +110,7 @@ func (f *fileStationClient) Upload(ctx context.Context, path string, file form.F
 		File:          file,
 		CreateParents: createParents,
 		Overwrite:     overwrite,
-	}, filestation.API_METHODS["Upload"])
+	}, methods.Upload)
 }
 
 func NewFileStationClient(client *APIClient) filestation.FileStationApi {

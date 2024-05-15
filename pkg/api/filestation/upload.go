@@ -22,30 +22,3 @@ type UploadResponse struct {
 }
 
 var _ api.Request = (*UploadRequest)(nil)
-
-func NewUploadRequest(path string, file form.File) *UploadRequest {
-	return &UploadRequest{
-		Path: path,
-		File: file,
-	}
-}
-
-func (r *UploadRequest) WithPath(value string) *UploadRequest {
-	r.Path = value
-	return r
-}
-
-func (r *UploadRequest) WithFile(file form.File) *UploadRequest {
-	r.File = file
-	return r
-}
-
-func (r *UploadRequest) WithCreateParents(value bool) *UploadRequest {
-	r.CreateParents = value
-	return r
-}
-
-func (r *UploadRequest) WithOverwrite(value bool) *UploadRequest {
-	r.Overwrite = value
-	return r
-}

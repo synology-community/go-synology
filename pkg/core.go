@@ -9,7 +9,6 @@ import (
 	"io"
 	"maps"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/google/go-querystring/query"
@@ -22,26 +21,7 @@ import (
 
 var defaultTimeout = 15 * time.Second
 
-func LookupMethod(callingFunc string) (*api.APIMethod, error) {
-	var api, method string
-
-	sp := strings.Split(callingFunc, ".")
-
-	if len(sp) < 2 {
-		return nil, errors.New("invalid caller function")
-	}
-
-	api = sp[0]
-	method = sp[1]
-
-	if res, ok := MethodLookup[api][method]; ok {
-		return &res, nil
-	} else {
-		return nil, errors.New("method not found")
-	}
-}
-
-func Post[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Context, r *TReq, method api.APIMethod) (*TResp, error) {
+func Post[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Context, r *TReq, method api.Method) (*TResp, error) {
 
 	c, ok := s.(*APIClient)
 
@@ -79,16 +59,16 @@ func Post[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Co
 	}
 }
 
-func List[TResp api.Response](c SynologyClient, ctx context.Context, method api.APIMethod) (*TResp, error) {
+func List[TResp api.Response](c SynologyClient, ctx context.Context, method api.Method) (*TResp, error) {
 
 	return Get[api.Request, TResp](c, ctx, nil, method)
 }
 
-func GetEncode[TReq api.EncodeRequest, TResp api.Response](s SynologyClient, ctx context.Context, r *TReq, method api.APIMethod) (*TResp, error) {
+func GetEncode[TReq api.EncodeRequest, TResp api.Response](s SynologyClient, ctx context.Context, r *TReq, method api.Method) (*TResp, error) {
 	return Get[TReq, TResp](s, ctx, r, method)
 }
 
-func Get[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Context, r *TReq, method api.APIMethod) (*TResp, error) {
+func Get[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Context, r *TReq, method api.Method) (*TResp, error) {
 	c, ok := s.(*APIClient)
 	if !ok {
 		return nil, errors.New("invalid client")

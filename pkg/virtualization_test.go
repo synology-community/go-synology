@@ -4,95 +4,39 @@ import (
 	"context"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/synology-community/synology-api/pkg/api/virtualization"
 )
 
-func Test_virtualizationClient_ImageCreate(t *testing.T) {
-
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
-
-	defer cancel()
-
-	type fields struct {
-		client *APIClient
-	}
-	type args struct {
-		ctx context.Context
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *virtualization.TaskRef
-		wantErr bool
-	}{
-		{
-			name: "Create image",
-			fields: fields{
-				client: newClient(t),
-			},
-			args: args{
-				ctx: ctx,
-			},
-			want:    &virtualization.TaskRef{},
-			wantErr: false,
+func Test_Virtualization_Image(t *testing.T) {
+	image := virtualization.Image{
+		Name: "testmantic",
+		Storages: virtualization.Storages{
+			{Name: "default"},
 		},
+		Type:      "iso",
+		FilePath:  "/data/cluster_storage/commoninit.iso",
+		AutoClean: false,
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			v := tt.fields.client.VirtualizationAPI()
 
-			s, err := tt.fields.client.Virtualization.StorageList(context.Background())
-			if err != nil {
-				t.Fatal(err)
-			}
-			storageId := s.Storages[0].ID
-
-			got, err := v.ImageCreate(tt.args.ctx, virtualization.Image{
-				Name: "testmantic",
-				Storages: virtualization.Storages{
-					{ID: storageId},
-				},
-				Type:      "iso",
-				FilePath:  "/data/cluster_storage/commoninit.iso",
-				AutoClean: false,
-			})
-			assert.Nil(t, err)
-			assert.NotNil(t, got, "TaskRef is nil")
-		})
-	}
+	testImageCreate(t, image)
+	testImageDelete(t, image.Name)
 }
 
-func Test_virtualizationClient_ImageDelete(t *testing.T) {
-	type fields struct {
-		client *APIClient
-	}
-	type args struct {
-		ctx     context.Context
-		imageID string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *virtualization.TaskRef
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			v := tt.fields.client.Virtualization
-			err := v.ImageDelete(tt.args.ctx, tt.args.imageID)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("virtualizationClient.ImageDelete() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-		})
-	}
+func testImageCreate(t *testing.T, image virtualization.Image) {
+	c := newClient(t)
+	v := c.Virtualization
+	got, err := v.ImageCreate(context.Background(), image)
+	assert.Nil(t, err)
+	assert.NotNil(t, got, "TaskRef is nil")
+}
+
+func testImageDelete(t *testing.T, imageName string) {
+	c := newClient(t)
+	v := c.Virtualization
+	err := v.ImageDelete(context.Background(), imageName)
+	assert.Nil(t, err)
 }
 
 func Test_virtualizationClient_ImageList(t *testing.T) {

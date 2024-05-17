@@ -46,6 +46,18 @@ func (f *fileStationClient) DeleteStatus(ctx context.Context, taskID string) (*f
 	}, methods.DeleteStatus)
 }
 
+func (f *fileStationClient) MD5(ctx context.Context, path string) (*filestation.MD5StatusResponse, error) {
+	rmd5, err := f.client.FileStationAPI().MD5Start(ctx, path)
+
+	time.Sleep(5000 * time.Millisecond)
+
+	if err != nil {
+		return nil, fmt.Errorf("unable to get file md5, got error: %s", err)
+	}
+
+	return f.client.FileStationAPI().MD5Status(ctx, rmd5.TaskID)
+}
+
 func (f *fileStationClient) MD5Start(ctx context.Context, path string) (*filestation.MD5StartResponse, error) {
 	return Get[filestation.MD5StartRequest, filestation.MD5StartResponse](f.client, ctx, &filestation.MD5StartRequest{
 		Path: path,
@@ -87,20 +99,6 @@ func (f *fileStationClient) CreateFolder(ctx context.Context, paths []string, na
 // ListShares implements filestation.FileStationApi.
 func (f *fileStationClient) ListShares(ctx context.Context) (*models.ShareList, error) {
 	return Get[filestation.ListShareRequest, models.ShareList](f.client, ctx, &filestation.ListShareRequest{}, methods.ListShares)
-}
-
-func (f *fileStationClient) MD5(ctx context.Context, path string) (*filestation.MD5StatusResponse, error) {
-	// var data filestation.MD5Response
-	// Start Delete the file
-	rmd5, err := f.client.FileStationAPI().MD5Start(ctx, path)
-
-	time.Sleep(5000 * time.Millisecond)
-
-	if err != nil {
-		return nil, fmt.Errorf("Unable to delete file, got error: %s", err)
-	}
-
-	return f.client.FileStationAPI().MD5Status(ctx, rmd5.TaskID)
 }
 
 // Upload implements filestation.FileStationApi.

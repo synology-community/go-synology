@@ -1,5 +1,11 @@
 package models
 
+import (
+	"fmt"
+	"strconv"
+	"time"
+)
+
 type Pagination struct {
 	Total  int `json:"total,omitempty"`
 	Offset int `json:"offset,omitempty"`
@@ -32,53 +38,72 @@ type Share struct {
 }
 
 type File struct {
-	Path  string `json:"path"`
-	Name  string `json:"name"`
-	IsDir bool   `json:"isdir"`
+	Path       string               `json:"path"`
+	Name       string               `json:"name"`
+	IsDir      bool                 `json:"isdir"`
+	Additional AdditionalAttributes `json:"additional,omitempty"`
 }
 
 type AdditionalAttributes struct {
-	Indexed        bool   `json:"indexed"`
-	IsHybridShare  bool   `json:"is_hybrid_share"`
-	IsWormShare    bool   `json:"is_worm_share"`
-	MountPointType string `json:"mount_point_type"`
+	Indexed        bool   `json:"indexed,omitempty"`
+	IsHybridShare  bool   `json:"is_hybrid_share,omitempty"`
+	IsWormShare    bool   `json:"is_worm_share,omitempty"`
+	MountPointType string `json:"mount_point_type,omitempty"`
 	Owner          struct {
-		Group   string `json:"group"`
-		GroupID int    `json:"gid"`
-		User    string `json:"user"`
-		UserID  int    `json:"uid"`
-	} `json:"owner"`
+		Group   string `json:"group,omitempty"`
+		GroupID int    `json:"gid,omitempty"`
+		User    string `json:"user,omitempty"`
+		UserID  int    `json:"uid,omitempty"`
+	} `json:"owner,omitempty"`
 	Perm struct {
 		ACL struct {
-			Append bool `json:"append"`
-			Del    bool `json:"del"`
-			Exec   bool `json:"exec"`
-			Read   bool `json:"read"`
-			Write  bool `json:"write"`
-		} `json:"acl"`
-		ACLEnable bool `json:"acl_enable"`
+			Append bool `json:"append,omitempty"`
+			Del    bool `json:"del,omitempty"`
+			Exec   bool `json:"exec,omitempty"`
+			Read   bool `json:"read,omitempty"`
+			Write  bool `json:"write,omitempty"`
+		} `json:"acl,omitempty"`
+		ACLEnable bool `json:"acl_enable,omitempty"`
 		AdvRight  struct {
-			DisableDownload bool `json:"disable_download"`
-			DisableList     bool `json:"disable_list"`
-			DisableModify   bool `json:"disable_modify"`
-		} `json:"adv_right"`
+			DisableDownload bool `json:"disable_download,omitempty"`
+			DisableList     bool `json:"disable_list,omitempty"`
+			DisableModify   bool `json:"disable_modify,omitempty"`
+		} `json:"adv_right,omitempty"`
 		IsACLMode       bool   `json:"is_acl_mode"`
 		IsShareReadonly bool   `json:"is_share_readonly"`
 		Posix           int    `json:"posix"`
 		ShareRight      string `json:"share_right"`
-	} `json:"perm"`
-	RealPath  string `json:"real_path"`
-	SyncShare bool   `json:"sync_share"`
+	} `json:"perm,omitempty"`
+	RealPath  string `json:"real_path,omitempty"`
+	SyncShare bool   `json:"sync_share,omitempty"`
 	Time      struct {
-		Atime  int `json:"atime"`
-		Crtime int `json:"crtime"`
-		Ctime  int `json:"ctime"`
-		Mtime  int `json:"mtime"`
-	} `json:"time"`
+		Atime  JsonTime `json:"atime"`
+		Crtime JsonTime `json:"crtime"`
+		Ctime  JsonTime `json:"ctime"`
+		Mtime  JsonTime `json:"mtime"`
+	} `json:"time,omitempty"`
 	VolumeStatus struct {
-		Freespace  int64 `json:"freespace"`
-		Readonly   bool  `json:"readonly"`
-		Totalspace int64 `json:"totalspace"`
-	} `json:"volume_status"`
-	WormState int `json:"worm_state"`
+		Freespace  int64 `json:"freespace,omitempty"`
+		Readonly   bool  `json:"readonly,omitempty"`
+		Totalspace int64 `json:"totalspace,omitempty"`
+	} `json:"volume_status,omitempty"`
+	WormState int `json:"worm_state,omitempty"`
+}
+
+type JsonTime struct {
+	time.Time
+}
+
+func (ms JsonTime) MarshalJSON() ([]byte, error) {
+	str := fmt.Sprintf(`%d`, ms.Time.Unix())
+	return []byte(str), nil
+}
+
+func (ms *JsonTime) UnmarshalJSON(text []byte) error {
+	i, err := strconv.ParseInt(string(text), 10, 64)
+	if err != nil {
+		return err
+	}
+	ms.Time = time.Unix(i, 0)
+	return nil
 }

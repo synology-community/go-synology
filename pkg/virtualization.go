@@ -13,6 +13,12 @@ type virtualizationClient struct {
 	client *APIClient
 }
 
+// GuestUpdate implements virtualization.VirtualizationAPI.
+func (v *virtualizationClient) GuestUpdate(ctx context.Context, guest virtualization.GuestUpdate) error {
+	_, err := Post[virtualization.GuestUpdate, virtualization.GuestUpdateResponse](v.client, ctx, &guest, methods.GuestUpdate)
+	return err
+}
+
 // StorageList implements virtualization.VirtualizationAPI.
 func (v *virtualizationClient) StorageList(ctx context.Context) (*virtualization.StorageList, error) {
 	return List[virtualization.StorageList](v.client, ctx, methods.StorageList)

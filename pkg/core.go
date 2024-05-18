@@ -16,12 +16,13 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/synology-community/synology-api/pkg/api"
 	"github.com/synology-community/synology-api/pkg/api/filestation"
+	"github.com/synology-community/synology-api/pkg/util"
 	"github.com/synology-community/synology-api/pkg/util/form"
 )
 
 var defaultTimeout = 15 * time.Second
 
-func Post[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Context, r *TReq, method api.Method) (*TResp, error) {
+func PostFile[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Context, r *TReq, method api.Method) (*TResp, error) {
 
 	c, ok := s.(*APIClient)
 
@@ -68,6 +69,64 @@ func GetEncode[TReq api.EncodeRequest, TResp api.Response](s SynologyClient, ctx
 	return Get[TReq, TResp](s, ctx, r, method)
 }
 
+func Post[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Context, r *TReq, method api.Method) (*TResp, error) {
+	c, ok := s.(*APIClient)
+	if !ok {
+		return nil, errors.New("invalid client")
+	}
+
+	qu, err := util.Query(method, r)
+	if err != nil {
+		return nil, err
+	}
+
+	u := c.BaseURL
+
+	// Only set a timeout if one isn't already set
+	// var cancel context.CancelFunc
+	// if _, ok := ctx.Deadline(); !ok {
+	// 	ctx, cancel = context.WithTimeout(ctx, defaultTimeout)
+	// 	defer cancel()
+	// }
+
+	// body := bytes.NewReader([]byte(qu.Encode()))
+
+	// c.httpClient.HTTPClient.Jar.SetCookies(&u, []*http.Cookie{
+	// 	{
+	// 		Name:  "id",
+	// 		Value: c.GetAuth().SessionID,
+	// 	},
+	// })
+
+	resp, err := c.httpClient.PostForm(u.String(), qu)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return handleResponse[TResp](resp)
+
+	// req, err := retryablehttp.NewRequest(http.MethodPost, u.String(), body)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// req = req.WithContext(ctx)
+
+	// req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	// err = req.ParseForm()
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// token := c.GetAuth().Token
+	// if token != "" {
+	// 	req.Header.Add("X-Syno-Token", token)
+	// }
+
+	// return Do[TResp](c.httpClient, req)
+}
+
 func Get[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Context, r *TReq, method api.Method) (*TResp, error) {
 	c, ok := s.(*APIClient)
 	if !ok {
@@ -88,12 +147,6 @@ func Get[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Con
 	maps.Copy(qu, dq)
 
 	u := c.BaseURL
-
-	// if len(params) > 0 {
-	// 	u = params[0]
-	// } else {
-	// 	u = c.BaseURL
-	// }
 
 	u.RawQuery = qu.Encode()
 
@@ -139,8 +192,7 @@ func Do[TResponse api.Response](client *retryablehttp.Client, req *retryablehttp
 		_ = resp.Body.Close()
 	}()
 
-	// application/octet-stream
-
+	// Download response handler
 	if resp.Header.Get("Content-Type") == "application/octet-stream" {
 		resp, err := download(resp.Body)
 		if err != nil {
@@ -153,6 +205,26 @@ func Do[TResponse api.Response](client *retryablehttp.Client, req *retryablehttp
 			return nil, errors.New("invalid response")
 		}
 	}
+
+	return handleResponse[TResponse](resp)
+
+	// var synoResponse api.ApiResponse[TResponse]
+
+	// if err := json.NewDecoder(resp.Body).Decode(&synoResponse); err != nil {
+	// 	return nil, err
+	// }
+
+	// if synoResponse.Success {
+	// 	return &synoResponse.Data, nil
+	// } else {
+	// 	return nil, handleErrors(synoResponse, api.GlobalErrors)
+	// }
+
+	// response.SetError(handleErrors(synoResponse, response, api.GlobalErrors))
+	// return nil
+}
+
+func handleResponse[TResponse api.Response](resp *http.Response) (*TResponse, error) {
 	var synoResponse api.ApiResponse[TResponse]
 
 	if err := json.NewDecoder(resp.Body).Decode(&synoResponse); err != nil {
@@ -164,38 +236,7 @@ func Do[TResponse api.Response](client *retryablehttp.Client, req *retryablehttp
 	} else {
 		return nil, handleErrors(synoResponse, api.GlobalErrors)
 	}
-
-	// response.SetError(handleErrors(synoResponse, response, api.GlobalErrors))
-	// return nil
 }
-
-// func Retry(ctx context.Context, delay time.Duration, fn func() error) error {
-// 	deadline, ok := ctx.Deadline()
-// 	if !ok {
-// 		deadline = time.Now().Add(60 * time.Second)
-// 	}
-
-// 	for {
-// 		err := fn()
-// 		if err == nil {
-// 			return nil
-// 		}
-
-// 		delay := 5 * time.Second
-// 		for {
-// 			if err := fn(); err != nil {
-// 				return nil
-// 			}
-// 			if task.Finished {
-// 				return task, nil
-// 			}
-// 			if time.Now().After(deadline.Add(delay)) {
-// 				return nil, fmt.Errorf("Timeout waiting for task to complete")
-// 			}
-// 			time.Sleep(delay)
-// 		}
-// 	}
-// }
 
 func handleErrors[T any | api.ApiError](response api.ApiResponse[T], knownErrors api.ErrorSummary) error {
 	if response.Error.Code == 0 {

@@ -28,6 +28,8 @@ type SynologyClient interface {
 
 	FileStationAPI() filestation.FileStationApi
 
+	GetAuth() AuthStorage
+
 	// get(request api.Request, response api.Response) error
 }
 type APIClient struct {
@@ -63,6 +65,10 @@ func (c *APIClient) Login(ctx context.Context, user, password string) (*api.Logi
 
 	c.BaseURL.RawQuery = q.Encode()
 	return resp, nil
+}
+
+func (c *APIClient) GetAuth() AuthStorage {
+	return c.Auth
 }
 
 // FileStationAPI implements SynologyClient.

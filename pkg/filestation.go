@@ -103,7 +103,7 @@ func (f *fileStationClient) ListShares(ctx context.Context) (*models.ShareList, 
 
 // Upload implements filestation.FileStationApi.
 func (f *fileStationClient) Upload(ctx context.Context, path string, file form.File, createParents bool, overwrite bool) (*filestation.UploadResponse, error) {
-	return Post[filestation.UploadRequest, filestation.UploadResponse](f.client, ctx, &filestation.UploadRequest{
+	return PostFile[filestation.UploadRequest, filestation.UploadResponse](f.client, ctx, &filestation.UploadRequest{
 		Path:          path,
 		File:          file,
 		CreateParents: createParents,

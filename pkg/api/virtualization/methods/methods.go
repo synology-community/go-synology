@@ -9,6 +9,7 @@ const (
 	API_Guest_Image = "SYNO.Virtualization.API.Guest.Image"
 	API_Task_Info   = "SYNO.Virtualization.API.Task.Info"
 	API_Storage     = "SYNO.Virtualization.API.Storage"
+	SET_Guest       = "SYNO.Virtualization.Guest"
 )
 
 var (
@@ -34,6 +35,12 @@ var (
 		API:          API_Guest,
 		Version:      1,
 		Method:       "delete",
+		ErrorSummary: api.GlobalErrors,
+	}
+	GuestUpdate = api.Method{
+		API:          SET_Guest,
+		Version:      1,
+		Method:       "set",
 		ErrorSummary: api.GlobalErrors,
 	}
 	ImageList = api.Method{

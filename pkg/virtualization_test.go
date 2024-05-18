@@ -10,6 +10,8 @@ import (
 )
 
 func Test_Virtualization_Image(t *testing.T) {
+	c := newClient(t)
+	v := c.Virtualization
 	image := virtualization.Image{
 		Name: "testmantic",
 		Storages: virtualization.Storages{
@@ -20,56 +22,78 @@ func Test_Virtualization_Image(t *testing.T) {
 		AutoClean: false,
 	}
 
-	testImageCreate(t, image)
-	testImageDelete(t, image.Name)
+	testImageCreate(t, v, image)
+	testImageDelete(t, v, image.Name)
 }
 
-func testImageCreate(t *testing.T, image virtualization.Image) {
+func Test_Virtualization_Guest(t *testing.T) {
 	c := newClient(t)
 	v := c.Virtualization
+
+	guest := virtualization.Guest{
+		Name:        "test001",
+		StorageName: "default",
+		VcpuNum:     4,
+		VramSize:    4096,
+		Networks: virtualization.VNICs{
+			{Name: "default"},
+		},
+		Disks: virtualization.VDisks{
+			{
+				CreateType: 0,
+				Size:       20000,
+			},
+		},
+	}
+
+	g := testGuestCreate(t, v, guest)
+
+	if g == nil {
+		g = testGuestGet(t, v, guest)
+	}
+
+	testGuestUpdate(t, v, virtualization.GuestUpdate{
+		ID:        g.ID,
+		Name:      guest.Name,
+		IsoImages: []string{"unmounted", "unmounted"},
+	})
+
+	testGuestDelete(t, v, virtualization.Guest{
+		Name: guest.Name,
+	})
+}
+
+func testGuestGet(t *testing.T, v *virtualizationClient, guest virtualization.Guest) *virtualization.Guest {
+	g, err := v.GuestGet(context.Background(), guest)
+	assert.Nil(t, err)
+	return g
+}
+
+func testGuestCreate(t *testing.T, v *virtualizationClient, guest virtualization.Guest) *virtualization.Guest {
+	g, err := v.GuestCreate(context.Background(), guest)
+	assert.Nil(t, err)
+	return g
+}
+
+func testGuestDelete(t *testing.T, v *virtualizationClient, guest virtualization.Guest) {
+	err := v.GuestDelete(context.Background(), guest)
+	assert.Nil(t, err)
+}
+
+func testGuestUpdate(t *testing.T, v *virtualizationClient, guest virtualization.GuestUpdate) {
+	err := v.GuestUpdate(context.Background(), guest)
+	assert.Nil(t, err)
+}
+
+func testImageCreate(t *testing.T, v *virtualizationClient, image virtualization.Image) {
 	got, err := v.ImageCreate(context.Background(), image)
 	assert.Nil(t, err)
 	assert.NotNil(t, got, "TaskRef is nil")
 }
 
-func testImageDelete(t *testing.T, imageName string) {
-	c := newClient(t)
-	v := c.Virtualization
+func testImageDelete(t *testing.T, v *virtualizationClient, imageName string) {
 	err := v.ImageDelete(context.Background(), imageName)
 	assert.Nil(t, err)
-}
-
-func Test_virtualizationClient_ImageList(t *testing.T) {
-	type fields struct {
-		client *APIClient
-	}
-	type args struct {
-		ctx context.Context
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *virtualization.ImageList
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			v := &virtualizationClient{
-				client: tt.fields.client,
-			}
-			got, err := v.ImageList(tt.args.ctx)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("virtualizationClient.ImageList() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("virtualizationClient.ImageList() = %v, want %v", got, tt.want)
-			}
-		})
-	}
 }
 
 func Test_virtualizationClient_TaskGet(t *testing.T) {
@@ -101,64 +125,6 @@ func Test_virtualizationClient_TaskGet(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("virtualizationClient.TaskGet() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_virtualizationClient_GuestGet(t *testing.T) {
-	type fields struct {
-		client *APIClient
-	}
-	type args struct {
-		ctx  context.Context
-		name string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *virtualization.Guest
-		wantErr bool
-	}{
-		{
-			name: "Get guest",
-			fields: fields{
-				client: newClient(t),
-			},
-			args: args{
-				ctx:  context.Background(),
-				name: "testmantic",
-			},
-			want: &virtualization.Guest{
-				ID:          "1",
-				Name:        "testmantic",
-				Description: "Testmantic",
-				Status:      "stopped",
-				StorageID:   "1",
-				StorageName: "default",
-				AutoRun:     0,
-				VcpuNum:     1,
-				VramSize:    512,
-				Disks:       virtualization.VDisks{},
-				Networks:    virtualization.VNICs{},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			v := &virtualizationClient{
-				client: tt.fields.client,
-			}
-			got, err := v.GuestGet(tt.args.ctx, virtualization.Guest{
-				Name: tt.args.name,
-			})
-			if (err != nil) != tt.wantErr {
-				t.Errorf("virtualizationClient.GetGuest() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("virtualizationClient.GetGuest() = %v, want %v", got, tt.want)
 			}
 		})
 	}

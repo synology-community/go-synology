@@ -246,17 +246,17 @@ func handleErrors[T any | api.ApiError](response api.ApiResponse[T], knownErrors
 	var result error
 
 	if errDesc, ok := knownErrors[response.Error.Code]; ok {
-		result = multierror.Append(result, fmt.Errorf("api response error: response code %d => %v", response.Error.Code, errDesc))
+		result = multierror.Append(result, fmt.Errorf("api response error code %d: %v", response.Error.Code, errDesc))
 	} else {
-		result = multierror.Append(result, fmt.Errorf("api response error: response code %d => %v", response.Error.Code, response.Error))
+		result = multierror.Append(result, fmt.Errorf("api response error code %d: %v", response.Error.Code, response.Error))
 	}
 
 	if response.Error.Errors != nil {
 		for i, err := range response.Error.Errors {
 			if errDesc, ok := knownErrors[err.Code]; ok {
-				result = multierror.Append(result, fmt.Errorf("api response error[%d]: response code %d => %v", i, err.Code, errDesc))
+				result = multierror.Append(result, fmt.Errorf("api response error[%d] code %d: %v", i, err.Code, errDesc))
 			} else {
-				result = multierror.Append(result, fmt.Errorf("api response error[%d]: response code %d => %v", i, err.Code, err))
+				result = multierror.Append(result, fmt.Errorf("api response error[%d] code %d: %v", i, err.Code, err))
 			}
 		}
 	}

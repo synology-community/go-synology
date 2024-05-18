@@ -10,6 +10,8 @@ type VirtualizationAPI interface {
 	GuestCreate(ctx context.Context, guest Guest) (*Guest, error)
 	GuestDelete(ctx context.Context, guest Guest) error
 	GuestUpdate(ctx context.Context, guest GuestUpdate) error
+	GuestPowerOn(ctx context.Context, guest Guest) error
+	GuestPowerOff(ctx context.Context, guest Guest) error
 
 	ImageList(ctx context.Context) (*ImageList, error)
 	ImageCreate(ctx context.Context, image Image) (*Task, error)

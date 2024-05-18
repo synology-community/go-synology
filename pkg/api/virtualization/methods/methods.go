@@ -5,11 +5,12 @@ import (
 )
 
 const (
-	API_Guest       = "SYNO.Virtualization.API.Guest"
-	API_Guest_Image = "SYNO.Virtualization.API.Guest.Image"
-	API_Task_Info   = "SYNO.Virtualization.API.Task.Info"
-	API_Storage     = "SYNO.Virtualization.API.Storage"
-	SET_Guest       = "SYNO.Virtualization.Guest"
+	API_Guest        = "SYNO.Virtualization.API.Guest"
+	API_Guest_Image  = "SYNO.Virtualization.API.Guest.Image"
+	API_Guest_Action = "SYNO.Virtualization.API.Guest.Action"
+	API_Task_Info    = "SYNO.Virtualization.API.Task.Info"
+	API_Storage      = "SYNO.Virtualization.API.Storage"
+	SET_Guest        = "SYNO.Virtualization.Guest"
 )
 
 var (
@@ -41,6 +42,18 @@ var (
 		API:          SET_Guest,
 		Version:      1,
 		Method:       "set",
+		ErrorSummary: api.GlobalErrors,
+	}
+	GuestPowerOn = api.Method{
+		API:          API_Guest_Action,
+		Version:      1,
+		Method:       "poweron",
+		ErrorSummary: api.GlobalErrors,
+	}
+	GuestPowerOff = api.Method{
+		API:          API_Guest_Action,
+		Version:      1,
+		Method:       "poweroff",
 		ErrorSummary: api.GlobalErrors,
 	}
 	ImageList = api.Method{

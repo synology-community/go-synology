@@ -7,10 +7,22 @@ import (
 
 	"github.com/synology-community/synology-api/pkg/api/virtualization"
 	"github.com/synology-community/synology-api/pkg/api/virtualization/methods"
+	"github.com/synology-community/synology-api/pkg/models"
 )
 
 type virtualizationClient struct {
 	client *APIClient
+}
+
+func (v *virtualizationClient) GuestPowerOn(ctx context.Context, guest virtualization.Guest) error {
+	_, err := Get[virtualization.Guest, models.NilResponse](v.client, ctx, &guest, methods.GuestPowerOn)
+	return err
+}
+
+// GuestPowerOff implements virtualization.VirtualizationAPI.
+func (v *virtualizationClient) GuestPowerOff(ctx context.Context, guest virtualization.Guest) error {
+	_, err := Get[virtualization.Guest, models.NilResponse](v.client, ctx, &guest, methods.GuestPowerOff)
+	return err
 }
 
 // GuestUpdate implements virtualization.VirtualizationAPI.

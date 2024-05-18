@@ -89,7 +89,7 @@ func (v *virtualizationClient) TaskGet(ctx context.Context, taskID string) (*vir
 
 // GetGuest implements virtualization.VirtualizationAPI.
 func (v *virtualizationClient) GuestGet(ctx context.Context, guest virtualization.Guest) (*virtualization.Guest, error) {
-	return Get[virtualization.Guest, virtualization.Guest](v.client, ctx, &guest, methods.GuestGet)
+	return Get[virtualization.GetGuest, virtualization.Guest](v.client, ctx, &virtualization.GetGuest{Name: guest.Name}, methods.GuestGet)
 }
 
 // ListGuests implements virtualization.VirtualizationAPI.

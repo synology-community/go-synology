@@ -46,10 +46,12 @@ func Test_Virtualization_Guest(t *testing.T) {
 		},
 	}
 
-	g := testGuestCreate(t, v, guest)
+	g, err := v.GuestGet(context.Background(), guest)
 
-	if g == nil {
-		g = testGuestGet(t, v, guest)
+	if err != nil {
+		g, err = v.GuestCreate(context.Background(), guest)
+
+		assert.Nil(t, err)
 	}
 
 	testGuestUpdate(t, v, virtualization.GuestUpdate{

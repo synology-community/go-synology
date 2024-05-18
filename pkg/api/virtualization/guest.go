@@ -52,7 +52,7 @@ type Guest struct {
 	VramSize    int64    `url:"vram_size,omitempty" json:"vram_size"`
 	Disks       VDisks   `url:"vdisks,omitempty" json:"vdisks"`
 	Networks    VNICs    `url:"vnics,omitempty" json:"vnics"`
-	IsoImages   []string `url:"iso_images" json:"iso_images" form:"iso_images"`
+	IsoImages   []string `url:"iso_images,omitempty" json:"iso_images,omitempty" form:"iso_images,omitempty"`
 }
 
 type GuestList struct {

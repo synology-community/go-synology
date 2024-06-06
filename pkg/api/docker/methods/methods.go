@@ -47,4 +47,10 @@ var (
 		Method:       methodDelete,
 		ErrorSummary: docker.CommonErrors,
 	}
+	RegistryList = api.Method{
+		API:          "SYNO.Docker.Registry",
+		Version:      1,
+		Method:       methodGet,
+		ErrorSummary: docker.CommonErrors,
+	}
 )

@@ -7,5 +7,5 @@ import (
 )
 
 type DockerApi interface {
-	CreateContainer(ctx context.Context, container CreateContainerRequest) (*models.FolderList, error)
+	ContainerCreate(ctx context.Context, container CreateContainerRequest) (*models.FolderList, error)
 }

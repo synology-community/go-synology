@@ -1,5 +1,11 @@
 package docker
 
+import (
+	"net/url"
+
+	"github.com/synology-community/synology-api/pkg/util"
+)
+
 type EnvVariable struct {
 	Key   string `json:"key,omitempty"`
 	Value string `json:"value,omitempty"`
@@ -46,7 +52,11 @@ type Container struct {
 	Links               []Link          `json:"links,omitempty"`
 }
 
+func (s Container) EncodeValues(k string, v *url.Values) error {
+	return util.EncodeValues(&s, k, v)
+}
+
 type CreateContainerRequest struct {
-	Container     Container `json:"profile,omitempty"`
-	IsRunIstantly bool      `json:"is_run_instantly,omitempty"`
+	Container      Container `json:"profile,omitempty" url:"profile"`
+	IsRunInstantly bool      `json:"is_run_instantly,omitempty" url:"is_run_instantly"`
 }

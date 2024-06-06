@@ -15,6 +15,10 @@ type fileStationClient struct {
 	client *APIClient
 }
 
+func NewFileStationClient(client *APIClient) filestation.FileStationApi {
+	return &fileStationClient{client: client}
+}
+
 // List implements filestation.FileStationApi.
 func (f *fileStationClient) List(ctx context.Context, folderPath string) (*models.FileList, error) {
 	return Get[models.FileListRequest, models.FileList](f.client, ctx, &models.FileListRequest{
@@ -109,8 +113,4 @@ func (f *fileStationClient) Upload(ctx context.Context, path string, file form.F
 		CreateParents: createParents,
 		Overwrite:     overwrite,
 	}, methods.Upload)
-}
-
-func NewFileStationClient(client *APIClient) filestation.FileStationApi {
-	return &fileStationClient{client: client}
 }

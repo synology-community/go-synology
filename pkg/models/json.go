@@ -16,6 +16,6 @@ func (s JsonArray) EncodeValues(k string, v *url.Values) error {
 type JsonString string
 
 func (s JsonString) EncodeValues(k string, v *url.Values) error {
-	v.Set(k, `"`+string(s)+`"`)
+	v.Set(k, fmt.Sprintf(`"%s"`, s))
 	return nil
 }

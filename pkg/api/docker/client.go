@@ -19,6 +19,11 @@ func (d *Client) ProjectCleanStream(ctx context.Context, req ProjectCleanStreamR
 	return api.Get[ProjectCleanStreamRequest, ProjectCleanStreamResponse](d.client, ctx, &req, methods.ProjectCleanStream)
 }
 
+// ProjectStopStream implements DockerApi.
+func (d *Client) ProjectStopStream(ctx context.Context, req ProjectStopStreamRequest) (*ProjectStopStreamResponse, error) {
+	return api.Get[ProjectStopStreamRequest, ProjectStopStreamResponse](d.client, ctx, &req, methods.ProjectStopStream)
+}
+
 // ProjectCreate implements DockerApi.
 func (d *Client) ProjectCreate(ctx context.Context, req ProjectCreateRequest) (*ProjectCreateResponse, error) {
 	return api.Get[ProjectCreateRequest, ProjectCreateResponse](d.client, ctx, &req, methods.ProjectCreate)

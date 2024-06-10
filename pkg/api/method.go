@@ -14,5 +14,6 @@ const (
 	MethodPullStart   = "pull_start"
 	MethodPullStatus  = "pull_status"
 	MethodCleanStream = "clean_stream"
+	MethodStopStream  = "stop_stream"
 	MethodStatus      = "status"
 )

@@ -126,3 +126,9 @@ type ProjectCleanStreamRequest struct {
 }
 
 type ProjectCleanStreamResponse string
+
+type ProjectStopStreamRequest struct {
+	ID models.JsonString `url:"id,omitempty"`
+}
+
+type ProjectStopStreamResponse string

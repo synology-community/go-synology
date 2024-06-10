@@ -20,4 +20,5 @@ type Api interface {
 	ProjectUpdate(ctx context.Context, req ProjectUpdateRequest) (*ProjectUpdateResponse, error)
 	ProjectDelete(ctx context.Context, req ProjectDeleteRequest) (*ProjectDeleteResponse, error)
 	ProjectCleanStream(ctx context.Context, req ProjectCleanStreamRequest) (*ProjectCleanStreamResponse, error)
+	ProjectStopStream(ctx context.Context, req ProjectStopStreamRequest) (*ProjectStopStreamResponse, error)
 }

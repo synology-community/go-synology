@@ -99,4 +99,10 @@ var (
 		Method:       api.MethodCleanStream,
 		ErrorSummary: CommonErrors,
 	}
+	ProjectStopStream = api.Method{
+		API:          API_DockerProject,
+		Version:      1,
+		Method:       api.MethodStopStream,
+		ErrorSummary: CommonErrors,
+	}
 )

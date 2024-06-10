@@ -13,7 +13,7 @@ type FileStationApi interface {
 	List(ctx context.Context, folderPath string) (*models.FileList, error)
 	Upload(ctx context.Context, path string, file form.File, createParents bool, overwrite bool) (*UploadResponse, error)
 	Rename(ctx context.Context, path string, name string, newName string) (*models.FileList, error)
-	Download(ctx context.Context, path string, mode string) (*DownloadResponse, error)
+	Download(ctx context.Context, path string, mode string) (*form.File, error)
 	Delete(ctx context.Context, paths []string, accurateProgress bool) (*DeleteStatusResponse, error)
 	DeleteStart(ctx context.Context, paths []string, accurateProgress bool) (*DeleteStartResponse, error)
 	DeleteStatus(ctx context.Context, taskID string) (*DeleteStatusResponse, error)

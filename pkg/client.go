@@ -11,6 +11,8 @@ import (
 
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/synology-community/synology-api/pkg/api"
+	"github.com/synology-community/synology-api/pkg/api/core"
+	"github.com/synology-community/synology-api/pkg/api/docker"
 	"github.com/synology-community/synology-api/pkg/api/filestation"
 	"github.com/synology-community/synology-api/pkg/api/virtualization"
 	"golang.org/x/net/publicsuffix"
@@ -28,6 +30,10 @@ type SynologyClient interface {
 
 	FileStationAPI() filestation.FileStationApi
 
+	DockerAPI() docker.DockerApi
+
+	CoreAPI() core.CoreApi
+
 	GetAuth() AuthStorage
 
 	// get(request api.Request, response api.Response) error
@@ -37,6 +43,8 @@ type APIClient struct {
 
 	FileStation    *fileStationClient
 	Virtualization *virtualizationClient
+	Docker         *dockerClient
+	Core           *coreClient
 
 	BaseURL url.URL
 
@@ -78,6 +86,14 @@ func (c *APIClient) FileStationAPI() filestation.FileStationApi {
 
 func (c *APIClient) VirtualizationAPI() virtualization.VirtualizationAPI {
 	return c.Virtualization
+}
+
+func (c *APIClient) DockerAPI() docker.DockerApi {
+	return c.Docker
+}
+
+func (c *APIClient) CoreAPI() core.CoreApi {
+	return c.Core
 }
 
 // New initializes "client" instance with minimal input configuration.
@@ -124,8 +140,10 @@ func New(o Options) (SynologyClient, error) {
 		BaseURL:    *baseURL,
 	}
 
+	synoClient.Core = &coreClient{client: synoClient}
 	synoClient.FileStation = &fileStationClient{client: synoClient}
 	synoClient.Virtualization = &virtualizationClient{client: synoClient}
+	synoClient.Docker = &dockerClient{client: synoClient}
 
 	return synoClient, nil
 }

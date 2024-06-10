@@ -75,8 +75,8 @@ func (f *fileStationClient) MD5Status(ctx context.Context, taskID string) (*file
 }
 
 // Download implements filestation.FileStationApi.
-func (f *fileStationClient) Download(ctx context.Context, path string, mode string) (*filestation.DownloadResponse, error) {
-	return Get[filestation.DownloadRequest, filestation.DownloadResponse](f.client, ctx, &filestation.DownloadRequest{
+func (f *fileStationClient) Download(ctx context.Context, path string, mode string) (*form.File, error) {
+	return Get[filestation.DownloadRequest, form.File](f.client, ctx, &filestation.DownloadRequest{
 		Path: path,
 		Mode: mode,
 	}, methods.Download)

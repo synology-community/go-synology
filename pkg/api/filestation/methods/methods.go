@@ -5,17 +5,6 @@ import (
 	"github.com/synology-community/synology-api/pkg/api/filestation"
 )
 
-const (
-	MethodCreate     = "create"
-	MethodGet        = "get"
-	MethodUpload     = "upload"
-	MethodList       = "list"
-	MethodListShares = "list_share"
-	MethodRename     = "rename"
-	MethodInfo       = "get"
-	MethodStart      = "start"
-)
-
 var (
 	Upload = api.Method{
 		API:     "SYNO.FileStation.Upload",
@@ -35,13 +24,13 @@ var (
 	ListShares = api.Method{
 		API:          "SYNO.FileStation.List",
 		Version:      2,
-		Method:       "list_share",
+		Method:       api.MethodListShares,
 		ErrorSummary: filestation.CommonErrors,
 	}
 	Rename = api.Method{
 		API:     "SYNO.FileStation.Rename",
 		Version: 2,
-		Method:  "rename",
+		Method:  api.MethodRename,
 		ErrorSummary: filestation.CommonErrors.Combine(api.ErrorSummary{
 			1200: "Failed to rename it.",
 		}),
@@ -49,13 +38,13 @@ var (
 	Info = api.Method{
 		API:          "SYNO.FileStation.Info",
 		Version:      1,
-		Method:       "get",
+		Method:       api.MethodGet,
 		ErrorSummary: filestation.CommonErrors,
 	}
 	CreateFolder = api.Method{
 		API:     "SYNO.FileStation.CreateFolder",
 		Version: 2,
-		Method:  "create",
+		Method:  api.MethodCreate,
 		ErrorSummary: api.ErrorSummary{
 			1100: "Failed to create a folder. More information in <errors> object.",
 			1101: "The number of folders to the parent folder would exceed the system limitation.",
@@ -64,13 +53,13 @@ var (
 	DeleteStart = api.Method{
 		API:          "SYNO.FileStation.Delete",
 		Version:      2,
-		Method:       "start",
+		Method:       api.MethodStart,
 		ErrorSummary: filestation.CommonErrors,
 	}
 	DeleteStatus = api.Method{
 		API:          "SYNO.FileStation.Delete",
 		Version:      1,
-		Method:       "status",
+		Method:       api.MethodStatus,
 		ErrorSummary: filestation.CommonErrors,
 	}
 	Download = api.Method{
@@ -82,7 +71,7 @@ var (
 	MD5Start = api.Method{
 		API:          "SYNO.FileStation.MD5",
 		Version:      2,
-		Method:       "start",
+		Method:       api.MethodStatus,
 		ErrorSummary: filestation.CommonErrors,
 	}
 	MD5Status = api.Method{

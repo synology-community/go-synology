@@ -16,6 +16,18 @@ type File struct {
 	Content string `form:"content" url:"content"`
 }
 
+func (f *File) UnmarshalJSON(data []byte) error {
+	if string(data) == "null" || string(data) == `""` {
+		return nil
+	}
+
+	*f = File{
+		Content: string(data),
+	}
+
+	return nil
+}
+
 func NewEncoder() error {
 	return nil
 }

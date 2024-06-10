@@ -24,7 +24,7 @@ type Network struct {
 type PortBinding struct {
 	HostPort      int64  `json:"host_port,omitempty"`
 	ContainerPort int64  `json:"container_port,omitempty"`
-	Type          string `json:"type,omitempty"`
+	Protocol      string `json:"type,omitempty"`
 }
 
 type VolumeBinding struct {
@@ -43,12 +43,12 @@ type Container struct {
 	Network             []Network       `json:"network,omitempty"`
 	UseHostNetwork      bool            `json:"use_host_network,omitempty"`
 	Cmd                 string          `json:"cmd,omitempty"`
-	ServicePortals      []interface{}   `json:"service_portals,omitempty"`
+	ServicePortals      []string        `json:"service_portals,omitempty"`
 	CPUPriority         int64           `json:"cpu_priority,omitempty"`
 	MemoryLimit         int64           `json:"memory_limit,omitempty"`
 	EnableRestartPolicy bool            `json:"enable_restart_policy,omitempty"`
 	CapAdd              []string        `json:"CapAdd,omitempty"`
-	CapDrop             []interface{}   `json:"CapDrop,omitempty"`
+	CapDrop             []string        `json:"CapDrop,omitempty"`
 	Links               []Link          `json:"links,omitempty"`
 }
 
@@ -59,4 +59,9 @@ func (s Container) EncodeValues(k string, v *url.Values) error {
 type CreateContainerRequest struct {
 	Container      Container `json:"profile,omitempty" url:"profile"`
 	IsRunInstantly bool      `json:"is_run_instantly,omitempty" url:"is_run_instantly"`
+}
+
+type CreateContainerResponse struct {
+	Services                []string `json:"services,omitempty"`
+	StartDependentContainer bool     `json:"start_dependent_container,omitempty"`
 }

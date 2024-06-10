@@ -243,10 +243,25 @@ func Test_fileStationClient_Download(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *filestation.DownloadResponse
+		want    *form.File
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Download",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx:  context.Background(),
+				path: "/data/foo/test.txt",
+				mode: "download",
+			},
+			want: &form.File{
+				Name:    "download",
+				Content: "Hello, World!",
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

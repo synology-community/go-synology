@@ -9,18 +9,33 @@ import (
 	"io"
 	"maps"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/google/go-querystring/query"
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/synology-community/synology-api/pkg/api"
-	"github.com/synology-community/synology-api/pkg/api/filestation"
+	"github.com/synology-community/synology-api/pkg/api/core"
+	"github.com/synology-community/synology-api/pkg/api/core/methods"
 	"github.com/synology-community/synology-api/pkg/util"
 	"github.com/synology-community/synology-api/pkg/util/form"
 )
 
 var defaultTimeout = 15 * time.Second
+
+type coreClient struct {
+	client *APIClient
+}
+
+// PackageList implements core.CoreApi.
+func (c *coreClient) PackageList(ctx context.Context) (*core.PackageListResponse, error) {
+	return List[core.PackageListResponse](c.client, ctx, methods.PackageList)
+}
+
+func NewCoreClient(client *APIClient) core.CoreApi {
+	return &coreClient{client: client}
+}
 
 func PostFile[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Context, r *TReq, method api.Method) (*TResp, error) {
 
@@ -172,14 +187,10 @@ func download(r io.ReadCloser) (interface{}, error) {
 		return nil, err
 	}
 
-	dlr := filestation.DownloadResponse{
-		File: form.File{
-			Content: buf.String(),
-			Name:    "download",
-		},
-	}
-
-	return &dlr, nil
+	return &form.File{
+		Content: buf.String(),
+		Name:    "download",
+	}, nil
 }
 
 func Do[TResponse api.Response](client *retryablehttp.Client, req *retryablehttp.Request) (*TResponse, error) {
@@ -192,8 +203,21 @@ func Do[TResponse api.Response](client *retryablehttp.Client, req *retryablehttp
 		_ = resp.Body.Close()
 	}()
 
-	// Download response handler
-	if resp.Header.Get("Content-Type") == "application/octet-stream" {
+	return handleResponse[TResponse](resp)
+}
+
+func handleResponse[TResponse api.Response](resp *http.Response) (*TResponse, error) {
+	var synoResponse api.ApiResponse[TResponse]
+
+	contentType := resp.Header.Get("Content-Type")
+	contentType = strings.Split(contentType, ";")[0]
+
+	switch contentType {
+	case "application/json":
+		if err := json.NewDecoder(resp.Body).Decode(&synoResponse); err != nil {
+			return nil, err
+		}
+	case "application/octet-stream":
 		resp, err := download(resp.Body)
 		if err != nil {
 			return nil, err
@@ -204,31 +228,6 @@ func Do[TResponse api.Response](client *retryablehttp.Client, req *retryablehttp
 		} else {
 			return nil, errors.New("invalid response")
 		}
-	}
-
-	return handleResponse[TResponse](resp)
-
-	// var synoResponse api.ApiResponse[TResponse]
-
-	// if err := json.NewDecoder(resp.Body).Decode(&synoResponse); err != nil {
-	// 	return nil, err
-	// }
-
-	// if synoResponse.Success {
-	// 	return &synoResponse.Data, nil
-	// } else {
-	// 	return nil, handleErrors(synoResponse, api.GlobalErrors)
-	// }
-
-	// response.SetError(handleErrors(synoResponse, response, api.GlobalErrors))
-	// return nil
-}
-
-func handleResponse[TResponse api.Response](resp *http.Response) (*TResponse, error) {
-	var synoResponse api.ApiResponse[TResponse]
-
-	if err := json.NewDecoder(resp.Body).Decode(&synoResponse); err != nil {
-		return nil, err
 	}
 
 	if synoResponse.Success {

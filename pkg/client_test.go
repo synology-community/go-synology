@@ -10,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 	"github.com/synology-community/synology-api/pkg/api"
 	"github.com/synology-community/synology-api/pkg/util"
 	"github.com/synology-community/synology-api/pkg/util/form"
@@ -42,6 +43,26 @@ func newClient(t *testing.T) *APIClient {
 	} else {
 		return client
 	}
+}
+
+func newSuiteClient(suite *suite.Suite) *APIClient {
+	c, err := New(Options{
+		Host:       os.Getenv("SYNOLOGY_HOST"),
+		VerifyCert: false,
+	})
+	suite.Require().NoError(err)
+
+	r, err := c.Login(context.Background(), os.Getenv("SYNOLOGY_USER"), os.Getenv("SYNOLOGY_PASSWORD"))
+	suite.Require().NoError(err)
+
+	log.Infoln("Login successful")
+	log.Infof("[INFO] Session: %s\nDeviceID: %s", r.SessionID, r.DeviceID)
+
+	client, ok := c.(*APIClient)
+
+	suite.Require().True(ok)
+
+	return client
 }
 
 func Test_FileStationClient_Upload(t *testing.T) {

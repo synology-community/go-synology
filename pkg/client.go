@@ -1,21 +1,11 @@
 package client
 
 import (
-	"context"
-	"crypto/tls"
-	"net"
-	"net/http"
-	"net/http/cookiejar"
-	"net/url"
-	"time"
-
-	"github.com/hashicorp/go-retryablehttp"
 	"github.com/synology-community/synology-api/pkg/api"
 	"github.com/synology-community/synology-api/pkg/api/core"
 	"github.com/synology-community/synology-api/pkg/api/docker"
 	"github.com/synology-community/synology-api/pkg/api/filestation"
 	"github.com/synology-community/synology-api/pkg/api/virtualization"
-	"golang.org/x/net/publicsuffix"
 )
 
 type AuthStorage struct {
@@ -24,126 +14,59 @@ type AuthStorage struct {
 }
 
 type SynologyClient interface {
-	api.API
+	api.Api
 
-	VirtualizationAPI() virtualization.VirtualizationAPI
+	VirtualizationAPI() virtualization.Api
 
-	FileStationAPI() filestation.FileStationApi
+	FileStationAPI() filestation.Api
 
-	DockerAPI() docker.DockerApi
+	DockerAPI() docker.Api
 
-	CoreAPI() core.CoreApi
-
-	GetAuth() AuthStorage
+	CoreAPI() core.Api
 
 	// get(request api.Request, response api.Response) error
 }
 type APIClient struct {
-	httpClient *retryablehttp.Client
+	api.Api
 
-	FileStation    *fileStationClient
-	Virtualization *virtualizationClient
-	Docker         *dockerClient
-	Core           *coreClient
-
-	BaseURL url.URL
-
-	Auth AuthStorage
-}
-
-// Login runs a login flow to retrieve session token from Synology.
-func (c *APIClient) Login(ctx context.Context, user, password string) (*api.LoginResponse, error) {
-	resp, err := Get[api.LoginRequest, api.LoginResponse](c, ctx, &api.LoginRequest{
-		Account:  user,
-		Password: password,
-		// Session:         sessionName,
-		Format:          "sid", //"cookie",
-		EnableSynoToken: "yes",
-	}, api.API_METHODS["Login"])
-	if err != nil {
-		return nil, err
-	}
-	c.Auth = AuthStorage{
-		SessionID: resp.SessionID,
-		Token:     resp.Token,
-	}
-	q := c.BaseURL.Query()
-	q.Set("_sid", resp.SessionID)
-	q.Set("SynoToken", resp.Token)
-
-	c.BaseURL.RawQuery = q.Encode()
-	return resp, nil
-}
-
-func (c *APIClient) GetAuth() AuthStorage {
-	return c.Auth
+	FileStation    filestation.Api
+	Virtualization virtualization.Api
+	Docker         docker.Api
+	Core           core.Api
 }
 
 // FileStationAPI implements SynologyClient.
-func (c *APIClient) FileStationAPI() filestation.FileStationApi {
+func (c *APIClient) FileStationAPI() filestation.Api {
 	return c.FileStation
 }
 
-func (c *APIClient) VirtualizationAPI() virtualization.VirtualizationAPI {
+func (c *APIClient) VirtualizationAPI() virtualization.Api {
 	return c.Virtualization
 }
 
-func (c *APIClient) DockerAPI() docker.DockerApi {
+func (c *APIClient) DockerAPI() docker.Api {
 	return c.Docker
 }
 
-func (c *APIClient) CoreAPI() core.CoreApi {
+func (c *APIClient) CoreAPI() core.Api {
 	return c.Core
 }
 
 // New initializes "client" instance with minimal input configuration.
-func New(o Options) (SynologyClient, error) {
-	transport := &http.Transport{
-		DialContext: (&net.Dialer{
-			Timeout:   10 * time.Second,
-			KeepAlive: 30 * time.Second,
-		}).DialContext,
-		ForceAttemptHTTP2:     true,
-		MaxIdleConns:          100,
-		IdleConnTimeout:       60 * time.Second,
-		TLSHandshakeTimeout:   10 * time.Second,
-		ExpectContinueTimeout: 1 * time.Second,
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: !o.VerifyCert,
-		},
-	}
-
-	// currently, 'Cookie' is the only supported method for providing 'sid' token to DSM
-	jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
-	if err != nil {
-		return nil, err
-	}
-
-	c := retryablehttp.NewClient()
-	if o.Logger != nil {
-		c.Logger = o.Logger
-	}
-	c.HTTPClient.Jar = jar
-	c.HTTPClient.Transport = transport
-
-	baseURL, err := url.Parse(o.Host)
-
-	baseURL.Scheme = "https"
-	baseURL.Path = "/webapi/entry.cgi"
-
+func New(o api.Options) (SynologyClient, error) {
+	client, err := api.New(o)
 	if err != nil {
 		return nil, err
 	}
 
 	synoClient := &APIClient{
-		httpClient: c,
-		BaseURL:    *baseURL,
+		Api: client,
 	}
 
-	synoClient.Core = &coreClient{client: synoClient}
-	synoClient.FileStation = &fileStationClient{client: synoClient}
-	synoClient.Virtualization = &virtualizationClient{client: synoClient}
-	synoClient.Docker = &dockerClient{client: synoClient}
+	synoClient.Core = core.New(synoClient)
+	synoClient.FileStation = filestation.New(synoClient)
+	synoClient.Virtualization = virtualization.New(synoClient)
+	synoClient.Docker = docker.New(synoClient)
 
 	return synoClient, nil
 }

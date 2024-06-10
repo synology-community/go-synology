@@ -7,7 +7,7 @@ import (
 	"github.com/synology-community/synology-api/pkg/util/form"
 )
 
-type FileStationApi interface {
+type Api interface {
 	CreateFolder(ctx context.Context, paths []string, names []string, forceParent bool) (*models.FolderList, error)
 	ListShares(ctx context.Context) (*models.ShareList, error)
 	List(ctx context.Context, folderPath string) (*models.FileList, error)

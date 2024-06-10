@@ -1,8 +1,16 @@
 package api
 
-import "context"
+import (
+	"context"
+	"net/url"
 
-type API interface {
+	"github.com/hashicorp/go-retryablehttp"
+)
+
+type Api interface {
+	Client() *retryablehttp.Client
+	BaseUrl() url.URL
+	Credentials() Credentials
 	Login(ctx context.Context, user, password string) (*LoginResponse, error)
 }
 

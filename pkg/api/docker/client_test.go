@@ -1,18 +1,36 @@
-package client
+package docker_test
 
 import (
 	"context"
+	"os"
 	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
+	"github.com/synology-community/synology-api/pkg/api"
 	"github.com/synology-community/synology-api/pkg/api/docker"
 )
 
-type DockerClientTestSuite struct {
+func newClient(suite *suite.Suite) docker.Api {
+	c, err := api.New(api.Options{
+		Host:       os.Getenv("SYNOLOGY_HOST"),
+		VerifyCert: false,
+	})
+	suite.Require().NoError(err)
+
+	r, err := c.Login(context.Background(), os.Getenv("SYNOLOGY_USER"), os.Getenv("SYNOLOGY_PASSWORD"))
+	suite.Require().NoError(err)
+
+	suite.T().Log("Login successful")
+	suite.T().Logf("[INFO] Session: %s\nDeviceID: %s", r.SessionID, r.DeviceID)
+
+	return docker.New(c)
+}
+
+type ClientTestSuite struct {
 	suite.Suite
 
-	Client docker.DockerApi
+	Client docker.Api
 
 	ContainerName   string
 	ProjectShare    string
@@ -21,19 +39,19 @@ type DockerClientTestSuite struct {
 	ImageTag        string
 }
 
-func (suite *DockerClientTestSuite) SetupTest() {
+func (suite *ClientTestSuite) SetupTest() {
 	suite.ContainerName = "test-container"
 	suite.ProjectName = "test-project"
 	suite.ProjectShare = "/projects"
 	suite.ImageRepository = "chainguard/bash"
 	suite.ImageTag = "latest"
 
-	client := newSuiteClient(&suite.Suite)
+	client := newClient(&suite.Suite)
 
-	suite.Client = client.Docker
+	suite.Client = client
 }
 
-func (suite *DockerClientTestSuite) TestImagePull() {
+func (suite *ClientTestSuite) TestImagePull() {
 	ctx := context.Background()
 
 	resp, err := suite.Client.ImagePull(ctx, suite.ImageRepository, suite.ImageTag)
@@ -41,7 +59,7 @@ func (suite *DockerClientTestSuite) TestImagePull() {
 	suite.Equal(resp.Finished, true)
 }
 
-func (suite *DockerClientTestSuite) TestImageDelete() {
+func (suite *ClientTestSuite) TestImageDelete() {
 	ctx := context.Background()
 
 	_, err := suite.Client.ImagePull(ctx, suite.ImageRepository, suite.ImageTag)
@@ -61,7 +79,7 @@ func (suite *DockerClientTestSuite) TestImageDelete() {
 	suite.Equal(resp.ImageObjects[suite.ImageRepository][suite.ImageTag].Error, int64(0))
 }
 
-func (suite *DockerClientTestSuite) TestRegistryList() {
+func (suite *ClientTestSuite) TestRegistryList() {
 	ctx := context.Background()
 
 	resp, err := suite.Client.RegistryList(ctx, docker.ListRegistryRequest{
@@ -76,7 +94,7 @@ func (suite *DockerClientTestSuite) TestRegistryList() {
 	}
 }
 
-func (suite *DockerClientTestSuite) TestContainerCreate() {
+func (suite *ClientTestSuite) TestContainerCreate() {
 	ctx := context.Background()
 
 	resp, err := suite.Client.ContainerCreate(ctx, docker.CreateContainerRequest{
@@ -92,25 +110,25 @@ func (suite *DockerClientTestSuite) TestContainerCreate() {
 	suite.NotNil(resp)
 }
 
-func TestDockerClientTestSuite(t *testing.T) {
-	suite.Run(t, new(DockerClientTestSuite))
+func TestClientTestSuite(t *testing.T) {
+	suite.Run(t, new(ClientTestSuite))
 }
 
-func TestNewDockerClient(t *testing.T) {
+func TestNewClient(t *testing.T) {
 	type args struct {
-		client *APIClient
+		client api.Api
 	}
 	tests := []struct {
 		name string
 		args args
-		want docker.DockerApi
+		want docker.Api
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewDockerClient(tt.args.client); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewDockerClient() = %v, want %v", got, tt.want)
+			if got := docker.New(tt.args.client); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewClient() = %v, want %v", got, tt.want)
 			}
 		})
 	}

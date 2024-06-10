@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-type VirtualizationAPI interface {
+type Api interface {
 	GuestGet(ctx context.Context, guest Guest) (*Guest, error)
 	GuestList(ctx context.Context) (*GuestList, error)
 	GuestCreate(ctx context.Context, guest Guest) (*Guest, error)

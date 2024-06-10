@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-type CoreApi interface {
+type Api interface {
 	PackageList(ctx context.Context) (*PackageListResponse, error)
 	SystemInfo(ctx context.Context) (*SystemInfoResponse, error)
 }

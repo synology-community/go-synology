@@ -2,7 +2,6 @@ package methods
 
 import (
 	"github.com/synology-community/synology-api/pkg/api"
-	"github.com/synology-community/synology-api/pkg/api/filestation"
 )
 
 var (
@@ -10,7 +9,7 @@ var (
 		API:     "SYNO.FileStation.Upload",
 		Version: 2,
 		Method:  "upload",
-		ErrorSummary: filestation.CommonErrors.Combine(api.ErrorSummary{
+		ErrorSummary: CommonErrors.Combine(api.ErrorSummary{
 			1100: "Failed to create a folder. More information in <errors> object.",
 			1101: "The number of folders to the parent folder would exceed the system limitation.",
 		}),
@@ -19,19 +18,19 @@ var (
 		API:          "SYNO.FileStation.List",
 		Version:      2,
 		Method:       "list",
-		ErrorSummary: filestation.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	ListShares = api.Method{
 		API:          "SYNO.FileStation.List",
 		Version:      2,
 		Method:       api.MethodListShares,
-		ErrorSummary: filestation.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	Rename = api.Method{
 		API:     "SYNO.FileStation.Rename",
 		Version: 2,
 		Method:  api.MethodRename,
-		ErrorSummary: filestation.CommonErrors.Combine(api.ErrorSummary{
+		ErrorSummary: CommonErrors.Combine(api.ErrorSummary{
 			1200: "Failed to rename it.",
 		}),
 	}
@@ -39,7 +38,7 @@ var (
 		API:          "SYNO.FileStation.Info",
 		Version:      1,
 		Method:       api.MethodGet,
-		ErrorSummary: filestation.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	CreateFolder = api.Method{
 		API:     "SYNO.FileStation.CreateFolder",
@@ -54,31 +53,31 @@ var (
 		API:          "SYNO.FileStation.Delete",
 		Version:      2,
 		Method:       api.MethodStart,
-		ErrorSummary: filestation.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	DeleteStatus = api.Method{
 		API:          "SYNO.FileStation.Delete",
 		Version:      1,
 		Method:       api.MethodStatus,
-		ErrorSummary: filestation.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	Download = api.Method{
 		API:          "SYNO.FileStation.Download",
 		Version:      2,
 		Method:       "download",
-		ErrorSummary: filestation.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	MD5Start = api.Method{
 		API:          "SYNO.FileStation.MD5",
 		Version:      2,
 		Method:       api.MethodStatus,
-		ErrorSummary: filestation.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	MD5Status = api.Method{
 		API:          "SYNO.FileStation.MD5",
 		Version:      2,
 		Method:       "status",
-		ErrorSummary: filestation.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	BackgroundTask = api.Method{
 		API:     "SYNO.FileStation.BackgroundTask",

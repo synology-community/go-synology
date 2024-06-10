@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-type DockerApi interface {
+type Api interface {
 	ContainerCreate(ctx context.Context, container CreateContainerRequest) (*CreateContainerResponse, error)
 
 	RegistryList(ctx context.Context, req ListRegistryRequest) (*ListRegistryResponse, error)

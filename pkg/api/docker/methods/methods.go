@@ -2,8 +2,6 @@ package methods
 
 import (
 	"github.com/synology-community/synology-api/pkg/api"
-
-	"github.com/synology-community/synology-api/pkg/api/docker"
 )
 
 const (
@@ -18,7 +16,7 @@ var (
 		API:     API_DockerContainer,
 		Version: 1,
 		Method:  api.MethodCreate,
-		ErrorSummary: docker.CommonErrors.Combine(api.ErrorSummary{
+		ErrorSummary: CommonErrors.Combine(api.ErrorSummary{
 			1100: "Failed to create a folder. More information in <errors> object.",
 			1101: "The number of folders to the parent folder would exceed the system limitation.",
 		}),
@@ -27,78 +25,78 @@ var (
 		API:          API_DockerContainer,
 		Version:      1,
 		Method:       api.MethodGet,
-		ErrorSummary: docker.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	List = api.Method{
 		API:          API_DockerContainer,
 		Version:      1,
 		Method:       api.MethodList,
-		ErrorSummary: docker.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	Delete = api.Method{
 		API:          API_DockerContainer,
 		Version:      1,
 		Method:       api.MethodDelete,
-		ErrorSummary: docker.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	RegistryList = api.Method{
 		API:          API_DockerRegistry,
 		Version:      1,
 		Method:       api.MethodGet,
-		ErrorSummary: docker.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	ImagePullStart = api.Method{
 		API:          API_DockerImage,
 		Version:      1,
 		Method:       api.MethodPullStart,
-		ErrorSummary: docker.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	ImagePullStatus = api.Method{
 		API:          API_DockerImage,
 		Version:      1,
 		Method:       api.MethodPullStatus,
-		ErrorSummary: docker.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	ImageDelete = api.Method{
 		API:          API_DockerImage,
 		Version:      1,
 		Method:       api.MethodDelete,
-		ErrorSummary: docker.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	ProjectGet = api.Method{
 		API:          API_DockerProject,
 		Version:      1,
 		Method:       api.MethodGet,
-		ErrorSummary: docker.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	ProjectList = api.Method{
 		API:          API_DockerProject,
 		Version:      1,
 		Method:       api.MethodList,
-		ErrorSummary: docker.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	ProjectCreate = api.Method{
 		API:          API_DockerProject,
 		Version:      1,
 		Method:       api.MethodCreate,
-		ErrorSummary: docker.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	ProjectUpdate = api.Method{
 		API:          API_DockerProject,
 		Version:      1,
 		Method:       api.MethodUpdate,
-		ErrorSummary: docker.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	ProjectDelete = api.Method{
 		API:          API_DockerProject,
 		Version:      1,
 		Method:       api.MethodDelete,
-		ErrorSummary: docker.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 	ProjectCleanStream = api.Method{
 		API:          API_DockerProject,
 		Version:      1,
 		Method:       api.MethodCleanStream,
-		ErrorSummary: docker.CommonErrors,
+		ErrorSummary: CommonErrors,
 	}
 )

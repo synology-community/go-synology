@@ -1,4 +1,4 @@
-package client
+package api
 
 type Options struct {
 	Host       string `json:"host"`

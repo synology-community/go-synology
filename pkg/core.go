@@ -28,6 +28,11 @@ type coreClient struct {
 	client *APIClient
 }
 
+// SystemInfo implements core.CoreApi.
+func (c *coreClient) SystemInfo(ctx context.Context) (*core.SystemInfoResponse, error) {
+	panic("unimplemented")
+}
+
 // PackageList implements core.CoreApi.
 func (c *coreClient) PackageList(ctx context.Context) (*core.PackageListResponse, error) {
 	return List[core.PackageListResponse](c.client, ctx, methods.PackageList)
@@ -45,8 +50,6 @@ func PostFile[TReq api.Request, TResp api.Response](s SynologyClient, ctx contex
 		return nil, errors.New("invalid client")
 	}
 	buf := new(bytes.Buffer)
-
-	//buf.WriteString(fmt.Sprintf("multipart/form-data; boundary=%s\n\n\\--AaB03x", "--AaB03x"))
 
 	// Prepare a form that you will submit to that URL.
 	if w, fs, err := form.Marshal(buf, method, r); err != nil {
@@ -97,22 +100,6 @@ func Post[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Co
 
 	u := c.BaseURL
 
-	// Only set a timeout if one isn't already set
-	// var cancel context.CancelFunc
-	// if _, ok := ctx.Deadline(); !ok {
-	// 	ctx, cancel = context.WithTimeout(ctx, defaultTimeout)
-	// 	defer cancel()
-	// }
-
-	// body := bytes.NewReader([]byte(qu.Encode()))
-
-	// c.httpClient.HTTPClient.Jar.SetCookies(&u, []*http.Cookie{
-	// 	{
-	// 		Name:  "id",
-	// 		Value: c.GetAuth().SessionID,
-	// 	},
-	// })
-
 	resp, err := c.httpClient.PostForm(u.String(), qu)
 
 	if err != nil {
@@ -120,26 +107,6 @@ func Post[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Co
 	}
 
 	return handleResponse[TResp](resp)
-
-	// req, err := retryablehttp.NewRequest(http.MethodPost, u.String(), body)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// req = req.WithContext(ctx)
-
-	// req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
-	// err = req.ParseForm()
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// token := c.GetAuth().Token
-	// if token != "" {
-	// 	req.Header.Add("X-Syno-Token", token)
-	// }
-
-	// return Do[TResp](c.httpClient, req)
 }
 
 func Get[TReq api.Request, TResp api.Response](s SynologyClient, ctx context.Context, r *TReq, method api.Method) (*TResp, error) {

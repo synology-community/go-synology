@@ -8,7 +8,7 @@ const (
 	MethodList        = "list"
 	MethodListShares  = "list_share"
 	MethodRename      = "rename"
-	MethodInfo        = "get"
+	MethodInfo        = "info"
 	MethodStart       = "start"
 	MethodDelete      = "delete"
 	MethodPullStart   = "pull_start"

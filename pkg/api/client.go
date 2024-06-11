@@ -174,6 +174,41 @@ func Post[TReq Request, TResp Response](c Api, ctx context.Context, r *TReq, met
 	return handleResponse[TResp](resp)
 }
 
+func GetQuery[TResp any](c Api, ctx context.Context, r interface{}, method Method) (*TResp, error) {
+	aq, err := query.Values(method) //.AsApiParams())
+	if err != nil {
+		return nil, err
+	}
+	dq, err := query.Values(r)
+	if err != nil {
+		return nil, err
+	}
+
+	url := c.BaseUrl()
+
+	qu := maps.Clone(url.Query())
+	maps.Copy(qu, aq)
+	maps.Copy(qu, dq)
+
+	u := c.BaseUrl()
+
+	u.RawQuery = qu.Encode()
+
+	// Only set a timeout if one isn't already set
+	var cancel context.CancelFunc
+	if _, ok := ctx.Deadline(); !ok {
+		ctx, cancel = context.WithTimeout(ctx, defaultTimeout)
+		defer cancel()
+	}
+
+	req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return Do[TResp](c.Client(), req)
+}
+
 func Get[TReq Request, TResp Response](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
 	aq, err := query.Values(method) //.AsApiParams())
 	if err != nil {

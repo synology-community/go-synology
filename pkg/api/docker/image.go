@@ -3,8 +3,8 @@ package docker
 import (
 	"net/url"
 
+	"github.com/synology-community/go-synology/internal/util"
 	"github.com/synology-community/go-synology/pkg/models"
-	"github.com/synology-community/go-synology/pkg/util"
 )
 
 type ImagePullStartRequest struct {

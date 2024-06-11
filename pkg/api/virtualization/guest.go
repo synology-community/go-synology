@@ -3,7 +3,7 @@ package virtualization
 import (
 	"net/url"
 
-	"github.com/synology-community/go-synology/pkg/util"
+	"github.com/synology-community/go-synology/internal/util"
 )
 
 type VDisk struct {

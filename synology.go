@@ -1,4 +1,4 @@
-package client
+package synology
 
 import (
 	"github.com/synology-community/go-synology/pkg/api"
@@ -13,7 +13,7 @@ type AuthStorage struct {
 	Token     string `url:"SynoToken"`
 }
 
-type SynologyClient interface {
+type Api interface {
 	api.Api
 
 	VirtualizationAPI() virtualization.Api
@@ -26,7 +26,7 @@ type SynologyClient interface {
 
 	// get(request api.Request, response api.Response) error
 }
-type APIClient struct {
+type Client struct {
 	api.Api
 
 	FileStation    filestation.Api
@@ -36,30 +36,30 @@ type APIClient struct {
 }
 
 // FileStationAPI implements SynologyClient.
-func (c *APIClient) FileStationAPI() filestation.Api {
+func (c *Client) FileStationAPI() filestation.Api {
 	return c.FileStation
 }
 
-func (c *APIClient) VirtualizationAPI() virtualization.Api {
+func (c *Client) VirtualizationAPI() virtualization.Api {
 	return c.Virtualization
 }
 
-func (c *APIClient) DockerAPI() docker.Api {
+func (c *Client) DockerAPI() docker.Api {
 	return c.Docker
 }
 
-func (c *APIClient) CoreAPI() core.Api {
+func (c *Client) CoreAPI() core.Api {
 	return c.Core
 }
 
 // New initializes "client" instance with minimal input configuration.
-func New(o api.Options) (SynologyClient, error) {
+func New(o api.Options) (Api, error) {
 	client, err := api.New(o)
 	if err != nil {
 		return nil, err
 	}
 
-	synoClient := &APIClient{
+	synoClient := &Client{
 		Api: client,
 	}
 

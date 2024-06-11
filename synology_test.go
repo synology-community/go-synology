@@ -1,21 +1,20 @@
-package client
+package synology
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"testing"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+	"github.com/synology-community/go-synology/internal/util/form"
 	"github.com/synology-community/go-synology/pkg/api"
-	"github.com/synology-community/go-synology/pkg/util/form"
 )
 
 type Nil struct{}
 
-func newClient(t *testing.T) *APIClient {
+func newClient(t *testing.T) *Client {
 	c, err := New(api.Options{
 		Host:       os.Getenv("SYNOLOGY_HOST"),
 		VerifyCert: false,
@@ -29,11 +28,12 @@ func newClient(t *testing.T) *APIClient {
 		t.Error(err)
 		require.NoError(t, err)
 	} else {
-		log.Infoln("Login successful")
-		log.Infof("[INFO] Session: %s\nDeviceID: %s", r.SessionID, r.DeviceID)
+		fmt.Printf("Session: %s\nDeviceID: %s\n", r.SessionID, r.DeviceID)
+		// log.Infoln("Login successful")
+		// log.Infof("[INFO] Session: %s\nDeviceID: %s", r.SessionID, r.DeviceID)
 	}
 
-	if client, ok := c.(*APIClient); !ok {
+	if client, ok := c.(*Client); !ok {
 		t.Error("Client is not of type APIClient")
 		require.True(t, ok)
 		return nil
@@ -42,7 +42,7 @@ func newClient(t *testing.T) *APIClient {
 	}
 }
 
-func newSuiteClient(suite *suite.Suite) *APIClient {
+func newSuiteClient(suite *suite.Suite) *Client {
 	c, err := New(api.Options{
 		Host:       os.Getenv("SYNOLOGY_HOST"),
 		VerifyCert: false,
@@ -52,10 +52,11 @@ func newSuiteClient(suite *suite.Suite) *APIClient {
 	r, err := c.Login(context.Background(), os.Getenv("SYNOLOGY_USER"), os.Getenv("SYNOLOGY_PASSWORD"))
 	suite.Require().NoError(err)
 
-	log.Infoln("Login successful")
-	log.Infof("[INFO] Session: %s\nDeviceID: %s", r.SessionID, r.DeviceID)
+	fmt.Printf("Session: %s\nDeviceID: %s\n", r.SessionID, r.DeviceID)
+	// log.Infoln("Login successful")
+	// log.Infof("[INFO] Session: %s\nDeviceID: %s", r.SessionID, r.DeviceID)
 
-	client, ok := c.(*APIClient)
+	client, ok := c.(*Client)
 
 	suite.Require().True(ok)
 

@@ -1,0 +1,19 @@
+name: VDSM
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  dsm:
+    name: dsm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Virtual DSM
+        id: vdsm
+        uses: synology-community/virtual-dsm-action@main
+        with:
+          disk-size: "500M"

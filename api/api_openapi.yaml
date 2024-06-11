@@ -1,0 +1,334 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/schemas/v3.1/schema.json
+openapi: 3.1.0
+servers:
+  - url: http://{customerId}.synology.me:{port}/webapi
+    variables:
+      customerId:
+        default: appkins
+        description: Customer ID assigned by the service provider
+      port:
+        enum:
+          - "5000"
+          - "5001"
+        default: "5000"
+info:
+  description: >-
+    The DSM Web API connects to Synology NAS servers.
+  version: 1.0.0
+  title: DSM Web API
+  contact:
+    name: Synology Community
+    url: "https://github.com/synology-community"
+    email: synology@appkins.io
+tags:
+  - name: metadata
+    description: Find out about the data sets
+  - name: search
+    description: Search a data set
+paths:
+  # Login
+  ? /webapi/entry.cgi?api=SYNO.API.Auth&version=6&method=login&format=sid&enable_syno_token=yes
+  : get:
+      operationId: Login
+      summary: Logs in and returns the authentication tokens
+      parameters:
+        - name: account
+          in: query
+          description: "Synology username."
+          required: true
+          example: "user"
+          schema:
+            type: string
+        - name: passwd
+          in: query
+          description: "Synology password."
+          required: true
+          example: "password"
+          schema:
+            type: string
+      security: []
+      responses:
+        "200":
+          description: >
+            Successfully authenticated.
+            The session ID is returned in a cookie named `id`. You need to include this cookie in subsequent requests.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+          # headers:
+          #   Set-Cookie:
+          #     schema:
+          #       type: string
+          #       example: id=abcde12345; Path=/; HttpOnly
+  # List VM Guests
+  /webapi/entry.cgi?api=SYNO.Virtualization.Guest&method=list&version=7:
+    get:
+      tags:
+        - Guest
+      operationId: ListGuests
+      summary: List available VM guests
+      responses:
+        "200":
+          description: Returns a list of guests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListGuestResponse"
+  # Get VM Guest
+  /webapi/entry.cgi?api=SYNO.Virtualization.API.Guest&method=get&version=1:
+    get:
+      tags:
+        - Guest
+      operationId: GetGuest
+      summary: Get information about a vm guest
+      parameters:
+        - name: guest_name
+          in: query
+          description: "Name of the vm guest."
+          required: true
+          example: "foo"
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Returns a guest by name.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetGuestResponse"
+security:
+  - sid: []
+  - synotoken: []
+components:
+  # securitySchemes:
+  #   cookieAuth:
+  #     type: apiKey
+  #     in: cookie
+  #     name: id
+  securitySchemes:
+    sid:
+      type: apiKey
+      in: query
+      name: sid
+    synotoken:
+      type: apiKey
+      in: query
+      name: synotoken
+  schemas:
+    LoginResponse:
+      type: object
+      parameters:
+        data:
+          type: object
+          properties:
+            did:
+              type: string
+            is_portal_port:
+              type: boolean
+            sid:
+              type: string
+            synotoken:
+              type: string
+        success:
+          type: boolean
+    dataSetList:
+      type: object
+      parameters:
+        - name: api
+          in: query
+          description: "Name of the dataset."
+          required: true
+          example: "SYNO.API.Auth"
+          schema:
+            type: string
+      properties:
+        total:
+          type: integer
+        apis:
+          type: array
+          items:
+            type: object
+            properties:
+              apiKey:
+                type: string
+                description: To be used as a dataset parameter value
+              apiVersionNumber:
+                type: string
+                description: To be used as a version parameter value
+              apiUrl:
+                type: string
+                format: uriref
+                description: "The URL describing the dataset's fields"
+              apiDocumentationUrl:
+                type: string
+                format: uriref
+                description: A URL to the API console for each API
+    TaskListResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            tasks:
+              type: array
+              items:
+                $ref: "#/components/schemas/Task"
+            total:
+              type: integer
+              format: int32
+        success:
+          type: boolean
+    Task:
+      type: object
+      properties:
+        action:
+          type: string
+        can_delete:
+          type: boolean
+        can_edit:
+          type: boolean
+        can_run:
+          type: boolean
+        enable:
+          type: boolean
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        next_trigger_time:
+          type: string
+        owner:
+          type: string
+        real_owner:
+          type: string
+        type:
+          type: string
+    ListImageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            images:
+              type: array
+              items:
+                $ref: "#/components/schemas/Image"
+              example:
+                - image_id: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
+                  image_name: ubuntu-24
+                  storages:
+                    - status: online
+                      storage_id: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
+                      storage_name: default
+                  type: iso
+        success:
+          type: boolean
+    Image:
+      type: object
+      properties:
+        image_id:
+          type: string
+          example: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
+        image_name:
+          type: string
+          example: ubuntu-24
+        storages:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: online
+              storage_id:
+                type: string
+                example: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
+              storage_name:
+                type: string
+                example: default
+          example:
+            - status: online
+              storage_id: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
+              storage_name: default
+        type:
+          type: string
+          example: iso
+    GetGuestResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/Guest"
+        success:
+          type: boolean
+    ListGuestResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            tasks:
+              type: array
+              items:
+                $ref: "#/components/schemas/Guest"
+            total:
+              type: integer
+              format: int32
+        success:
+          type: boolean
+    Guest:
+      type: object
+      properties:
+        guest_id:
+          type: string
+        guest_name:
+          type: string
+        autorun:
+          type: integer
+          format: int32
+        description:
+          type: string
+        status:
+          type: string
+        storage_id:
+          type: string
+        storage_name:
+          type: string
+        vcpu_num:
+          type: integer
+          format: int32
+        vdisks:
+          type: array
+          items:
+            type: object
+            properties:
+              vdisk_id:
+                type: string
+              vdisk_size:
+                type: integer
+                format: int32
+              controller:
+                type: integer
+                format: int32
+              unmap:
+                type: boolean
+        vnics:
+          type: array
+          items:
+            type: object
+            properties:
+              mac:
+                type: string
+              model:
+                type: integer
+                format: int32
+              network_id:
+                type: string
+              network_name:
+                type: string
+              vnic_id:
+                type: string
+        vram_size:
+          type: integer
+          format: int32

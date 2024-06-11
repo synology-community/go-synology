@@ -16,4 +16,4 @@ jobs:
         id: vdsm
         uses: synology-community/virtual-dsm-action@main
         with:
-          disk-size: "500M"
+          disk-size: "6G"

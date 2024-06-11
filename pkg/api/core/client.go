@@ -3,9 +3,9 @@ package core
 import (
 	"context"
 
-	"github.com/synology-community/synology-api/pkg/api"
-	"github.com/synology-community/synology-api/pkg/api/core/methods"
-	"github.com/synology-community/synology-api/pkg/models"
+	"github.com/synology-community/go-synology/pkg/api"
+	"github.com/synology-community/go-synology/pkg/api/core/methods"
+	"github.com/synology-community/go-synology/pkg/models"
 )
 
 type Client struct {

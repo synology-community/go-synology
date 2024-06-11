@@ -1,7 +1,7 @@
 package methods
 
 import (
-	"github.com/synology-community/synology-api/pkg/api"
+	"github.com/synology-community/go-synology/pkg/api"
 )
 
 var (

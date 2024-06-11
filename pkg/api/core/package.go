@@ -1,6 +1,6 @@
 package core
 
-import "github.com/synology-community/synology-api/pkg/models"
+import "github.com/synology-community/go-synology/pkg/models"
 
 type PackageListRequest struct {
 	IgnoreHidden bool     `url:"ignore_hidden"`

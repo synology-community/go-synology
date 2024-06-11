@@ -7,7 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/google/go-querystring/query"
-	"github.com/synology-community/synology-api/pkg/util"
+	"github.com/synology-community/go-synology/pkg/util"
 )
 
 type Request interface {

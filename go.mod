@@ -1,4 +1,4 @@
-module github.com/synology-community/synology-api
+module github.com/synology-community/go-synology
 
 go 1.22.3
 

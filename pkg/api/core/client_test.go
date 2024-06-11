@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"github.com/synology-community/synology-api/pkg/api"
+	"github.com/synology-community/go-synology/pkg/api"
 )
 
 func newClient(t *testing.T) Api {

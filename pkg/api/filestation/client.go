@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/synology-community/synology-api/pkg/api"
-	"github.com/synology-community/synology-api/pkg/api/filestation/methods"
-	"github.com/synology-community/synology-api/pkg/models"
-	"github.com/synology-community/synology-api/pkg/util/form"
+	"github.com/synology-community/go-synology/pkg/api"
+	"github.com/synology-community/go-synology/pkg/api/filestation/methods"
+	"github.com/synology-community/go-synology/pkg/models"
+	"github.com/synology-community/go-synology/pkg/util/form"
 )
 
 type Client struct {

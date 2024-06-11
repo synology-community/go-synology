@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/synology-community/synology-api/pkg/api"
-	"github.com/synology-community/synology-api/pkg/models"
-	"github.com/synology-community/synology-api/pkg/util/form"
+	"github.com/synology-community/go-synology/pkg/api"
+	"github.com/synology-community/go-synology/pkg/models"
+	"github.com/synology-community/go-synology/pkg/util/form"
 )
 
 func newClient(t *testing.T) Api {

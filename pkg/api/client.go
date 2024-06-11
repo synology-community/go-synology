@@ -19,8 +19,8 @@ import (
 	"github.com/google/go-querystring/query"
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/go-retryablehttp"
-	"github.com/synology-community/synology-api/pkg/util"
-	"github.com/synology-community/synology-api/pkg/util/form"
+	"github.com/synology-community/go-synology/pkg/util"
+	"github.com/synology-community/go-synology/pkg/util/form"
 	"golang.org/x/net/publicsuffix"
 )
 

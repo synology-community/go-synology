@@ -15,11 +15,11 @@ package client
 // 	"github.com/google/go-querystring/query"
 // 	"github.com/hashicorp/go-multierror"
 // 	"github.com/hashicorp/go-retryablehttp"
-// 	"github.com/synology-community/synology-api/pkg/api"
-// 	"github.com/synology-community/synology-api/pkg/api/core"
-// 	"github.com/synology-community/synology-api/pkg/api/core/methods"
-// 	"github.com/synology-community/synology-api/pkg/util"
-// 	"github.com/synology-community/synology-api/pkg/util/form"
+// 	"github.com/synology-community/go-synology/pkg/api"
+// 	"github.com/synology-community/go-synology/pkg/api/core"
+// 	"github.com/synology-community/go-synology/pkg/api/core/methods"
+// 	"github.com/synology-community/go-synology/pkg/util"
+// 	"github.com/synology-community/go-synology/pkg/util/form"
 // )
 
 // var defaultTimeout = 15 * time.Second

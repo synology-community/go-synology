@@ -1,11 +1,11 @@
 package client
 
 import (
-	"github.com/synology-community/synology-api/pkg/api"
-	"github.com/synology-community/synology-api/pkg/api/core"
-	"github.com/synology-community/synology-api/pkg/api/docker"
-	"github.com/synology-community/synology-api/pkg/api/filestation"
-	"github.com/synology-community/synology-api/pkg/api/virtualization"
+	"github.com/synology-community/go-synology/pkg/api"
+	"github.com/synology-community/go-synology/pkg/api/core"
+	"github.com/synology-community/go-synology/pkg/api/docker"
+	"github.com/synology-community/go-synology/pkg/api/filestation"
+	"github.com/synology-community/go-synology/pkg/api/virtualization"
 )
 
 type AuthStorage struct {

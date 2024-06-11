@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"github.com/synology-community/synology-api/pkg/api"
-	"github.com/synology-community/synology-api/pkg/api/docker"
+	"github.com/synology-community/go-synology/pkg/api"
+	"github.com/synology-community/go-synology/pkg/api/docker"
 )
 
 func newClient(suite *suite.Suite) docker.Api {

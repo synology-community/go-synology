@@ -3,7 +3,7 @@ package docker
 import (
 	"time"
 
-	"github.com/synology-community/synology-api/pkg/models"
+	"github.com/synology-community/go-synology/pkg/models"
 )
 
 type Project struct {

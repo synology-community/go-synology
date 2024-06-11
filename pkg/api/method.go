@@ -16,4 +16,5 @@ const (
 	MethodCleanStream = "clean_stream"
 	MethodStopStream  = "stop_stream"
 	MethodStatus      = "status"
+	MethodInstall     = "install"
 )

@@ -64,6 +64,7 @@ func (suite *ClientTestSuite) TestImageDelete() {
 
 	_, err := suite.Client.ImagePull(ctx, suite.ImageRepository, suite.ImageTag)
 	if err != nil {
+		suite.NoError(err)
 		suite.T().Skip("Unable to pull image, skipping delete test")
 	}
 

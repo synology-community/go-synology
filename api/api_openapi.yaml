@@ -8,9 +8,9 @@ servers:
         description: Customer ID assigned by the service provider
       port:
         enum:
-          - '5000'
-          - '5001'
-        default: '5000'
+          - "5000"
+          - "5001"
+        default: "5000"
 info:
   description: >-
     The DSM Web API connects to Synology NAS servers.
@@ -27,8 +27,8 @@ tags:
     description: Search a data set
 paths:
   # Login
-  /webapi/entry.cgi?api=SYNO.API.Auth&version=6&method=login&format=sid&enable_syno_token=yes:
-    get:
+  ? /webapi/entry.cgi?api=SYNO.API.Auth&version=6&method=login&format=sid&enable_syno_token=yes
+  : get:
       operationId: Login
       summary: Logs in and returns the authentication tokens
       parameters:
@@ -119,18 +119,18 @@ components:
     LoginResponse:
       type: object
       parameters:
-        data: 
+        data:
           type: object
-          properties: 
-            did: 
+          properties:
+            did:
               type: string
-            is_portal_port: 
+            is_portal_port:
               type: boolean
-            sid: 
+            sid:
               type: string
-            synotoken: 
+            synotoken:
               type: string
-        success: 
+        success:
           type: boolean
     dataSetList:
       type: object
@@ -166,55 +166,55 @@ components:
                 description: A URL to the API console for each API
     TaskListResponse:
       type: object
-      properties: 
-        data: 
+      properties:
+        data:
           type: object
-          properties: 
-            tasks: 
+          properties:
+            tasks:
               type: array
-              items: 
-                $ref: '#/components/schemas/Task'
-            total: 
+              items:
+                $ref: "#/components/schemas/Task"
+            total:
               type: integer
               format: int32
-        success: 
+        success:
           type: boolean
     Task:
       type: object
-      properties: 
-        action: 
+      properties:
+        action:
           type: string
-        can_delete: 
+        can_delete:
           type: boolean
-        can_edit: 
+        can_edit:
           type: boolean
-        can_run: 
+        can_run:
           type: boolean
-        enable: 
+        enable:
           type: boolean
-        id: 
+        id:
           type: integer
           format: int32
-        name: 
+        name:
           type: string
-        next_trigger_time: 
+        next_trigger_time:
           type: string
-        owner: 
+        owner:
           type: string
-        real_owner: 
+        real_owner:
           type: string
-        type: 
+        type:
           type: string
     ListImageResponse:
       type: object
-      properties: 
-        data: 
+      properties:
+        data:
           type: object
-          properties: 
-            images: 
+          properties:
+            images:
               type: array
-              items: 
-                $ref: '#/components/schemas/Image'
+              items:
+                $ref: "#/components/schemas/Image"
               example:
                 - image_id: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
                   image_name: ubuntu-24
@@ -223,112 +223,112 @@ components:
                       storage_id: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
                       storage_name: default
                   type: iso
-        success: 
+        success:
           type: boolean
     Image:
       type: object
-      properties: 
-        image_id: 
+      properties:
+        image_id:
           type: string
           example: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
-        image_name: 
+        image_name:
           type: string
           example: ubuntu-24
-        storages: 
+        storages:
           type: array
-          items: 
+          items:
             type: object
-            properties: 
-              status: 
+            properties:
+              status:
                 type: string
                 example: online
-              storage_id: 
+              storage_id:
                 type: string
                 example: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
-              storage_name: 
+              storage_name:
                 type: string
                 example: default
           example:
             - status: online
               storage_id: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
               storage_name: default
-        type: 
+        type:
           type: string
           example: iso
     GetGuestResponse:
       type: object
-      properties: 
-        data: 
-          $ref: '#/components/schemas/Guest'
-        success: 
+      properties:
+        data:
+          $ref: "#/components/schemas/Guest"
+        success:
           type: boolean
     ListGuestResponse:
       type: object
-      properties: 
-        data: 
+      properties:
+        data:
           type: object
-          properties: 
-            tasks: 
+          properties:
+            tasks:
               type: array
-              items: 
-                $ref: '#/components/schemas/Guest'
-            total: 
+              items:
+                $ref: "#/components/schemas/Guest"
+            total:
               type: integer
               format: int32
-        success: 
+        success:
           type: boolean
     Guest:
       type: object
       properties:
-        guest_id: 
+        guest_id:
           type: string
-        guest_name: 
+        guest_name:
           type: string
-        autorun: 
+        autorun:
           type: integer
           format: int32
-        description: 
+        description:
           type: string
-        status: 
+        status:
           type: string
-        storage_id: 
+        storage_id:
           type: string
-        storage_name: 
+        storage_name:
           type: string
-        vcpu_num: 
+        vcpu_num:
           type: integer
           format: int32
-        vdisks: 
+        vdisks:
           type: array
-          items: 
+          items:
             type: object
-            properties: 
-              vdisk_id: 
+            properties:
+              vdisk_id:
                 type: string
-              vdisk_size: 
+              vdisk_size:
                 type: integer
                 format: int32
-              controller: 
+              controller:
                 type: integer
                 format: int32
-              unmap: 
+              unmap:
                 type: boolean
-        vnics: 
+        vnics:
           type: array
-          items: 
+          items:
             type: object
-            properties: 
-              mac: 
+            properties:
+              mac:
                 type: string
-              model: 
+              model:
                 type: integer
                 format: int32
-              network_id: 
+              network_id:
                 type: string
-              network_name: 
+              network_name:
                 type: string
-              vnic_id: 
+              vnic_id:
                 type: string
-        vram_size: 
+        vram_size:
           type: integer
           format: int32

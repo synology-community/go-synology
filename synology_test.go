@@ -8,8 +8,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	"github.com/synology-community/go-synology/internal/util/form"
 	"github.com/synology-community/go-synology/pkg/api"
+	"github.com/synology-community/go-synology/pkg/util/form"
 )
 
 type Nil struct{}

@@ -3,7 +3,7 @@ package filestation
 import (
 	"net/url"
 
-	"github.com/synology-community/go-synology/internal/util"
+	"github.com/synology-community/go-synology/pkg/util"
 )
 
 type Paths []string

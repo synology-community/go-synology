@@ -3,8 +3,8 @@ package filestation
 import (
 	"context"
 
-	"github.com/synology-community/go-synology/internal/util/form"
 	"github.com/synology-community/go-synology/pkg/models"
+	"github.com/synology-community/go-synology/pkg/util/form"
 )
 
 type Api interface {

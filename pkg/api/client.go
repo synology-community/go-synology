@@ -102,7 +102,7 @@ func (c *Client) Login(ctx context.Context, user, password string) (*LoginRespon
 		// Session:         sessionName,
 		Format:          "sid", //"cookie",
 		EnableSynoToken: "yes",
-	}, API_METHODS["Login"])
+	}, Login)
 	if err != nil {
 		return nil, err
 	}

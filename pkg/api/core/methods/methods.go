@@ -5,10 +5,11 @@ import (
 )
 
 const (
-	API_Core_System               = "SYNO.Core.System"
-	API_Core_Package              = "SYNO.Core.Package"
-	API_Core_Package_Installation = "SYNO.Core.Package.Installation"
-	API_Core_Package_Server       = "SYNO.Core.Package.Server"
+	API_Core_System                 = "SYNO.Core.System"
+	API_Core_Package                = "SYNO.Core.Package"
+	API_Core_Package_Installation   = "SYNO.Core.Package.Installation"
+	API_Core_Package_Uninstallation = "SYNO.Core.Package.Uninstallation"
+	API_Core_Package_Server         = "SYNO.Core.Package.Server"
 )
 
 var (
@@ -40,6 +41,12 @@ var (
 		API:          API_Core_Package_Installation,
 		Version:      1,
 		Method:       api.MethodInstall,
+		ErrorSummary: api.GlobalErrors,
+	}
+	PackageUnistallationUninstall = api.Method{
+		API:          API_Core_Package_Uninstallation,
+		Version:      1,
+		Method:       api.MethodUninstall,
 		ErrorSummary: api.GlobalErrors,
 	}
 	PackageInstallationStatus = api.Method{

@@ -2,6 +2,8 @@ package core
 
 import (
 	"context"
+	"fmt"
+	"slices"
 
 	"github.com/synology-community/go-synology/pkg/api"
 	"github.com/synology-community/go-synology/pkg/api/core/methods"
@@ -26,9 +28,38 @@ func (c Client) SystemInfo(ctx context.Context) (*SystemInfoResponse, error) {
 	panic("unimplemented")
 }
 
+func (c Client) PackageCheck(ctx context.Context) (*Package, error) {
+	panic("unimplemented")
+}
+
 // PackageList implements CoreApi.
 func (c Client) PackageList(ctx context.Context) (*PackageListResponse, error) {
-	return api.List[PackageListResponse](c.client, ctx, methods.PackageList)
+	return api.Get[PackageListRequest, PackageListResponse](c.client, ctx, &PackageListRequest{
+		Additional: []string{"description", "description_enu", "dependent_packages", "beta", "distributor", "distributor_url", "maintainer", "maintainer_url", "dsm_apps", "dsm_app_page", "dsm_app_launch_name", "report_beta_url", "support_center", "startable", "installed_info", "support_url", "is_uninstall_pages", "install_type", "autoupdate", "silent_upgrade", "installing_progress", "ctl_uninstall", "updated_at", "status", "url", "available_operation", "install_type"},
+	}, methods.PackageList)
+}
+
+func (c Client) PackageFind(ctx context.Context, name string) (*Package, error) {
+	for i := 0; i < 2; i++ {
+		var req PackageServerListRequest
+		if i == 0 {
+			req.LoadOthers = false
+		} else {
+			req.LoadOthers = true
+		}
+		resp, err := c.PackageServerList(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+
+		ii := slices.IndexFunc(resp.Packages, func(p Package) bool {
+			return p.Package == name
+		})
+		if ii != -1 {
+			return &resp.Packages[ii], nil
+		}
+	}
+	return nil, fmt.Errorf("package %s not found", name)
 }
 
 func (c Client) PackageServerList(ctx context.Context, req PackageServerListRequest) (*PackageServerListResponse, error) {
@@ -36,7 +67,10 @@ func (c Client) PackageServerList(ctx context.Context, req PackageServerListRequ
 }
 
 func (c Client) PackageGet(ctx context.Context, id string) (*PackageGetResponse, error) {
-	return api.Get[PackageGetRequest, PackageGetResponse](c.client, ctx, &PackageGetRequest{ID: models.JsonString(id)}, methods.PackageGet)
+	return api.Get[PackageGetRequest, PackageGetResponse](c.client, ctx, &PackageGetRequest{
+		ID:         models.JsonString(id),
+		Additional: []string{"description", "description_enu", "dependent_packages", "beta", "distributor", "distributor_url", "maintainer", "maintainer_url", "dsm_apps", "dsm_app_page", "dsm_app_launch_name", "report_beta_url", "support_center", "startable", "installed_info", "support_url", "is_uninstall_pages", "install_type", "autoupdate", "silent_upgrade", "installing_progress", "ctl_uninstall", "updated_at", "status", "url", "available_operation", "install_type"},
+	}, methods.PackageGet)
 }
 
 func (c Client) PackageInstallStatus(ctx context.Context, req PackageInstallStatusRequest) (*PackageInstallStatusResponse, error) {
@@ -52,7 +86,13 @@ func (c Client) PackageInstall(ctx context.Context, req PackageInstallRequest) (
 		req.FileSize = size
 	}
 
+	req.Operation = "install"
+
 	return api.Get[PackageInstallRequest, PackageInstallResponse](c.client, ctx, &req, methods.PackageInstallationInstall)
+}
+
+func (c Client) PackageUninstall(ctx context.Context, req PackageUninstallRequest) (*PackageUninstallResponse, error) {
+	return api.Get[PackageUninstallRequest, PackageUninstallResponse](c.client, ctx, &req, methods.PackageUnistallationUninstall)
 }
 
 func New(client api.Api) Api {

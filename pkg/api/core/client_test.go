@@ -10,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/synology-community/go-synology/pkg/api"
+	"github.com/synology-community/go-synology/pkg/models"
 )
 
 func newClient(t *testing.T) Api {
@@ -110,81 +111,45 @@ func TestClient_PackageInstall(t *testing.T) {
 				}
 			}
 
-			if pkg, ok := packageLookup[tt.args.packageName]; ok {
-				size, err := tt.fields.client.ContentLength(context.Background(), pkg.Link)
+			pkg, err := tt.fields.client.PackageFind(tt.args.ctx, tt.args.packageName)
+			if err != nil {
+				t.Errorf("Client.PackageFind() error = %v", err)
+				return
+			}
+
+			size := int64(0)
+			if pkg.Size != 0 {
+				size = pkg.Size
+			} else {
+				size, err = tt.fields.client.ContentLength(context.Background(), pkg.Link)
 				if err != nil {
 					t.Errorf("Client.Head() error = %v", err)
 					return
 				}
+			}
 
-				dlRes, err := tt.fields.client.PackageInstall(tt.args.ctx, PackageInstallRequest{
-					Name:       pkg.Package,
-					URL:        pkg.Link,
-					Type:       0,
-					BigInstall: false,
-					FileSize:   size,
-				})
-				if err != nil {
-					t.Errorf("Client.PackageInstall() error = %v", err)
-					return
-				}
+			dlRes, err := tt.fields.client.PackageInstall(tt.args.ctx, PackageInstallRequest{
+				Name:       pkg.Package,
+				URL:        pkg.Link,
+				Type:       0,
+				BigInstall: false,
+				FileSize:   size,
+			})
+			if err != nil {
+				t.Errorf("Client.PackageInstall() error = %v", err)
+				return
+			}
 
-				if dlRes.TaskID == "" {
-					t.Errorf("Client.PackageInstall() success = %v", dlRes.TaskID)
-					return
-				}
+			if dlRes.TaskID == "" {
+				t.Errorf("Client.PackageInstall() success = %v", dlRes.TaskID)
+				return
+			}
 
-				status := new(PackageInstallStatusResponse)
+			status := new(PackageInstallStatusResponse)
 
-				for retry := 0; !status.Finished; retry++ {
-					status, err = tt.fields.client.PackageInstallStatus(tt.args.ctx, PackageInstallStatusRequest{
-						TaskID: dlRes.TaskID,
-					})
-
-					if err != nil {
-						t.Errorf("Client.PackageInstallStatus() error = %v", err)
-						return
-					}
-
-					if status.Finished {
-						t.Logf("Package installed: %s", status.Name)
-						break
-					}
-
-					if retry > 10 {
-						t.Errorf("Client.PackageInstallStatus() retry = %d", retry)
-						return
-					}
-
-					if !status.Finished {
-						time.Sleep(2 * time.Second)
-					}
-				}
-
-				path := fmt.Sprintf("%s/%s", status.TmpFolder, status.Taskid)
-
-				instRes, err := tt.fields.client.PackageInstall(tt.args.ctx, PackageInstallRequest{
-					Name:              status.Name,
-					Path:              path,
-					InstallRunPackage: true,
-					Force:             true,
-					CheckCodesign:     false,
-					Type:              0,
-					ExtraValues:       "{}",
-				})
-
-				if err != nil {
-					t.Errorf("Client.PackageInstall() error = %v", err)
-					return
-				}
-
-				if instRes.TaskID == "" {
-					t.Errorf("Client.PackageInstall() success = %v", instRes.TaskID)
-					return
-				}
-
+			for retry := 0; !status.Finished; retry++ {
 				status, err = tt.fields.client.PackageInstallStatus(tt.args.ctx, PackageInstallStatusRequest{
-					TaskID: instRes.TaskID,
+					TaskID: dlRes.TaskID,
 				})
 
 				if err != nil {
@@ -194,12 +159,58 @@ func TestClient_PackageInstall(t *testing.T) {
 
 				if status.Finished {
 					t.Logf("Package installed: %s", status.Name)
-				} else {
-					t.Errorf("Client.PackageInstallStatus() status = %s", status.Status)
+					break
 				}
 
-				require.Equal(t, tt.want, status.Name)
+				if retry > 10 {
+					t.Errorf("Client.PackageInstallStatus() retry = %d", retry)
+					return
+				}
+
+				if !status.Finished {
+					time.Sleep(2 * time.Second)
+				}
 			}
+
+			path := fmt.Sprintf("%s/%s", status.TmpFolder, status.Taskid)
+
+			instRes, err := tt.fields.client.PackageInstall(tt.args.ctx, PackageInstallRequest{
+				Name:              status.Name,
+				Path:              models.JsonString(path),
+				InstallRunPackage: true,
+				Force:             true,
+				CheckCodesign:     false,
+				Type:              0,
+				ExtraValues:       "{}",
+			})
+
+			if err != nil {
+				t.Errorf("Client.PackageInstall() error = %v", err)
+				return
+			}
+
+			if instRes.TaskID == "" {
+				t.Errorf("Client.PackageInstall() success = %v", instRes.TaskID)
+				return
+			}
+
+			status, err = tt.fields.client.PackageInstallStatus(tt.args.ctx, PackageInstallStatusRequest{
+				TaskID: instRes.TaskID,
+			})
+
+			if err != nil {
+				t.Errorf("Client.PackageInstallStatus() error = %v", err)
+				return
+			}
+
+			if status.Finished {
+				t.Logf("Package installed: %s", status.Name)
+			} else {
+				t.Errorf("Client.PackageInstallStatus() status = %s", status.Status)
+			}
+
+			require.Equal(t, tt.want, status.Name)
+
 		})
 	}
 }
@@ -428,6 +439,52 @@ func TestNew(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := New(tt.args.client); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("New() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestClient_PackageFind(t *testing.T) {
+	type fields struct {
+		client Api
+	}
+	type args struct {
+		ctx  context.Context
+		name string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *Package
+		wantErr bool
+	}{
+		{
+			name: "Find Container Manager Package",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx:  context.Background(),
+				name: "ContainerManager",
+			},
+			want: &Package{
+				ID:        "ContainerManager",
+				Beta:      false,
+				Breakpkgs: nil,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.fields.client.PackageFind(tt.args.ctx, tt.args.name)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.PackageFind() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got.Package != tt.args.name {
+				t.Errorf("Client.PackageFind() = %v, want %v", got, tt.want)
 			}
 		})
 	}

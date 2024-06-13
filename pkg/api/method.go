@@ -19,4 +19,7 @@ const (
 	MethodInstall     = "install"
 	MethodUninstall   = "uninstall"
 	MethodRequest     = "request"
+	MethodCheck       = "check"
+	MethodIsPortBlock = "is_port_block"
+	MethodAdd         = "add"
 )

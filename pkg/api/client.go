@@ -153,6 +153,11 @@ func List[TResp Response](c Api, ctx context.Context, method Method) (*TResp, er
 	return Get[Request, TResp](c, ctx, nil, method)
 }
 
+func Void[TReq Request](c Api, ctx context.Context, r *TReq, method Method) error {
+	_, err := Get[TReq, Request](c, ctx, r, method)
+	return err
+}
+
 func GetEncode[TReq EncodeRequest, TResp Response](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
 	return Get[TReq, TResp](c, ctx, r, method)
 }

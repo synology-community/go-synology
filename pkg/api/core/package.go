@@ -1,6 +1,11 @@
 package core
 
-import "github.com/synology-community/go-synology/pkg/models"
+import (
+	"net/url"
+
+	"github.com/synology-community/go-synology/pkg/models"
+	"github.com/synology-community/go-synology/pkg/util"
+)
 
 type PackageListRequest struct {
 	IgnoreHidden bool             `url:"ignore_hidden"`
@@ -56,8 +61,8 @@ type PackageListResponse struct {
 }
 
 type PackageGetRequest struct {
-	ID         models.JsonString `url:"id"`
-	Additional models.JsonArray  `url:"additional,omitempty"`
+	ID         string           `url:"id"`
+	Additional models.JsonArray `url:"additional,omitempty"`
 }
 
 type PackageGetResponse InstalledPackage
@@ -115,6 +120,9 @@ type PackageInstallCheckRequest struct {
 	ReplacePkgs          string `url:"replacepkgs"`
 }
 
+type PackageInstallCheckResponse struct {
+}
+
 type PackageInstallStatusResponse struct {
 	Beta       bool   `json:"beta,omitempty"`
 	Blqinst    bool   `json:"blqinst,omitempty"`
@@ -140,29 +148,98 @@ type PackageInstallRequest struct {
 	Checksum          models.JsonString `url:"checksum"`
 	FileSize          int64             `url:"filesize,omitempty"`
 	ExtraValues       models.JsonString `url:"extra_values,omitempty"`
-	CheckCodesign     bool              `url:"check_codesign,omitempty"`
+	CheckCodesign     bool              `url:"check_codesign"`
 	Force             bool              `url:"force,omitempty"`
-	InstallRunPackage bool              `url:"installrunpackage,omitempty"`
-	Path              models.JsonString `url:"path,omitempty"`
+	InstallRunPackage bool              `url:"installrunpackage"`
+	Path              string            `url:"path,omitempty"`
 	Operation         models.JsonString `url:"operation,omitempty"`
 	VolumePath        string            `url:"volume_path,omitempty"`
 }
 
 type PackageInstallResponse struct {
-	TaskID   string  `json:"taskid"`
-	Progress float64 `json:"progress,omitempty"`
+	TaskID      string  `json:"taskid"`
+	Progress    float64 `json:"progress,omitempty"`
+	PackageName string  `json:"packageName,omitempty"`
+}
+
+type PackageInstallDeleteRequest struct {
+	Path string `url:"path"`
 }
 
 type PackageFindRequest struct {
 	Name string `url:"name"`
 }
 
+type UninstallExtra struct {
+	KeepData   bool `json:"wizard_keep_data"`
+	DeleteData bool `json:"wizard_delete_data"`
+}
+
+func (s UninstallExtra) EncodeValues(k string, v *url.Values) error {
+	return util.EncodeValues(s, k, v)
+}
+
 type PackageUninstallRequest struct {
-	ID      string `url:"id"`
-	DSMApps string `url:"dsm_apps,omitempty"`
+	ID          string         `url:"id"`
+	DSMApps     string         `url:"dsm_apps,omitempty"`
+	ExtraValues UninstallExtra `url:"extra_values,omitempty"`
 }
 
 type PackageUninstallResponse struct {
 	Message       string   `json:"message,omitempty"`
 	WorkerMessage []string `json:"worker_message,omitempty"`
+}
+
+type PackageFeedItem struct {
+	Feed string `json:"feed"`
+	Name string `json:"name"`
+}
+
+func (s PackageFeedItem) EncodeValues(k string, v *url.Values) error {
+	return util.EncodeValuesWrap(s, k, v)
+}
+
+type PackageFeeds []string
+
+func (s PackageFeeds) EncodeValues(k string, v *url.Values) error {
+	return util.EncodeValuesWrap(s, k, v)
+}
+
+type PackageFeedListResponse struct {
+	Items []PackageFeedItem `json:"items"`
+	Total int64             `json:"total"`
+}
+
+type PackageFeedAddRequest struct {
+	List PackageFeedItem `url:"list"`
+}
+
+type PackageFeedDeleteRequest struct {
+	List PackageFeeds `url:"list"`
+}
+
+type PackageSettingGetRequest struct {
+	Option models.JsonString `url:"option"`
+}
+
+type PackageSettingGetResponse struct {
+	Autoupdateall       bool   `json:"autoupdateall,omitempty"`
+	Autoupdateimportant bool   `json:"autoupdateimportant,omitempty"`
+	DefaultVol          string `json:"default_vol,omitempty"`
+	EnableAutoupdate    bool   `json:"enable_autoupdate,omitempty"`
+	EnableDsm           bool   `json:"enable_dsm,omitempty"`
+	EnableEmail         bool   `json:"enable_email,omitempty"`
+	Mailset             bool   `json:"mailset,omitempty"`
+	TrustLevel          int    `json:"trust_level,omitempty"`
+	UpdateChannel       bool   `json:"update_channel,omitempty"`
+	VolumeCount         int    `json:"volume_count,omitempty"`
+	VolumeList          []struct {
+		Desc           string `json:"desc,omitempty"`
+		Display        string `json:"display,omitempty"`
+		MountPoint     string `json:"mount_point,omitempty"`
+		SizeFree       string `json:"size_free,omitempty"`
+		SizeTotal      string `json:"size_total,omitempty"`
+		VolDesc        string `json:"vol_desc,omitempty"`
+		VolumeFeatures []any  `json:"volume_features,omitempty"`
+	} `json:"volume_list,omitempty"`
 }

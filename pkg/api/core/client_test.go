@@ -261,7 +261,7 @@ func TestClient_PackageFeed(t *testing.T) {
 
 func TestClient_SystemInfo(t *testing.T) {
 	type fields struct {
-		client api.Api
+		client Api
 	}
 	type args struct {
 		ctx context.Context
@@ -273,20 +273,27 @@ func TestClient_SystemInfo(t *testing.T) {
 		want    *SystemInfoResponse
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Get System Info",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx: context.Background(),
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := Client{
-				client: tt.fields.client,
-			}
-			got, err := c.SystemInfo(tt.args.ctx)
+			c := tt.fields.client
+			resp, err := c.SystemInfo(tt.args.ctx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.SystemInfo() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Client.SystemInfo() = %v, want %v", got, tt.want)
+			if resp == nil {
+				t.Errorf("Client.SystemInfo() = %v, want %v", resp, tt.want)
 			}
 		})
 	}

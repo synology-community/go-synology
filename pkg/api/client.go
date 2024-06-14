@@ -168,6 +168,7 @@ func Post[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, met
 	}
 
 	u := c.BaseUrl().JoinPath(method.API)
+	u.RawQuery = ""
 
 	// Only set a timeout if one isn't already set
 	var cancel context.CancelFunc
@@ -183,6 +184,7 @@ func Post[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, met
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("X-SYNO-TOKEN", c.Credentials().Token)
 
 	return Do[TResp](c.Client(), req)
 }

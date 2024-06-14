@@ -25,7 +25,7 @@ func (c *Client) ContentLength(ctx context.Context, url string) (int64, error) {
 
 // SystemInfo implements CoreApi.
 func (c Client) SystemInfo(ctx context.Context) (*SystemInfoResponse, error) {
-	panic("unimplemented")
+	return api.Post[SystemInfoResponse, api.Request](c.client, ctx, nil, methods.SystemInfo)
 }
 
 func (c Client) PackageInstallCheck(ctx context.Context, req PackageInstallCheckRequest) (*PackageInstallCheckResponse, error) {
@@ -222,11 +222,11 @@ func (c Client) PackageFeedList(ctx context.Context) (*PackageFeedListResponse, 
 }
 
 func (c Client) PackageFeedAdd(ctx context.Context, req PackageFeedAddRequest) error {
-	return api.Void[PackageFeedAddRequest](c.client, ctx, &req, methods.PackageFeedAdd)
+	return api.Void(c.client, ctx, &req, methods.PackageFeedAdd)
 }
 
 func (c Client) PackageFeedDelete(ctx context.Context, req PackageFeedDeleteRequest) error {
-	return api.Void[PackageFeedDeleteRequest](c.client, ctx, &req, methods.PackageFeedDelete)
+	return api.Void(c.client, ctx, &req, methods.PackageFeedDelete)
 }
 
 func New(client api.Api) Api {

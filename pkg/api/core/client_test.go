@@ -133,7 +133,11 @@ func TestClient_PackageInstall(t *testing.T) {
 				}
 			}
 
-			err = tt.fields.client.PackageInstallCompound(tt.args.ctx, tt.args.packageName, pkg.Link, size)
+			err = tt.fields.client.PackageInstallCompound(tt.args.ctx, PackageInstallCompoundRequest{
+				Name: tt.args.packageName,
+				URL:  pkg.Link,
+				Size: size,
+			})
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.PackageInstall() error = %v, wantErr %v", err, tt.wantErr)

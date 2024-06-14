@@ -97,7 +97,7 @@ func (c Client) PackageUninstallCompound(ctx context.Context, name string) error
 	return nil
 }
 
-func (c Client) PackageInstallCompound(ctx context.Context, name string, url string, size int64) error {
+func (c Client) PackageInstallCompound(ctx context.Context, req PackageInstallCompoundRequest) error {
 
 	pkgSetting, err := c.PackageSettingGet(ctx, PackageSettingGetRequest{})
 
@@ -112,11 +112,11 @@ func (c Client) PackageInstallCompound(ctx context.Context, name string, url str
 	}
 
 	dlRes, err := c.PackageInstall(ctx, PackageInstallRequest{
-		Name:       name,
-		URL:        url,
+		Name:       req.Name,
+		URL:        req.URL,
 		Type:       0,
 		BigInstall: false,
-		FileSize:   size,
+		FileSize:   req.Size,
 	})
 	if err != nil {
 		return err
@@ -153,7 +153,7 @@ func (c Client) PackageInstallCompound(ctx context.Context, name string, url str
 	path := fmt.Sprintf("%s/%s", status.TmpFolder, status.Taskid)
 
 	_, err = c.PackageInstallCheck(ctx, PackageInstallCheckRequest{
-		ID:                   name,
+		ID:                   req.Name,
 		InstallType:          "",
 		InstallOnColdStorage: false,
 		BreakPkgs:            "",
@@ -172,7 +172,7 @@ func (c Client) PackageInstallCompound(ctx context.Context, name string, url str
 		Force:             true,
 		CheckCodesign:     false,
 		Type:              0,
-		ExtraValues:       "{}",
+		ExtraValues:       ExtraValues(req.ExtraValues),
 		VolumePath:        defaultVol,
 	})
 

@@ -11,7 +11,7 @@ type Api interface {
 	SystemInfo(ctx context.Context) (*SystemInfoResponse, error)
 	PackageServerList(ctx context.Context, req PackageServerListRequest) (*PackageServerListResponse, error)
 	PackageInstall(ctx context.Context, req PackageInstallRequest) (*PackageInstallResponse, error)
-	PackageInstallCompound(ctx context.Context, name string, url string, size int64) error
+	PackageInstallCompound(ctx context.Context, req PackageInstallCompoundRequest) error
 	PackageInstallStatus(ctx context.Context, req PackageInstallStatusRequest) (*PackageInstallStatusResponse, error)
 	PackageInstallDelete(ctx context.Context, req PackageInstallDeleteRequest) error
 	PackageUninstall(ctx context.Context, req PackageUninstallRequest) (*PackageUninstallResponse, error)

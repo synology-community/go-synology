@@ -1,7 +1,10 @@
 package core
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/synology-community/go-synology/pkg/models"
 	"github.com/synology-community/go-synology/pkg/util"
@@ -147,7 +150,7 @@ type PackageInstallRequest struct {
 	BigInstall        bool              `url:"blqinst,omitempty"`
 	Checksum          models.JsonString `url:"checksum"`
 	FileSize          int64             `url:"filesize,omitempty"`
-	ExtraValues       models.JsonString `url:"extra_values,omitempty"`
+	ExtraValues       ExtraValues       `url:"extra_values,omitempty"`
 	CheckCodesign     bool              `url:"check_codesign"`
 	Force             bool              `url:"force,omitempty"`
 	InstallRunPackage bool              `url:"installrunpackage"`
@@ -220,6 +223,40 @@ type PackageFeedDeleteRequest struct {
 
 type PackageSettingGetRequest struct {
 	Option models.JsonString `url:"option"`
+}
+
+type ExtraValues map[string]string
+
+func (s ExtraValues) EncodeValues(k string, v *url.Values) error {
+
+	if len(s) == 0 {
+		v.Set(k, `"{}"`)
+		return nil
+	}
+
+	conf := make(map[string]string)
+	for k, v := range s {
+		if !strings.HasPrefix(k, "wizard_") {
+			conf["wizard_"+k] = v
+		} else {
+			conf[k] = v
+		}
+	}
+
+	encoded, err := json.Marshal(conf)
+	if err != nil {
+		return err
+	}
+	v.Set(k, fmt.Sprintf(`"%s"`, encoded))
+	return nil
+}
+
+type PackageInstallCompoundRequest struct {
+	Name        string            `url:"name"`
+	URL         string            `url:"url"`
+	Size        int64             `url:"size"`
+	Run         bool              `url:"run"`
+	ExtraValues map[string]string `url:"extra_values"`
 }
 
 type PackageSettingGetResponse struct {

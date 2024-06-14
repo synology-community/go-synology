@@ -3,7 +3,7 @@ package util
 import (
 	"encoding/json"
 	"net/url"
-	"strings"
+	"strconv"
 )
 
 func EncodeValues(s interface{}, k string, v *url.Values) error {
@@ -24,9 +24,9 @@ func EncodeValuesWrap(s interface{}, k string, v *url.Values) error {
 		return err
 	}
 
-	e := strings.ReplaceAll(string(encoded), `"`, `\"`)
+	quoted := strconv.Quote(string(encoded))
 
-	v.Set(k, `"`+e+`"`)
+	v.Set(k, quoted)
 
 	return nil
 }

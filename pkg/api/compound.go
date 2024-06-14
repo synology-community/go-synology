@@ -9,7 +9,7 @@ package api
 // type CompoundRequest []RequestElem
 
 // func (c *Client) Compound(params ...RequestElem) (*CompoundResponse, error) {
-// 	resp, err := Post[CompoundRequest, CompoundResponse](c, context.Background(), params, Compound)
+// 	resp, err := Post[CompoundResponse](c, context.Background(), params, Compound)
 // 	if err != nil {
 // 		return nil, err
 // 	}

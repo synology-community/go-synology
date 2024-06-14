@@ -15,42 +15,42 @@ type Client struct {
 
 // ProjectCleanStream implements DockerApi.
 func (d *Client) ProjectCleanStream(ctx context.Context, req ProjectCleanStreamRequest) (*ProjectCleanStreamResponse, error) {
-	return api.Get[ProjectCleanStreamRequest, ProjectCleanStreamResponse](d.client, ctx, &req, methods.ProjectCleanStream)
+	return api.Get[ProjectCleanStreamResponse](d.client, ctx, &req, methods.ProjectCleanStream)
 }
 
 // ProjectStopStream implements DockerApi.
 func (d *Client) ProjectStopStream(ctx context.Context, req ProjectStopStreamRequest) (*ProjectStopStreamResponse, error) {
-	return api.Get[ProjectStopStreamRequest, ProjectStopStreamResponse](d.client, ctx, &req, methods.ProjectStopStream)
+	return api.Get[ProjectStopStreamResponse](d.client, ctx, &req, methods.ProjectStopStream)
 }
 
 // ProjectCreate implements DockerApi.
 func (d *Client) ProjectCreate(ctx context.Context, req ProjectCreateRequest) (*ProjectCreateResponse, error) {
-	return api.Get[ProjectCreateRequest, ProjectCreateResponse](d.client, ctx, &req, methods.ProjectCreate)
+	return api.Get[ProjectCreateResponse](d.client, ctx, &req, methods.ProjectCreate)
 }
 
 // ProjectDelete implements DockerApi.
 func (d *Client) ProjectDelete(ctx context.Context, req ProjectDeleteRequest) (*ProjectDeleteResponse, error) {
-	return api.Get[ProjectDeleteRequest, ProjectDeleteResponse](d.client, ctx, &req, methods.ProjectDelete)
+	return api.Get[ProjectDeleteResponse](d.client, ctx, &req, methods.ProjectDelete)
 }
 
 // ProjectGet implements DockerApi.
 func (d *Client) ProjectGet(ctx context.Context, req ProjectGetRequest) (*ProjectGetResponse, error) {
-	return api.Get[ProjectGetRequest, ProjectGetResponse](d.client, ctx, &req, methods.ProjectGet)
+	return api.Get[ProjectGetResponse](d.client, ctx, &req, methods.ProjectGet)
 }
 
 // ProjectList implements DockerApi.
 func (d *Client) ProjectList(ctx context.Context, req ProjectListRequest) (*ProjectListResponse, error) {
-	return api.Get[ProjectListRequest, ProjectListResponse](d.client, ctx, &req, methods.ProjectList)
+	return api.Get[ProjectListResponse](d.client, ctx, &req, methods.ProjectList)
 }
 
 // ProjectUpdate implements DockerApi.
 func (d *Client) ProjectUpdate(ctx context.Context, req ProjectUpdateRequest) (*ProjectUpdateResponse, error) {
-	return api.Get[ProjectUpdateRequest, ProjectUpdateResponse](d.client, ctx, &req, methods.ProjectUpdate)
+	return api.Get[ProjectUpdateResponse](d.client, ctx, &req, methods.ProjectUpdate)
 }
 
 // ImageDelete implements DockerApi.
 func (d *Client) ImageDelete(ctx context.Context, req ImageDeleteRequest) (*ImageDeleteResponse, error) {
-	return api.Get[ImageDeleteRequest, ImageDeleteResponse](d.client, ctx, &req, methods.ImageDelete)
+	return api.Get[ImageDeleteResponse](d.client, ctx, &req, methods.ImageDelete)
 }
 
 // ImagePull implements DockerApi.
@@ -88,22 +88,22 @@ func (d *Client) ImagePull(ctx context.Context, repository string, tag string) (
 
 // ImagePullStart implements DockerApi.
 func (d *Client) ImagePullStart(ctx context.Context, req ImagePullStartRequest) (*ImagePullStartResponse, error) {
-	return api.Get[ImagePullStartRequest, ImagePullStartResponse](d.client, ctx, &req, methods.ImagePullStart)
+	return api.Get[ImagePullStartResponse](d.client, ctx, &req, methods.ImagePullStart)
 }
 
 // ImagePullStatus implements DockerApi.
 func (d *Client) ImagePullStatus(ctx context.Context, req ImagePullStatusRequest) (*ImagePullStatusResponse, error) {
-	return api.Get[ImagePullStatusRequest, ImagePullStatusResponse](d.client, ctx, &req, methods.ImagePullStatus)
+	return api.Get[ImagePullStatusResponse](d.client, ctx, &req, methods.ImagePullStatus)
 }
 
 // ContainerCreate implements DockerApi.
 func (d *Client) ContainerCreate(ctx context.Context, req CreateContainerRequest) (*CreateContainerResponse, error) {
-	return api.Get[CreateContainerRequest, CreateContainerResponse](d.client, ctx, &req, methods.Create)
+	return api.Get[CreateContainerResponse](d.client, ctx, &req, methods.Create)
 }
 
 // RegistryList implements DockerApi.
 func (d *Client) RegistryList(ctx context.Context, req ListRegistryRequest) (*ListRegistryResponse, error) {
-	return api.Get[ListRegistryRequest, ListRegistryResponse](d.client, ctx, &req, methods.RegistryList)
+	return api.Get[ListRegistryResponse](d.client, ctx, &req, methods.RegistryList)
 }
 
 func New(client api.Api) Api {

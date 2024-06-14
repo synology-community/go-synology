@@ -96,7 +96,7 @@ func (c *Client) Credentials() Credentials {
 
 // Login runs a login flow to retrieve session token from Synology.
 func (c *Client) Login(ctx context.Context, user, password string) (*LoginResponse, error) {
-	resp, err := Get[LoginRequest, LoginResponse](c, ctx, &LoginRequest{
+	resp, err := Get[LoginResponse](c, ctx, &LoginRequest{
 		Account:  user,
 		Password: password,
 		// Session:         sessionName,
@@ -118,7 +118,7 @@ func (c *Client) Login(ctx context.Context, user, password string) (*LoginRespon
 	return resp, nil
 }
 
-func PostFile[TReq Request, TResp Response](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
+func PostFile[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
 	buf := new(bytes.Buffer)
 
 	// Prepare a form that you will submit to that URL.
@@ -148,18 +148,17 @@ func PostFile[TReq Request, TResp Response](c Api, ctx context.Context, r *TReq,
 	}
 }
 
-func List[TResp Response](c Api, ctx context.Context, method Method) (*TResp, error) {
-
-	return Get[Request, TResp](c, ctx, nil, method)
+func List[T Response](c Api, ctx context.Context, method Method) (*T, error) {
+	return Get[T, Request](c, ctx, nil, method)
 }
 
 func Void[TReq Request](c Api, ctx context.Context, r *TReq, method Method) error {
-	_, err := Get[TReq, Request](c, ctx, r, method)
+	_, err := Get[Request](c, ctx, r, method)
 	return err
 }
 
-func GetEncode[TReq EncodeRequest, TResp Response](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
-	return Get[TReq, TResp](c, ctx, r, method)
+func GetEncode[TResp Response, TReq EncodeRequest](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
+	return Get[TResp](c, ctx, r, method)
 }
 
 func Post[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
@@ -223,7 +222,7 @@ func GetQuery[TResp any](c Api, ctx context.Context, r interface{}, method Metho
 	return Do[TResp](c.Client(), req)
 }
 
-func Get[TReq Request, TResp Response](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
+func Get[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
 	aq, err := query.Values(method) //.AsApiParams())
 	if err != nil {
 		return nil, err
@@ -271,7 +270,7 @@ func download(r io.ReadCloser) (interface{}, error) {
 	}, nil
 }
 
-func Do[TResponse Response](client *retryablehttp.Client, req *retryablehttp.Request) (*TResponse, error) {
+func Do[T Response](client *retryablehttp.Client, req *retryablehttp.Request) (*T, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -281,7 +280,7 @@ func Do[TResponse Response](client *retryablehttp.Client, req *retryablehttp.Req
 		_ = resp.Body.Close()
 	}()
 
-	return handleResponse[TResponse](resp)
+	return handleResponse[T](resp)
 }
 
 func handle[T Response](resp *http.Response, res *T) error {

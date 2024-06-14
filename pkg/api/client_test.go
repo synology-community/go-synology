@@ -13,8 +13,6 @@ import (
 	"github.com/synology-community/go-synology/pkg/util"
 )
 
-type Nil struct{}
-
 func newClient(t *testing.T) Api {
 	c, err := New(Options{
 		Host:       os.Getenv("SYNOLOGY_HOST"),
@@ -33,13 +31,7 @@ func newClient(t *testing.T) Api {
 		log.Infof("[INFO] Session: %s\nDeviceID: %s", r.SessionID, r.DeviceID)
 	}
 
-	if client, ok := c.(Api); !ok {
-		t.Error("Client is not of type APIClient")
-		require.True(t, ok)
-		return nil
-	} else {
-		return client
-	}
+	return c
 }
 
 func TestMarshalURL(t *testing.T) {
@@ -154,15 +146,15 @@ func TestHandleErrors(t *testing.T) {
 
 	testCases := []struct {
 		name                string
-		response            ApiResponse[Nil]
+		response            ApiResponse[Response]
 		responseKnownErrors []ErrorSummary
 		expected            ApiError
 	}{
 		{
 			name: "global errors only",
-			response: ApiResponse[Nil]{
+			response: ApiResponse[Response]{
 				Success: false,
-				Data:    Nil{},
+				Data:    struct{}{},
 				Error: ApiError{
 					Code: 100,
 					Errors: []ErrorItem{
@@ -189,9 +181,9 @@ func TestHandleErrors(t *testing.T) {
 		},
 		{
 			name: "response-specific error",
-			response: ApiResponse[Nil]{
+			response: ApiResponse[Response]{
 				Success: false,
-				Data:    Nil{},
+				Data:    struct{}{},
 				Error: ApiError{
 					Code: 100,
 					Errors: []ErrorItem{

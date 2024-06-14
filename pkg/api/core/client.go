@@ -29,12 +29,12 @@ func (c Client) SystemInfo(ctx context.Context) (*SystemInfoResponse, error) {
 }
 
 func (c Client) PackageInstallCheck(ctx context.Context, req PackageInstallCheckRequest) (*PackageInstallCheckResponse, error) {
-	return api.Get[PackageInstallCheckRequest, PackageInstallCheckResponse](c.client, ctx, &req, methods.PackageInstallationCheck)
+	return api.Get[PackageInstallCheckResponse](c.client, ctx, &req, methods.PackageInstallationCheck)
 }
 
 // PackageList implements CoreApi.
 func (c Client) PackageList(ctx context.Context) (*PackageListResponse, error) {
-	return api.Get[PackageListRequest, PackageListResponse](c.client, ctx, &PackageListRequest{
+	return api.Get[PackageListResponse](c.client, ctx, &PackageListRequest{
 		Additional: []string{"description", "description_enu", "dependent_packages", "beta", "distributor", "distributor_url", "maintainer", "maintainer_url", "dsm_apps", "dsm_app_page", "dsm_app_launch_name", "report_beta_url", "support_center", "startable", "installed_info", "support_url", "is_uninstall_pages", "install_type", "autoupdate", "silent_upgrade", "installing_progress", "ctl_uninstall", "updated_at", "status", "url", "available_operation", "install_type"},
 	}, methods.PackageList)
 }
@@ -63,11 +63,11 @@ func (c Client) PackageFind(ctx context.Context, name string) (*Package, error) 
 }
 
 func (c Client) PackageServerList(ctx context.Context, req PackageServerListRequest) (*PackageServerListResponse, error) {
-	return api.Get[PackageServerListRequest, PackageServerListResponse](c.client, ctx, &req, methods.PackageServerList)
+	return api.Get[PackageServerListResponse](c.client, ctx, &req, methods.PackageServerList)
 }
 
 func (c Client) PackageGet(ctx context.Context, id string) (*PackageGetResponse, error) {
-	return api.Get[PackageGetRequest, PackageGetResponse](c.client, ctx, &PackageGetRequest{
+	return api.Get[PackageGetResponse](c.client, ctx, &PackageGetRequest{
 		ID:         id,
 		Additional: []string{"description", "description_enu", "dependent_packages", "beta", "distributor", "distributor_url", "maintainer", "maintainer_url", "dsm_apps", "dsm_app_page", "dsm_app_launch_name", "report_beta_url", "support_center", "startable", "installed_info", "support_url", "is_uninstall_pages", "install_type", "autoupdate", "silent_upgrade", "installing_progress", "ctl_uninstall", "updated_at", "status", "url", "available_operation", "install_type"},
 	}, methods.PackageGet)
@@ -188,11 +188,11 @@ func (c Client) PackageInstallCompound(ctx context.Context, req PackageInstallCo
 }
 
 func (c Client) PackageInstallStatus(ctx context.Context, req PackageInstallStatusRequest) (*PackageInstallStatusResponse, error) {
-	return api.Get[PackageInstallStatusRequest, PackageInstallStatusResponse](c.client, ctx, &req, methods.PackageInstallationStatus)
+	return api.Get[PackageInstallStatusResponse](c.client, ctx, &req, methods.PackageInstallationStatus)
 }
 
 func (c Client) PackageSettingGet(ctx context.Context, req PackageSettingGetRequest) (*PackageSettingGetResponse, error) {
-	return api.Get[PackageSettingGetRequest, PackageSettingGetResponse](c.client, ctx, &req, methods.PackageSettingGet)
+	return api.Get[PackageSettingGetResponse](c.client, ctx, &req, methods.PackageSettingGet)
 }
 
 func (c Client) PackageInstall(ctx context.Context, req PackageInstallRequest) (*PackageInstallResponse, error) {
@@ -206,7 +206,7 @@ func (c Client) PackageInstall(ctx context.Context, req PackageInstallRequest) (
 
 	req.Operation = []string{"install"}
 
-	return api.Get[PackageInstallRequest, PackageInstallResponse](c.client, ctx, &req, methods.PackageInstallationInstall)
+	return api.Get[PackageInstallResponse](c.client, ctx, &req, methods.PackageInstallationInstall)
 }
 
 func (c Client) PackageInstallDelete(ctx context.Context, req PackageInstallDeleteRequest) error {
@@ -214,7 +214,7 @@ func (c Client) PackageInstallDelete(ctx context.Context, req PackageInstallDele
 }
 
 func (c Client) PackageUninstall(ctx context.Context, req PackageUninstallRequest) (*PackageUninstallResponse, error) {
-	return api.Get[PackageUninstallRequest, PackageUninstallResponse](c.client, ctx, &req, methods.PackageUnistallationUninstall)
+	return api.Get[PackageUninstallResponse](c.client, ctx, &req, methods.PackageUnistallationUninstall)
 }
 
 func (c Client) PackageFeedList(ctx context.Context) (*PackageFeedListResponse, error) {

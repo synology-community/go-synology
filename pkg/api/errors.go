@@ -88,7 +88,7 @@ var GlobalErrors ErrorSummary = ErrorSummary{
 	1805: "Can't overwrite or skip the existing file, if no   parameter is given.",
 	1903: "error - error_port_conflict",
 	1904: "error - error_port_conflict",
-	1905: "ftp - ftp_annoymous_root_share_invalid",
+	1905: "ftp - ftp_anoymous_root_share_invalid",
 	1951: "error - error_port_conflict",
 	2001: "error - error_error_system",
 	2002: "error - error_error_system",
@@ -652,17 +652,17 @@ type ErrorFields map[string]any
 // Error satisfies error interface for SynologyError type.
 func (se ApiError) Error() string {
 	buf := strings.Builder{}
-	buf.WriteString(fmt.Sprint("[%d] %s", se.Code, se.Summary))
+	buf.WriteString(fmt.Sprintf("[%d] %s", se.Code, se.Summary))
 	if len(se.Errors) > 0 {
 		buf.WriteString("\n\tDetails:")
 	}
 
 	for _, e := range se.Errors {
 		detailedFields := []string{}
-		buf.WriteString(fmt.Sprint("\n\t\t[%d] %s", e.Code, e.Summary))
+		buf.WriteString(fmt.Sprintf("\n\t\t[%d] %s", e.Code, e.Summary))
 		if len(e.Details) > 0 {
 			for k, v := range e.Details {
-				detailedFields = append(detailedFields, k+": "+fmt.Sprint("%v", v))
+				detailedFields = append(detailedFields, k+": "+fmt.Sprintf("%v", v))
 			}
 			buf.WriteString(": [" + strings.Join(detailedFields, ",") + "]")
 		}

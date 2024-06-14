@@ -7,7 +7,6 @@ import (
 
 	"github.com/synology-community/go-synology/pkg/api"
 	"github.com/synology-community/go-synology/pkg/api/virtualization/methods"
-	"github.com/synology-community/go-synology/pkg/models"
 )
 
 type Client struct {
@@ -15,19 +14,17 @@ type Client struct {
 }
 
 func (v *Client) GuestPowerOn(ctx context.Context, guest Guest) error {
-	_, err := api.Get[Guest, models.NilResponse](v.client, ctx, &guest, methods.GuestPowerOn)
-	return err
+	return api.Void(v.client, ctx, &guest, methods.GuestPowerOn)
 }
 
 // GuestPowerOff implements VirtualizationAPI.
 func (v *Client) GuestPowerOff(ctx context.Context, guest Guest) error {
-	_, err := api.Get[Guest, models.NilResponse](v.client, ctx, &guest, methods.GuestPowerOff)
-	return err
+	return api.Void(v.client, ctx, &guest, methods.GuestPowerOff)
 }
 
 // GuestUpdate implements VirtualizationAPI.
 func (v *Client) GuestUpdate(ctx context.Context, guest GuestUpdate) error {
-	_, err := api.Post[GuestUpdate, GuestUpdateResponse](v.client, ctx, &guest, methods.GuestUpdate)
+	_, err := api.Post[GuestUpdateResponse](v.client, ctx, &guest, methods.GuestUpdate)
 	return err
 }
 
@@ -38,7 +35,7 @@ func (v *Client) StorageList(ctx context.Context) (*StorageList, error) {
 
 // ImageCreate implements VirtualizationAPI.
 func (v *Client) ImageCreate(ctx context.Context, image Image) (*Task, error) {
-	resp, err := api.Get[Image, TaskRef](v.client, ctx, &image, methods.ImageCreate)
+	resp, err := api.Get[TaskRef](v.client, ctx, &image, methods.ImageCreate)
 
 	if err != nil {
 		return nil, err
@@ -49,7 +46,7 @@ func (v *Client) ImageCreate(ctx context.Context, image Image) (*Task, error) {
 
 // ImageDelete implements VirtualizationAPI.
 func (v *Client) ImageDelete(ctx context.Context, imageName string) error {
-	_, err := api.Get[Image, TaskRef](v.client, ctx, &Image{
+	_, err := api.Get[TaskRef](v.client, ctx, &Image{
 		Name: imageName,
 	}, methods.ImageDelete)
 
@@ -71,7 +68,7 @@ func (v *Client) TaskGet(ctx context.Context, taskID string) (*Task, error) {
 
 	delay := 5 * time.Second
 	for {
-		task, err := api.Get[TaskRef, Task](v.client, ctx, &TaskRef{
+		task, err := api.Get[Task](v.client, ctx, &TaskRef{
 			TaskID: taskID,
 		}, methods.TaskGet)
 		if err != nil && task == nil {
@@ -89,7 +86,7 @@ func (v *Client) TaskGet(ctx context.Context, taskID string) (*Task, error) {
 
 // GetGuest implements VirtualizationAPI.
 func (v *Client) GuestGet(ctx context.Context, guest Guest) (*Guest, error) {
-	return api.Get[GetGuest, Guest](v.client, ctx, &GetGuest{Name: guest.Name}, methods.GuestGet)
+	return api.Get[Guest](v.client, ctx, &GetGuest{Name: guest.Name}, methods.GuestGet)
 }
 
 // ListGuests implements VirtualizationAPI.
@@ -99,7 +96,7 @@ func (v *Client) GuestList(ctx context.Context) (*GuestList, error) {
 
 // GuestCreate implements VirtualizationAPI.
 func (v *Client) GuestCreate(ctx context.Context, guest Guest) (*Guest, error) {
-	resp, err := api.Get[Guest, TaskRef](v.client, ctx, &guest, methods.GuestCreate)
+	resp, err := api.Get[TaskRef](v.client, ctx, &guest, methods.GuestCreate)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +113,7 @@ func (v *Client) GuestCreate(ctx context.Context, guest Guest) (*Guest, error) {
 
 // GuestDelete implements VirtualizationAPI.
 func (v *Client) GuestDelete(ctx context.Context, guest Guest) error {
-	_, err := api.Get[Guest, TaskRef](v.client, ctx, &Guest{
+	_, err := api.Get[TaskRef](v.client, ctx, &Guest{
 		Name: guest.Name,
 	}, methods.GuestDelete)
 

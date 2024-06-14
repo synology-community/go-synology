@@ -1,11 +1,9 @@
 package core
 
-import "github.com/synology-community/go-synology/pkg/models"
-
 type PortEnableRequest struct {
-	IsDirectID bool             `url:"isDirectID"`
-	IsPkg      bool             `url:"isPkg"`
-	Name       models.JsonArray `url:"name"`
+	IsDirectID bool     `url:"isDirectID"`
+	IsPkg      bool     `url:"isPkg"`
+	Name       []string `url:"name,json"`
 }
 
 type PortEnableResponse struct {

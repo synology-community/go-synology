@@ -3,13 +3,12 @@ package docker
 import (
 	"net/url"
 
-	"github.com/synology-community/go-synology/pkg/models"
 	"github.com/synology-community/go-synology/pkg/util"
 )
 
 type ImagePullStartRequest struct {
-	Repository models.JsonString `form:"repository" url:"repository"`
-	Tag        models.JsonString `form:"tag" url:"tag"`
+	Repository string `form:"repository" url:"repository,quoted"`
+	Tag        string `form:"tag" url:"tag,quoted"`
 }
 
 type ImagePullStartResponse struct {
@@ -17,7 +16,7 @@ type ImagePullStartResponse struct {
 }
 
 type ImagePullStatusRequest struct {
-	TaskID models.JsonString `form:"task_id" url:"task_id"`
+	TaskID string `form:"task_id" url:"task_id,quoted"`
 }
 
 type ImagePullStatusResponse struct {

@@ -16,8 +16,8 @@ type FolderList struct {
 }
 
 type FileListRequest struct {
-	FolderPath string    `url:"folder_path" json:"folder_path"`
-	Additional JsonArray `url:"additional" json:"additional"`
+	FolderPath string   `url:"folder_path" json:"folder_path"`
+	Additional []string `url:"additional,json" json:"additional"`
 }
 
 type FileList struct {
@@ -77,10 +77,10 @@ type AdditionalAttributes struct {
 	RealPath  string `json:"real_path,omitempty"`
 	SyncShare bool   `json:"sync_share,omitempty"`
 	Time      struct {
-		Atime  JsonTime `json:"atime"`
-		Crtime JsonTime `json:"crtime"`
-		Ctime  JsonTime `json:"ctime"`
-		Mtime  JsonTime `json:"mtime"`
+		Atime  Time `json:"atime"`
+		Crtime Time `json:"crtime"`
+		Ctime  Time `json:"ctime"`
+		Mtime  Time `json:"mtime"`
 	} `json:"time,omitempty"`
 	VolumeStatus struct {
 		Freespace  int64 `json:"freespace,omitempty"`
@@ -90,20 +90,20 @@ type AdditionalAttributes struct {
 	WormState int `json:"worm_state,omitempty"`
 }
 
-type JsonTime struct {
+type Time struct {
 	time.Time
 }
 
-func (ms JsonTime) MarshalJSON() ([]byte, error) {
-	str := fmt.Sprintf(`%d`, ms.Time.Unix())
+func (ms Time) MarshalJSON() ([]byte, error) {
+	str := fmt.Sprintf(`%d`, ms.Unix())
 	return []byte(str), nil
 }
 
-func (ms *JsonTime) UnmarshalJSON(text []byte) error {
+func (ms *Time) UnmarshalJSON(text []byte) error {
 	i, err := strconv.ParseInt(string(text), 10, 64)
 	if err != nil {
 		return err
 	}
-	ms.Time = time.Unix(i, 0)
+	*ms = Time{Time: time.Unix(i, 0)}
 	return nil
 }

@@ -16,9 +16,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-querystring/query"
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/go-retryablehttp"
+	"github.com/synology-community/go-synology/pkg/query"
 	"github.com/synology-community/go-synology/pkg/util"
 	"github.com/synology-community/go-synology/pkg/util/form"
 	"golang.org/x/net/publicsuffix"
@@ -29,7 +29,7 @@ var defaultTimeout = 15 * time.Second
 type Client struct {
 	httpClient *retryablehttp.Client
 
-	BaseURL url.URL
+	BaseURL *url.URL
 
 	ApiCredentials Credentials
 }
@@ -74,14 +74,14 @@ func New(o Options) (Api, error) {
 
 	client := &Client{
 		httpClient: c,
-		BaseURL:    *baseURL,
+		BaseURL:    baseURL,
 	}
 
 	return client, nil
 }
 
 // BaseUrl implements api.Client.
-func (c *Client) BaseUrl() url.URL {
+func (c *Client) BaseUrl() *url.URL {
 	return c.BaseURL
 }
 
@@ -162,21 +162,30 @@ func GetEncode[TReq EncodeRequest, TResp Response](c Api, ctx context.Context, r
 	return Get[TReq, TResp](c, ctx, r, method)
 }
 
-func Post[TReq Request, TResp Response](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
-	qu, err := util.Query(method, r)
+func Post[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
+	qu, err := util.Query(method, r, c.Credentials())
 	if err != nil {
 		return nil, err
 	}
 
-	u := c.BaseUrl()
+	u := c.BaseUrl().JoinPath(method.API)
 
-	resp, err := c.Client().PostForm(u.String(), qu)
+	// Only set a timeout if one isn't already set
+	var cancel context.CancelFunc
+	if _, ok := ctx.Deadline(); !ok {
+		ctx, cancel = context.WithTimeout(ctx, defaultTimeout)
+		defer cancel()
+	}
+
+	req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodPost, u.String(), strings.NewReader(qu.Encode()))
 
 	if err != nil {
 		return nil, err
 	}
 
-	return handleResponse[TResp](resp)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	return Do[TResp](c.Client(), req)
 }
 
 func GetQuery[TResp any](c Api, ctx context.Context, r interface{}, method Method) (*TResp, error) {
@@ -275,8 +284,17 @@ func Do[TResponse Response](client *retryablehttp.Client, req *retryablehttp.Req
 	return handleResponse[TResponse](resp)
 }
 
-func handleResponse[TResponse Response](resp *http.Response) (*TResponse, error) {
-	var synoResponse ApiResponse[TResponse]
+func handle[T Response](resp *http.Response, res *T) error {
+	r, err := handleResponse[T](resp)
+	if err != nil {
+		return err
+	}
+	*res = *r
+	return nil
+}
+
+func handleResponse[T Response](resp *http.Response) (*T, error) {
+	var synoResponse ApiResponse[T]
 
 	contentType := resp.Header.Get("Content-Type")
 	contentType = strings.Split(contentType, ";")[0]
@@ -292,7 +310,7 @@ func handleResponse[TResponse Response](resp *http.Response) (*TResponse, error)
 			return nil, err
 		}
 
-		if resp, ok := resp.(*TResponse); ok {
+		if resp, ok := resp.(*T); ok {
 			return resp, nil
 		} else {
 			return nil, errors.New("invalid response")
@@ -306,7 +324,7 @@ func handleResponse[TResponse Response](resp *http.Response) (*TResponse, error)
 	}
 }
 
-func handleErrors[T any | ApiError](response ApiResponse[T], knownErrors ErrorSummary) error {
+func handleErrors[T Response](response ApiResponse[T], knownErrors ErrorSummary) error {
 	if response.Error.Code == 0 {
 		return nil
 	}

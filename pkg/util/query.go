@@ -4,7 +4,7 @@ import (
 	"maps"
 	"net/url"
 
-	"github.com/google/go-querystring/query"
+	"github.com/synology-community/go-synology/pkg/query"
 )
 
 func Query(params ...any) (url.Values, error) {

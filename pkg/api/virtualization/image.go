@@ -5,8 +5,6 @@ import (
 	"net/url"
 )
 
-type JsonArray []string
-
 type ImageType string
 
 func (s ImageType) EncodeValues(k string, v *url.Values) error {

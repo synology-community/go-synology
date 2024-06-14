@@ -70,6 +70,14 @@ type Encoder interface {
 //	// is skipped if empty.  Note the leading comma.
 //	Field int `url:",omitempty"`
 //
+//	// Field appears as URL parameter "myName" and the field is marshaled as
+//	// a JSON string.
+//	Field []int `url:"myName,json"`
+//
+//	// Field appears as URL parameter "myName" and the field is marshaled as
+//	// a JSON string, quoted.
+//	Field []string `url:"myName,json,quoted"`
+//
 // For encoding individual field values, the following type-dependent rules
 // apply:
 //

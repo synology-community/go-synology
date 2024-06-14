@@ -204,7 +204,7 @@ func (c Client) PackageInstall(ctx context.Context, req PackageInstallRequest) (
 		req.FileSize = size
 	}
 
-	req.Operation = "install"
+	req.Operation = []string{"install"}
 
 	return api.Get[PackageInstallRequest, PackageInstallResponse](c.client, ctx, &req, methods.PackageInstallationInstall)
 }

@@ -7,7 +7,6 @@ import (
 
 	"github.com/synology-community/go-synology/pkg/api"
 	"github.com/synology-community/go-synology/pkg/api/docker/methods"
-	"github.com/synology-community/go-synology/pkg/models"
 )
 
 type Client struct {
@@ -57,8 +56,8 @@ func (d *Client) ImageDelete(ctx context.Context, req ImageDeleteRequest) (*Imag
 // ImagePull implements DockerApi.
 func (d *Client) ImagePull(ctx context.Context, repository string, tag string) (*ImagePullStatusResponse, error) {
 	res, err := d.ImagePullStart(ctx, ImagePullStartRequest{
-		Repository: models.JsonString(repository),
-		Tag:        models.JsonString(tag),
+		Repository: repository,
+		Tag:        tag,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("Unable to delete file, got error: %s", err)
@@ -72,7 +71,7 @@ func (d *Client) ImagePull(ctx context.Context, repository string, tag string) (
 	delay := 5 * time.Second
 	for {
 		task, err := d.ImagePullStatus(ctx, ImagePullStatusRequest{
-			TaskID: models.JsonString(res.TaskID),
+			TaskID: res.TaskID,
 		})
 		if err != nil && task == nil {
 			return nil, err

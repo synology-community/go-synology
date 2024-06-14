@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/google/go-querystring/query"
+	"github.com/synology-community/go-synology/pkg/query"
 )
 
 func TestStorages_EncodeValues(t *testing.T) {
@@ -33,8 +33,8 @@ func TestStorages_EncodeValues(t *testing.T) {
 			args: args{
 				k: "test",
 				v: &url.Values{
-					"storage_ids":   []string{"['test1','test2']"},
-					"storage_names": []string{"['test1','test2']"},
+					"storage_ids":   []string{`["test1","test2"]`},
+					"storage_names": []string{`["test1","test2"]`},
 				},
 			},
 		},
@@ -59,11 +59,11 @@ func TestStorages_EncodeValues(t *testing.T) {
 		if v, err := query.Values(s); err != nil {
 			t.Errorf("Storages.EncodeValues() error = %v", err)
 		} else {
-			if v.Get("storage_ids") != "['test1','test2']" {
+			if v.Get("storage_ids") != `["test1","test2"]` {
 				t.Errorf("Storages.EncodeValues() error = %v", v.Get("storage_ids"))
 			}
 
-			if v.Get("storage_names") != "['test1','test2']" {
+			if v.Get("storage_names") != `["test1","test2"]` {
 				t.Errorf("Storages.EncodeValues() error = %v", v.Get("storage_names"))
 			}
 		}

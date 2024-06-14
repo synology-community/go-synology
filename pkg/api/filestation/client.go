@@ -70,7 +70,7 @@ func (f *Client) MD5Start(ctx context.Context, path string) (*MD5StartResponse, 
 
 func (f *Client) MD5Status(ctx context.Context, taskID string) (*MD5StatusResponse, error) {
 	return api.Get[MD5StatusRequest, MD5StatusResponse](f.client, ctx, &MD5StatusRequest{
-		TaskID: UrlWrapString(taskID),
+		TaskID: taskID,
 	}, methods.MD5Status)
 }
 

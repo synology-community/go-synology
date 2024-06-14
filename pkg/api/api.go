@@ -9,7 +9,7 @@ import (
 
 type Api interface {
 	Client() *retryablehttp.Client
-	BaseUrl() url.URL
+	BaseUrl() *url.URL
 	Credentials() Credentials
 	Login(ctx context.Context, user, password string) (*LoginResponse, error)
 }

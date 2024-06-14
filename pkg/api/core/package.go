@@ -6,13 +6,12 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/synology-community/go-synology/pkg/models"
 	"github.com/synology-community/go-synology/pkg/util"
 )
 
 type PackageListRequest struct {
-	IgnoreHidden bool             `url:"ignore_hidden"`
-	Additional   models.JsonArray `url:"additional"`
+	IgnoreHidden bool     `url:"ignore_hidden"`
+	Additional   []string `url:"additional,json"`
 }
 
 type InstalledPackage struct {
@@ -64,8 +63,8 @@ type PackageListResponse struct {
 }
 
 type PackageGetRequest struct {
-	ID         string           `url:"id"`
-	Additional models.JsonArray `url:"additional,omitempty"`
+	ID         string   `url:"id"`
+	Additional []string `url:"additional,omitempty,json"`
 }
 
 type PackageGetResponse InstalledPackage
@@ -144,19 +143,19 @@ type PackageInstallStatusResponse struct {
 }
 
 type PackageInstallRequest struct {
-	Name              string            `url:"name"`
-	URL               string            `url:"url,omitempty"`
-	Type              int64             `url:"type,omitempty"`
-	BigInstall        bool              `url:"blqinst,omitempty"`
-	Checksum          models.JsonString `url:"checksum"`
-	FileSize          int64             `url:"filesize,omitempty"`
-	ExtraValues       ExtraValues       `url:"extra_values,omitempty"`
-	CheckCodesign     bool              `url:"check_codesign"`
-	Force             bool              `url:"force,omitempty"`
-	InstallRunPackage bool              `url:"installrunpackage"`
-	Path              string            `url:"path,omitempty"`
-	Operation         models.JsonString `url:"operation,omitempty"`
-	VolumePath        string            `url:"volume_path,omitempty"`
+	Name              string      `url:"name"`
+	URL               string      `url:"url,omitempty"`
+	Type              int64       `url:"type,omitempty"`
+	BigInstall        bool        `url:"blqinst,omitempty"`
+	Checksum          []string    `url:"checksum,quoted"`
+	FileSize          int64       `url:"filesize,omitempty"`
+	ExtraValues       ExtraValues `url:"extra_values,omitempty"`
+	CheckCodesign     bool        `url:"check_codesign"`
+	Force             bool        `url:"force,omitempty"`
+	InstallRunPackage bool        `url:"installrunpackage"`
+	Path              string      `url:"path,omitempty"`
+	Operation         []string    `url:"operation,omitempty,quoted"`
+	VolumePath        string      `url:"volume_path,omitempty"`
 }
 
 type PackageInstallResponse struct {
@@ -222,7 +221,7 @@ type PackageFeedDeleteRequest struct {
 }
 
 type PackageSettingGetRequest struct {
-	Option models.JsonString `url:"option"`
+	Option []string `url:"option,quoted"`
 }
 
 type ExtraValues map[string]string

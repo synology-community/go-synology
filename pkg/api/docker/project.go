@@ -2,8 +2,6 @@ package docker
 
 import (
 	"time"
-
-	"github.com/synology-community/go-synology/pkg/models"
 )
 
 type Project struct {
@@ -34,7 +32,7 @@ type Project struct {
 }
 
 type ProjectGetRequest struct {
-	ID models.JsonString `url:"id,omitempty"`
+	ID string `url:"id,omitempty,quoted"`
 }
 
 type ProjectGetResponse Project
@@ -47,13 +45,13 @@ type ProjectListRequest struct {
 type ProjectListResponse map[string]Project
 
 type ProjectCreateRequest struct {
-	Name                  models.JsonString `url:"name,omitempty"`
-	Content               models.JsonString `url:"content,omitempty"`
-	SharePath             models.JsonString `url:"share_path,omitempty"`
-	EnableServicePortal   bool              `url:"enable_service_portal,omitempty"`
-	ServicePortalName     models.JsonString `url:"service_portal_name"`
-	ServicePortalPort     int               `url:"service_portal_port"`
-	ServicePortalProtocol models.JsonString `url:"service_portal_protocol"`
+	Name                  string `url:"name,omitempty,quoted"`
+	Content               string `url:"content,omitempty,quoted"`
+	SharePath             string `url:"share_path,omitempty,quoted"`
+	EnableServicePortal   bool   `url:"enable_service_portal,omitempty"`
+	ServicePortalName     string `url:"service_portal_name,quoted"`
+	ServicePortalPort     int    `url:"service_portal_port"`
+	ServicePortalProtocol string `url:"service_portal_protocol,quoted"`
 }
 
 type ProjectCreateResponse struct {
@@ -84,8 +82,8 @@ type ProjectCreateResponse struct {
 }
 
 type ProjectUpdateRequest struct {
-	ID      models.JsonString `url:"id,omitempty"`
-	Content models.JsonString `url:"content,omitempty"`
+	ID      string `url:"id,omitempty,quoted"`
+	Content string `url:"content,omitempty,quoted"`
 }
 
 type ProjectUpdateResponse struct {
@@ -116,19 +114,19 @@ type ProjectUpdateResponse struct {
 }
 
 type ProjectDeleteRequest struct {
-	ID models.JsonString `url:"id,omitempty"`
+	ID string `url:"id,omitempty,quoted"`
 }
 
 type ProjectDeleteResponse struct{}
 
 type ProjectCleanStreamRequest struct {
-	ID models.JsonString `url:"id,omitempty"`
+	ID string `url:"id,omitempty,quoted"`
 }
 
 type ProjectCleanStreamResponse string
 
 type ProjectStopStreamRequest struct {
-	ID models.JsonString `url:"id,omitempty"`
+	ID string `url:"id,omitempty,quoted"`
 }
 
 type ProjectStopStreamResponse string

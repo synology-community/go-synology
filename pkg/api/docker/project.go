@@ -48,9 +48,9 @@ type ProjectCreateRequest struct {
 	Name                  string `url:"name,omitempty,quoted"`
 	Content               string `url:"content,omitempty,quoted"`
 	SharePath             string `url:"share_path,omitempty,quoted"`
-	EnableServicePortal   bool   `url:"enable_service_portal,omitempty"`
+	EnableServicePortal   *bool  `url:"enable_service_portal,omitempty"`
 	ServicePortalName     string `url:"service_portal_name,quoted"`
-	ServicePortalPort     int    `url:"service_portal_port"`
+	ServicePortalPort     *int64 `url:"service_portal_port"`
 	ServicePortalProtocol string `url:"service_portal_protocol,quoted"`
 }
 
@@ -59,13 +59,13 @@ type ProjectCreateResponse struct {
 	Containers            []any     `json:"containers,omitempty"`
 	Content               string    `json:"content,omitempty"`
 	CreatedAt             time.Time `json:"created_at,omitempty"`
-	EnableServicePortal   bool      `json:"enable_service_portal,omitempty"`
 	ID                    string    `json:"id,omitempty"`
 	IsPackage             bool      `json:"is_package,omitempty"`
 	Name                  string    `json:"name,omitempty"`
 	Path                  string    `json:"path,omitempty"`
+	EnableServicePortal   *bool     `url:"enable_service_portal,omitempty"`
 	ServicePortalName     string    `json:"service_portal_name,omitempty"`
-	ServicePortalPort     int       `json:"service_portal_port,omitempty"`
+	ServicePortalPort     *int64    `json:"service_portal_port,omitempty"`
 	ServicePortalProtocol string    `json:"service_portal_protocol,omitempty"`
 	Services              []struct {
 		DisplayName string `json:"display_name,omitempty"`
@@ -82,8 +82,12 @@ type ProjectCreateResponse struct {
 }
 
 type ProjectUpdateRequest struct {
-	ID      string `url:"id,omitempty,quoted"`
-	Content string `url:"content,omitempty,quoted"`
+	ID                    string `url:"id,omitempty,quoted"`
+	Content               string `url:"content,omitempty,quoted"`
+	EnableServicePortal   *bool  `url:"enable_service_portal,omitempty"`
+	ServicePortalName     string `url:"service_portal_name,omitempty,quoted"`
+	ServicePortalPort     *int64 `url:"service_portal_port,omitempty"`
+	ServicePortalProtocol string `url:"service_portal_protocol,omitempty,quoted"`
 }
 
 type ProjectUpdateResponse struct {

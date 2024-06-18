@@ -429,7 +429,24 @@ func Test_Client_Upload(t *testing.T) {
 		want    *UploadResponse
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Upload",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx:  context.Background(),
+				path: "/data/foo",
+				file: form.File{
+					Name:    "test.txt",
+					Content: "Hello, World!",
+				},
+				createParents: true,
+				overwrite:     true,
+			},
+			want:    nil,
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

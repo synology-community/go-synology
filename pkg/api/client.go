@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"maps"
+	"mime/multipart"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
@@ -116,6 +117,39 @@ func (c *Client) Login(ctx context.Context, user, password string) (*LoginRespon
 
 	c.BaseURL.RawQuery = q.Encode()
 	return resp, nil
+}
+
+func PostFileUpload[TResp Response](c Api, ctx context.Context, name string, content string, method Method) (*TResp, error) {
+	buf := new(bytes.Buffer)
+	w := multipart.NewWriter(buf)
+	defer w.Close()
+
+	fs := int64(0)
+
+	fileReader := strings.NewReader(content)
+
+	if fw, err := w.CreateFormFile("file", name); err != nil {
+		return nil, err
+	} else {
+
+		if size, err := io.Copy(fw, fileReader); err != nil {
+			return nil, err
+		} else {
+			fs = size
+		}
+
+	}
+
+	u := c.BaseUrl()
+	req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodPost, u.String(), buf)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Length", fmt.Sprintf("%d", fs))
+	req.Header.Add("Content-Type", fmt.Sprintf("multipart/form-data; boundary=%s", w.Boundary()))
+
+	return Do[TResp](c.Client(), req)
 }
 
 func PostFile[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
@@ -234,13 +268,17 @@ func Get[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, meth
 		return nil, err
 	}
 
-	url := c.BaseUrl()
+	u2 := c.BaseUrl()
 
-	qu := maps.Clone(url.Query())
+	qu := maps.Clone(u2.Query())
 	maps.Copy(qu, aq)
 	maps.Copy(qu, dq)
 
-	u := c.BaseUrl()
+	if u2 == nil {
+		return nil, errors.New("base url is nil")
+	}
+	u := new(url.URL)
+	*u = *u2
 
 	u.RawQuery = qu.Encode()
 

@@ -3,6 +3,8 @@ package filestation
 import (
 	"context"
 	"fmt"
+	"path/filepath"
+	"slices"
 	"time"
 
 	"github.com/synology-community/go-synology/pkg/api"
@@ -24,7 +26,29 @@ func (f *Client) List(ctx context.Context, folderPath string) (*models.FileList,
 	return api.Get[models.FileList](f.client, ctx, &models.FileListRequest{
 		FolderPath: folderPath,
 		Additional: []string{"real_path", "size", "owner", "time", "perm", "mount_point_type", "type", "fileid"},
+		FileType:   "all",
 	}, methods.List)
+}
+
+func (f *Client) Get(ctx context.Context, path string) (*models.File, error) {
+	folder := filepath.Dir(path)
+	resp, err := f.List(ctx, folder)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to get file, got error: %s", err)
+	}
+	if resp.Files == nil {
+		return nil, fmt.Errorf("Files is nil")
+	}
+	if len(resp.Files) == 0 {
+		return nil, fmt.Errorf("Result is empty")
+	}
+	i := slices.IndexFunc(resp.Files, func(f models.File) bool {
+		return f.Path == path
+	})
+	if i == -1 {
+		return nil, fmt.Errorf("File not found")
+	}
+	return &resp.Files[i], nil
 }
 
 func (f *Client) Delete(ctx context.Context, paths []string, accurateProgress bool) (*DeleteStatusResponse, error) {

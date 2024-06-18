@@ -16,8 +16,9 @@ type FolderList struct {
 }
 
 type FileListRequest struct {
-	FolderPath string   `url:"folder_path" json:"folder_path"`
-	Additional []string `url:"additional,json" json:"additional"`
+	FolderPath string   `url:"folder_path"`
+	Additional []string `url:"additional,json"`
+	FileType   string   `url:"filetype,omitempty"`
 }
 
 type FileList struct {
@@ -97,6 +98,10 @@ type Time struct {
 func (ms Time) MarshalJSON() ([]byte, error) {
 	str := fmt.Sprintf(`%d`, ms.Unix())
 	return []byte(str), nil
+}
+
+func (ms Time) RFC3339() string {
+	return ms.Format(time.RFC3339)
 }
 
 func (ms *Time) UnmarshalJSON(text []byte) error {

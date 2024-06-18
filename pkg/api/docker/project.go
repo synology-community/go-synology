@@ -125,8 +125,8 @@ type ProjectCleanStreamRequest struct {
 
 type ProjectCleanStreamResponse string
 
-type ProjectStopStreamRequest struct {
+type ProjectStreamRequest struct {
 	ID string `url:"id,omitempty,quoted"`
 }
 
-type ProjectStopStreamResponse string
+type ProjectStreamResponse string

@@ -15,6 +15,8 @@ const (
 	MethodPullStatus  = "pull_status"
 	MethodCleanStream = "clean_stream"
 	MethodStopStream  = "stop_stream"
+	MethodStartStream = "start_stream"
+	MethodBuildStream = "build_stream"
 	MethodStatus      = "status"
 	MethodInstall     = "install"
 	MethodUninstall   = "uninstall"

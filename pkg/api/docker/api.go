@@ -14,8 +14,9 @@ type Api interface {
 	ImagePull(ctx context.Context, repository, tag string) (*ImagePullStatusResponse, error)
 	ImageDelete(ctx context.Context, req ImageDeleteRequest) (*ImageDeleteResponse, error)
 
-	ProjectGet(ctx context.Context, req ProjectGetRequest) (*ProjectGetResponse, error)
-	ProjectList(ctx context.Context, req ProjectListRequest) (*ProjectListResponse, error)
+	ProjectGet(ctx context.Context, id string) (*Project, error)
+	ProjectGetByName(ctx context.Context, name string) (*Project, error)
+	ProjectList(ctx context.Context, req ProjectListRequest) ([]Project, error)
 	ProjectCreate(ctx context.Context, req ProjectCreateRequest) (*ProjectCreateResponse, error)
 	ProjectUpdate(ctx context.Context, req ProjectUpdateRequest) (*ProjectUpdateResponse, error)
 	ProjectDelete(ctx context.Context, req ProjectDeleteRequest) (*ProjectDeleteResponse, error)

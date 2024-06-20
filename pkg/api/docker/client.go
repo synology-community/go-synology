@@ -7,6 +7,7 @@ import (
 
 	"github.com/synology-community/go-synology/pkg/api"
 	"github.com/synology-community/go-synology/pkg/api/docker/methods"
+	"golang.org/x/exp/maps"
 )
 
 type Client struct {
@@ -44,13 +45,43 @@ func (d *Client) ProjectDelete(ctx context.Context, req ProjectDeleteRequest) (*
 }
 
 // ProjectGet implements DockerApi.
-func (d *Client) ProjectGet(ctx context.Context, req ProjectGetRequest) (*ProjectGetResponse, error) {
-	return api.Post[ProjectGetResponse](d.client, ctx, &req, methods.ProjectGet)
+func (d *Client) ProjectGet(ctx context.Context, id string) (*Project, error) {
+	return api.Post[Project](d.client, ctx, &ProjectGetRequest{
+		ID: id,
+	}, methods.ProjectGet)
+}
+
+type ProjectNotFoundError struct{}
+
+func (e ProjectNotFoundError) Error() string {
+	return "Project not found"
+}
+
+func (d *Client) ProjectGetByName(ctx context.Context, name string) (*Project, error) {
+	res, err := d.ProjectList(ctx, ProjectListRequest{
+		Offset: 0,
+		Limit:  -1,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, p := range res {
+		if p.Name == name {
+			return &p, nil
+		}
+	}
+	return nil, ProjectNotFoundError{}
 }
 
 // ProjectList implements DockerApi.
-func (d *Client) ProjectList(ctx context.Context, req ProjectListRequest) (*ProjectListResponse, error) {
-	return api.Post[ProjectListResponse](d.client, ctx, &req, methods.ProjectList)
+func (d *Client) ProjectList(ctx context.Context, req ProjectListRequest) ([]Project, error) {
+	resp, err := api.Post[map[string]Project](d.client, ctx, &req, methods.ProjectList)
+	if err != nil {
+		return nil, err
+	}
+	return maps.Values(*resp), nil
 }
 
 // ProjectUpdate implements DockerApi.

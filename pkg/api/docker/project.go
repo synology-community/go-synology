@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"strings"
 	"time"
 )
 
@@ -31,11 +32,13 @@ type Project struct {
 	Version   int       `json:"version,omitempty"`
 }
 
+func (p Project) IsRunning() bool {
+	return strings.ToUpper(p.Status) == "RUNNING"
+}
+
 type ProjectGetRequest struct {
 	ID string `url:"id,omitempty,quoted"`
 }
-
-type ProjectGetResponse Project
 
 type ProjectListRequest struct {
 	Offset int `url:"offset,omitempty"`

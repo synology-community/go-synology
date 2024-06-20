@@ -21,4 +21,10 @@ type Api interface {
 	PackageFeedAdd(ctx context.Context, req PackageFeedAddRequest) error
 	PackageFeedDelete(ctx context.Context, req PackageFeedDeleteRequest) error
 	PackageSettingGet(ctx context.Context, req PackageSettingGetRequest) (*PackageSettingGetResponse, error)
+	ShareList(ctx context.Context) (*ShareListResponse, error)
+	ShareGet(ctx context.Context, name string) (*ShareGetResponse, error)
+	ShareGetByID(ctx context.Context, id string) (*Share, error)
+	ShareCreate(ctx context.Context, share ShareInfo) error
+	ShareDelete(ctx context.Context, name string) error
+	VolumeList(ctx context.Context) (*VolumeListResponse, error)
 }

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"strings"
 
 	"github.com/synology-community/go-synology/pkg/util"
 )
@@ -235,11 +234,12 @@ func (s ExtraValues) EncodeValues(k string, v *url.Values) error {
 
 	conf := make(map[string]string)
 	for k, v := range s {
-		if !strings.HasPrefix(k, "wizard_") {
-			conf["wizard_"+k] = v
-		} else {
-			conf[k] = v
-		}
+		conf[k] = v
+		// if !strings.HasPrefix(k, "pkgwizard_") && !strings.HasPrefix(k, "wizard_") {
+		// 	conf["wizard_"+k] = v
+		// } else {
+		// 	conf[k] = v
+		// }
 	}
 
 	encoded, err := json.Marshal(conf)

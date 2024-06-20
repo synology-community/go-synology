@@ -21,6 +21,14 @@ func New(client api.Api) Api {
 	return &Client{client: client}
 }
 
+type FileNotFoundError struct {
+	Path string
+}
+
+func (e FileNotFoundError) Error() string {
+	return fmt.Sprintf("File not found: %s", e.Path)
+}
+
 // List implements FileStationApi.
 func (f *Client) List(ctx context.Context, folderPath string) (*models.FileList, error) {
 	return api.Get[models.FileList](f.client, ctx, &models.FileListRequest{
@@ -46,7 +54,7 @@ func (f *Client) Get(ctx context.Context, path string) (*models.File, error) {
 		return f.Path == path
 	})
 	if i == -1 {
-		return nil, fmt.Errorf("File not found")
+		return nil, FileNotFoundError{Path: path}
 	}
 	return &resp.Files[i], nil
 }

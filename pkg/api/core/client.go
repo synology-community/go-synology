@@ -229,6 +229,57 @@ func (c Client) PackageFeedDelete(ctx context.Context, req PackageFeedDeleteRequ
 	return api.Void(c.client, ctx, &req, methods.PackageFeedDelete)
 }
 
+var additionalShareInfo = []string{"name", "hidden", "encryption", "is_aclmode", "unite_permission", "is_support_acl", "is_sync_share", "is_force_readonly", "force_readonly_reason", "recyclebin", "is_share_moving", "is_cluster_share", "is_exfat_share", "is_c2_share", "is_cold_storage_share", "is_missing_share", "is_offline_share", "support_snapshot", "share_quota", "enable_share_compress", "enable_share_cow", "enable_share_tiering", "load_worm_attr", "include_cold_storage_share", "is_cold_storage_share", "include_missing_share", "is_missing_share", "include_offline_share", "is_offline_share", "include_worm_share"}
+
+func (c Client) ShareList(ctx context.Context) (*ShareListResponse, error) {
+	return api.Get[ShareListResponse](c.client, ctx, &ShareListRequest{
+		ShareType:  "all",
+		Additional: additionalShareInfo,
+	}, methods.ShareList)
+}
+
+func (c Client) ShareGet(ctx context.Context, name string) (*ShareGetResponse, error) {
+	return api.Get[ShareGetResponse](c.client, ctx, &ShareGetRequest{
+		Name:       name,
+		Additional: additionalShareInfo,
+	}, methods.ShareGet)
+}
+
+func (c Client) ShareGetByID(ctx context.Context, id string) (*Share, error) {
+	resp, err := c.ShareList(ctx)
+	if err != nil {
+		return nil, err
+	}
+	i := slices.IndexFunc(resp.Shares, func(s Share) bool {
+		return s.UUID == id
+	})
+	if i < 0 {
+		return nil, fmt.Errorf("share not found")
+	}
+	return &resp.Shares[i], nil
+}
+
+func (c Client) ShareCreate(ctx context.Context, share ShareInfo) error {
+	return api.Void(c.client, ctx, &ShareCreateRequest{
+		Name:      share.Name,
+		ShareInfo: share,
+	}, methods.ShareCreate)
+}
+
+func (c Client) ShareDelete(ctx context.Context, name string) error {
+	return api.Void(c.client, ctx, &ShareDeleteRequest{
+		Name: name,
+	}, methods.ShareDelete)
+}
+
+func (c Client) VolumeList(ctx context.Context) (*VolumeListResponse, error) {
+	return api.Post[VolumeListResponse](c.client, ctx, &VolumeListRequest{
+		Limit:    -1,
+		Offset:   0,
+		Location: "local",
+	}, methods.VolumeList)
+}
+
 func New(client api.Api) Api {
 	return &Client{client: client}
 }

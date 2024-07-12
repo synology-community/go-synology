@@ -11,7 +11,7 @@ type Api interface {
 	Client() *retryablehttp.Client
 	BaseUrl() *url.URL
 	Credentials() Credentials
-	Login(ctx context.Context, user, password string) (*LoginResponse, error)
+	Login(ctx context.Context, user, password, otpSecret string) (*LoginResponse, error)
 }
 
 const (

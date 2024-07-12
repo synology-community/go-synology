@@ -96,14 +96,25 @@ func (c *Client) Credentials() Credentials {
 }
 
 // Login runs a login flow to retrieve session token from Synology.
-func (c *Client) Login(ctx context.Context, user, password string) (*LoginResponse, error) {
-	resp, err := Get[LoginResponse](c, ctx, &LoginRequest{
+func (c *Client) Login(ctx context.Context, user, password, otpSecret string) (*LoginResponse, error) {
+
+	req := LoginRequest{
 		Account:  user,
 		Password: password,
 		// Session:         sessionName,
 		Format:          "sid", //"cookie",
 		EnableSynoToken: "yes",
-	}, Login)
+	}
+
+	if otpSecret != "" {
+		otpCode, err := generateTotp(otpSecret)
+		if err != nil {
+			return nil, err
+		}
+		req.OTPCode = otpCode
+	}
+
+	resp, err := Get[LoginResponse](c, ctx, &req, Login)
 	if err != nil {
 		return nil, err
 	}

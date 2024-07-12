@@ -16,7 +16,7 @@ type Link struct {
 	Alias         string `json:"alias,omitempty"`
 }
 
-type Network struct {
+type ContainerNetwork struct {
 	Name   string `json:"name,omitempty"`
 	Driver string `json:"driver,omitempty"`
 }
@@ -34,22 +34,22 @@ type VolumeBinding struct {
 }
 
 type Container struct {
-	Name                string          `json:"name,omitempty"`
-	Image               string          `json:"image,omitempty"`
-	Privileged          bool            `json:"privileged,omitempty"`
-	PortBindings        []PortBinding   `json:"port_bindings,omitempty"`
-	VolumeBindings      []VolumeBinding `json:"volume_bindings,omitempty"`
-	EnvVariables        []EnvVariable   `json:"env_variables,omitempty"`
-	Network             []Network       `json:"network,omitempty"`
-	UseHostNetwork      bool            `json:"use_host_network,omitempty"`
-	Cmd                 string          `json:"cmd,omitempty"`
-	ServicePortals      []string        `json:"service_portals,omitempty"`
-	CPUPriority         int64           `json:"cpu_priority,omitempty"`
-	MemoryLimit         int64           `json:"memory_limit,omitempty"`
-	EnableRestartPolicy bool            `json:"enable_restart_policy,omitempty"`
-	CapAdd              []string        `json:"CapAdd,omitempty"`
-	CapDrop             []string        `json:"CapDrop,omitempty"`
-	Links               []Link          `json:"links,omitempty"`
+	Name                string             `json:"name,omitempty"`
+	Image               string             `json:"image,omitempty"`
+	Privileged          bool               `json:"privileged,omitempty"`
+	PortBindings        []PortBinding      `json:"port_bindings,omitempty"`
+	VolumeBindings      []VolumeBinding    `json:"volume_bindings,omitempty"`
+	EnvVariables        []EnvVariable      `json:"env_variables,omitempty"`
+	Network             []ContainerNetwork `json:"network,omitempty"`
+	UseHostNetwork      bool               `json:"use_host_network,omitempty"`
+	Cmd                 string             `json:"cmd,omitempty"`
+	ServicePortals      []string           `json:"service_portals,omitempty"`
+	CPUPriority         int64              `json:"cpu_priority,omitempty"`
+	MemoryLimit         int64              `json:"memory_limit,omitempty"`
+	EnableRestartPolicy bool               `json:"enable_restart_policy,omitempty"`
+	CapAdd              []string           `json:"CapAdd,omitempty"`
+	CapDrop             []string           `json:"CapDrop,omitempty"`
+	Links               []Link             `json:"links,omitempty"`
 }
 
 func (s Container) EncodeValues(k string, v *url.Values) error {

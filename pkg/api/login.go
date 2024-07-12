@@ -4,6 +4,7 @@ type LoginRequest struct {
 	// query.Encoder
 	Account         string `url:"account"`
 	Password        string `url:"passwd"`
+	OTPCode         string `url:"otp_code,omitempty"`
 	Session         string `url:"session,omitempty"`
 	Format          string `url:"format,omitempty"`
 	EnableSynoToken string `url:"enable_syno_token,omitempty"`

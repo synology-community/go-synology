@@ -9,6 +9,7 @@ const (
 	API_DockerRegistry  = "SYNO.Docker.Registry"
 	API_DockerImage     = "SYNO.Docker.Image"
 	API_DockerProject   = "SYNO.Docker.Project"
+	API_DockerNetwork   = "SYNO.Docker.Network"
 )
 
 var (
@@ -115,6 +116,12 @@ var (
 		API:          API_DockerProject,
 		Version:      1,
 		Method:       api.MethodBuildStream,
+		ErrorSummary: CommonErrors,
+	}
+	NetworkCreate = api.Method{
+		API:          API_DockerNetwork,
+		Version:      1,
+		Method:       api.MethodCreate,
 		ErrorSummary: CommonErrors,
 	}
 )

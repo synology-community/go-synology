@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strconv"
+	"strings"
 
 	"github.com/synology-community/go-synology/pkg/util"
 )
@@ -73,34 +75,51 @@ type PackageServerListRequest struct {
 	LoadOthers  bool `url:"blloadothers"`
 }
 
+type CInt int64
+
 type Package struct {
-	ID                  string   `json:"id"`
-	Link                string   `json:"link"`
-	Beta                bool     `json:"beta"`
-	Breakpkgs           any      `json:"breakpkgs"`
-	Changelog           string   `json:"changelog"`
-	Conflictpkgs        any      `json:"conflictpkgs"`
-	Deppkgs             any      `json:"deppkgs"`
-	Depsers             string   `json:"depsers"`
-	Desc                string   `json:"desc"`
-	Distributor         string   `json:"distributor"`
-	DistributorURL      string   `json:"distributor_url"`
-	Dname               string   `json:"dname"`
-	DownloadCount       int      `json:"download_count"`
-	Maintainer          string   `json:"maintainer"`
-	MaintainerURL       string   `json:"maintainer_url"`
-	Package             string   `json:"package"`
-	Qinst               bool     `json:"qinst"`
-	Qstart              bool     `json:"qstart"`
-	Qupgrade            bool     `json:"qupgrade"`
-	RecentDownloadCount int      `json:"recent_download_count,omitempty"`
+	ID                  string   `json:"id,omitempty"`
+	Link                string   `json:"link,omitempty"`
+	Beta                bool     `json:"beta,omitempty"`
+	Breakpkgs           any      `json:"breakpkgs,omitempty"`
+	Changelog           string   `json:"changelog,omitempty"`
+	Conflictpkgs        any      `json:"conflictpkgs,omitempty"`
+	Deppkgs             any      `json:"deppkgs,omitempty"`
+	Depsers             string   `json:"depsers,omitempty"`
+	Desc                string   `json:"desc,omitempty"`
+	Distributor         string   `json:"distributor,omitempty"`
+	DistributorURL      string   `json:"distributor_url,omitempty"`
+	Dname               string   `json:"dname,omitempty"`
+	DownloadCount       CInt     `json:"download_count,omitempty"`
+	Maintainer          string   `json:"maintainer,omitempty"`
+	MaintainerURL       string   `json:"maintainer_url,omitempty"`
+	Package             string   `json:"package,omitempty"`
+	Qinst               bool     `json:"qinst,omitempty"`
+	Qstart              bool     `json:"qstart,omitempty"`
+	Qupgrade            bool     `json:"qupgrade,omitempty"`
+	RecentDownloadCount int64    `json:"recent_download_count,omitempty"`
 	Replaceforcepkgs    any      `json:"replaceforcepkgs,omitempty"`
 	Replacepkgs         any      `json:"replacepkgs,omitempty"`
-	Source              string   `json:"source"`
+	Source              string   `json:"source,omitempty"`
 	Thumbnail           []string `json:"thumbnail,omitempty"`
-	Version             string   `json:"version"`
+	Version             string   `json:"version,omitempty"`
 	MD5                 string   `json:"md5,omitempty"`
 	Size                int64    `json:"size,omitempty"`
+}
+
+func (t *CInt) UnmarshalJSON(data []byte) error {
+	// Ignore null, like in the main JSON package.
+	s := string(data)
+	if s == "null" || s == `""` {
+		return nil
+	}
+	if strings.Contains(s, `"`) {
+		s = strings.Trim(s, `"`)
+	}
+	// Fractional seconds are handled implicitly by Parse.
+	i, err := strconv.ParseInt(s, 10, 64)
+	*t = CInt(i)
+	return err
 }
 
 type PackageServerListResponse struct {

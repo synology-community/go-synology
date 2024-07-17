@@ -24,7 +24,7 @@ func newClient(t *testing.T) *Client {
 		require.NoError(t, err)
 	}
 
-	if r, err := c.Login(context.Background(), os.Getenv("SYNOLOGY_USER"), os.Getenv("SYNOLOGY_PASSWORD")); err != nil {
+	if r, err := c.Login(context.Background(), os.Getenv("SYNOLOGY_USER"), os.Getenv("SYNOLOGY_PASSWORD"), ""); err != nil {
 		t.Error(err)
 		require.NoError(t, err)
 	} else {
@@ -49,7 +49,7 @@ func newSuiteClient(suite *suite.Suite) *Client {
 	})
 	suite.Require().NoError(err)
 
-	r, err := c.Login(context.Background(), os.Getenv("SYNOLOGY_USER"), os.Getenv("SYNOLOGY_PASSWORD"))
+	r, err := c.Login(context.Background(), os.Getenv("SYNOLOGY_USER"), os.Getenv("SYNOLOGY_PASSWORD"), "")
 	suite.Require().NoError(err)
 
 	fmt.Printf("Session: %s\nDeviceID: %s\n", r.SessionID, r.DeviceID)

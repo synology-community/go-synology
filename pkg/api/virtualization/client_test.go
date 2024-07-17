@@ -20,7 +20,7 @@ func newClient(t *testing.T) Api {
 		require.NoError(t, err)
 	}
 
-	if r, err := c.Login(context.Background(), os.Getenv("SYNOLOGY_USER"), os.Getenv("SYNOLOGY_PASSWORD")); err != nil {
+	if r, err := c.Login(context.Background(), os.Getenv("SYNOLOGY_USER"), os.Getenv("SYNOLOGY_PASSWORD"), ""); err != nil {
 		t.Error(err)
 		require.NoError(t, err)
 	} else {

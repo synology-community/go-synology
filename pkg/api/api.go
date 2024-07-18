@@ -12,6 +12,7 @@ type Api interface {
 	BaseUrl() *url.URL
 	Credentials() Credentials
 	Login(ctx context.Context, user, password, otpSecret string) (*LoginResponse, error)
+	Password() string
 }
 
 const (

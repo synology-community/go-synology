@@ -1,31 +1,31 @@
 package core
 
 type TaskExtra struct {
-	NotifyEnable  bool   `json:"notify_enable,omitempty"`
+	NotifyEnable  bool   `json:"notify_enable"`
 	Script        string `json:"script,omitempty"`
-	NotifyMail    string `json:"notify_mail,omitempty"`
-	NotifyIfError bool   `json:"notify_if_error,omitempty"`
+	NotifyMail    string `json:"notify_mail"`
+	NotifyIfError bool   `json:"notify_if_error"`
 }
 
 type TaskSchedule struct {
-	DateType              int    `json:"date_type,omitempty"`
-	Date                  string `json:"date,omitempty"`
-	WeekDay               string `json:"week_day,omitempty"`
-	RepeatDate            int    `json:"repeat_date,omitempty"`
-	MonthlyWeek           []any  `json:"monthly_week,omitempty"`
-	Hour                  int    `json:"hour,omitempty"`
-	Minute                int    `json:"minute,omitempty"`
-	RepeatHour            int    `json:"repeat_hour,omitempty"`
-	RepeatMin             int    `json:"repeat_min,omitempty"`
-	LastWorkHour          int    `json:"last_work_hour,omitempty"`
-	RepeatMinStoreConfig  []int  `json:"repeat_min_store_config,omitempty"`
-	RepeatHourStoreConfig []int  `json:"repeat_hour_store_config,omitempty"`
+	DateType              int64    `json:"date_type"`
+	Date                  string   `json:"date,omitempty"`
+	WeekDay               string   `json:"week_day"`
+	Hour                  int64    `json:"hour"`
+	Minute                int64    `json:"minute"`
+	MonthlyWeek           []string `json:"monthly_week"`
+	RepeatHour            int64    `json:"repeat_hour"`
+	RepeatMin             int64    `json:"repeat_min"`
+	RepeatDate            int64    `json:"repeat_date"`
+	RepeatMinStoreConfig  []int64  `json:"repeat_min_store_config"`
+	RepeatHourStoreConfig []int64  `json:"repeat_hour_store_config"`
+	LastWorkHour          *int64   `json:"last_work_hour"`
 }
 
 type TaskRequest struct {
-	Name               string       `url:"owner,omitempty" json:"name,omitempty"`
-	RealOwner          string       `url:"owner,omitempty" json:"real_owner,omitempty"`
-	Owner              string       `url:"owner,omitempty" json:"owner,omitempty"`
+	Name               string       `url:"name" json:"name,omitempty"`
+	RealOwner          string       `url:"real_owner" json:"real_owner,omitempty"`
+	Owner              string       `url:"owner" json:"owner,omitempty"`
 	Schedule           TaskSchedule `url:"schedule,json,omitempty" json:"schedule,omitempty"`
 	Extra              TaskExtra    `url:"extra,json,omitempty" json:"extra,omitempty"`
 	Type               string       `url:"type,omitempty" json:"type,omitempty"`
@@ -39,7 +39,7 @@ type ListTaskRequest struct {
 }
 
 type TaskResult struct {
-	ID              int    `json:"id,omitempty"`
+	ID              *int64 `json:"id,omitempty"`
 	Name            string `json:"name,omitempty"`
 	Action          string `json:"action,omitempty"`
 	CanDelete       bool   `json:"can_delete,omitempty"`
@@ -54,16 +54,16 @@ type TaskResult struct {
 
 type ListTaskResponse struct {
 	Tasks  []TaskResult `json:"tasks,omitempty"`
-	Total  int          `json:"total,omitempty"`
-	Offset int          `json:"offset,omitempty"`
+	Total  int64        `json:"total,omitempty"`
+	Offset int64        `json:"offset,omitempty"`
 }
 
 type TaskGetRequest struct {
-	ID int `url:"id"`
+	ID int64 `url:"id"`
 }
 
 type TaskRef struct {
-	ID        int    `json:"id,omitempty"`
+	ID        int64  `json:"id,omitempty"`
 	RealOwner string `json:"name,omitempty"`
 }
 

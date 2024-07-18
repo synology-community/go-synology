@@ -33,6 +33,9 @@ type Client struct {
 	BaseURL *url.URL
 
 	ApiCredentials Credentials
+
+	username string
+	password string
 }
 
 func New(o Options) (Api, error) {
@@ -81,6 +84,10 @@ func New(o Options) (Api, error) {
 	return client, nil
 }
 
+func (c *Client) Password() string {
+	return c.password
+}
+
 // BaseUrl implements api.Client.
 func (c *Client) BaseUrl() *url.URL {
 	return c.BaseURL
@@ -97,6 +104,9 @@ func (c *Client) Credentials() Credentials {
 
 // Login runs a login flow to retrieve session token from Synology.
 func (c *Client) Login(ctx context.Context, user, password, otpSecret string) (*LoginResponse, error) {
+
+	c.username = user
+	c.password = password
 
 	req := LoginRequest{
 		Account:  user,

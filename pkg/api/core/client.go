@@ -14,6 +14,21 @@ type Client struct {
 	client api.Api
 }
 
+// TaskFind implements Api.
+func (c *Client) TaskFind(ctx context.Context, name string) (*TaskResult, error) {
+	tasks, err := c.TaskList(ctx, ListTaskRequest{})
+	if err != nil {
+		return nil, err
+	}
+	i := slices.IndexFunc(tasks.Tasks, func(t TaskResult) bool {
+		return t.Name == name
+	})
+	if i < 0 {
+		return nil, TaskNotFoundError{}
+	}
+	return &tasks.Tasks[i], nil
+}
+
 // ContentLength implements Api.
 func (c *Client) ContentLength(ctx context.Context, url string) (int64, error) {
 	resp, err := c.client.Client().Head(url)
@@ -287,10 +302,32 @@ func (c Client) PasswordConfirm(ctx context.Context, password string) (*Password
 }
 
 func (c *Client) RootTaskCreate(ctx context.Context, req TaskRequest) (*TaskResult, error) {
+	pwtoken := req.SynoConfirmPWToken
+	if pwtoken == "" {
+		res, err := c.PasswordConfirm(ctx, c.client.Password())
+		if err != nil {
+			return nil, err
+		}
+		pwtoken = res.SynoConfirmPWToken
+	}
+
+	req.SynoConfirmPWToken = pwtoken
+
 	return api.Post[TaskResult](c.client, ctx, &req, methods.RootTaskCreate)
 }
 
 func (c *Client) RootTaskUpdate(ctx context.Context, req TaskRequest) (*TaskResult, error) {
+	pwtoken := req.SynoConfirmPWToken
+	if pwtoken == "" {
+		res, err := c.PasswordConfirm(ctx, c.client.Password())
+		if err != nil {
+			return nil, err
+		}
+		pwtoken = res.SynoConfirmPWToken
+	}
+
+	req.SynoConfirmPWToken = pwtoken
+
 	return api.Post[TaskResult](c.client, ctx, &req, methods.RootTaskUpdate)
 }
 
@@ -306,7 +343,7 @@ func (c *Client) TaskDelete(ctx context.Context, req TaskDeleteRequest) error {
 	return api.Void(c.client, ctx, &req, methods.TaskDelete)
 }
 
-func (c *Client) TaskGet(ctx context.Context, id int) (*TaskResult, error) {
+func (c *Client) TaskGet(ctx context.Context, id int64) (*TaskResult, error) {
 	return api.Get[TaskResult](c.client, ctx, &TaskGetRequest{
 		ID: id,
 	}, methods.TaskGet)

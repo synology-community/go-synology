@@ -35,7 +35,8 @@ type Api interface {
 	RootTaskUpdate(ctx context.Context, req TaskRequest) (*TaskResult, error)
 	TaskDelete(ctx context.Context, req TaskDeleteRequest) error
 	TaskRun(ctx context.Context, req TaskRunRequest) error
-	TaskGet(ctx context.Context, id int) (*TaskResult, error)
+	TaskGet(ctx context.Context, id int64) (*TaskResult, error)
+	TaskFind(ctx context.Context, name string) (*TaskResult, error)
 
 	PasswordConfirm(ctx context.Context, password string) (*PasswordConfirmResponse, error)
 }

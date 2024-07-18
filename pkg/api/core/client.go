@@ -339,8 +339,12 @@ func (c *Client) TaskUpdate(ctx context.Context, req TaskRequest) (*TaskResult, 
 	return api.Post[TaskResult](c.client, ctx, &req, methods.TaskUpdate)
 }
 
-func (c *Client) TaskDelete(ctx context.Context, req TaskDeleteRequest) error {
-	return api.Void(c.client, ctx, &req, methods.TaskDelete)
+func (c *Client) TaskDelete(ctx context.Context, ids ...int64) error {
+	tasks := make([]TaskRef, len(ids))
+	for i, id := range ids {
+		tasks[i] = TaskRef{ID: id}
+	}
+	return api.Void(c.client, ctx, &TaskDeleteRequest{Tasks: tasks}, methods.TaskDelete)
 }
 
 func (c *Client) TaskGet(ctx context.Context, id int64) (*TaskResult, error) {
@@ -353,8 +357,14 @@ func (c *Client) TaskList(ctx context.Context, req ListTaskRequest) (*ListTaskRe
 	return api.Get[ListTaskResponse](c.client, ctx, &req, methods.TaskList)
 }
 
-func (c *Client) TaskRun(ctx context.Context, req TaskRunRequest) error {
-	return api.Void(c.client, ctx, &req, methods.TaskRun)
+func (c *Client) TaskRun(ctx context.Context, ids ...int64) error {
+	tasks := make([]TaskRef, len(ids))
+	for i, id := range ids {
+		tasks[i] = TaskRef{ID: id}
+	}
+	return api.Void(c.client, ctx, &TaskRunRequest{
+		Tasks: tasks,
+	}, methods.TaskRun)
 }
 
 func New(client api.Api) Api {

@@ -33,8 +33,8 @@ type Api interface {
 	RootTaskCreate(ctx context.Context, req TaskRequest) (*TaskResult, error)
 	TaskUpdate(ctx context.Context, req TaskRequest) (*TaskResult, error)
 	RootTaskUpdate(ctx context.Context, req TaskRequest) (*TaskResult, error)
-	TaskDelete(ctx context.Context, req TaskDeleteRequest) error
-	TaskRun(ctx context.Context, req TaskRunRequest) error
+	TaskDelete(ctx context.Context, ids ...int64) error
+	TaskRun(ctx context.Context, ids ...int64) error
 	TaskGet(ctx context.Context, id int64) (*TaskResult, error)
 	TaskFind(ctx context.Context, name string) (*TaskResult, error)
 

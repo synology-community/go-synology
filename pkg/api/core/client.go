@@ -280,6 +280,46 @@ func (c Client) VolumeList(ctx context.Context) (*VolumeListResponse, error) {
 	}, methods.VolumeList)
 }
 
+func (c Client) PasswordConfirm(ctx context.Context, password string) (*PasswordConfirmResponse, error) {
+	return api.Post[PasswordConfirmResponse](c.client, ctx, &PasswordConfirmRequest{
+		Password: password,
+	}, methods.PasswordConfirm)
+}
+
+func (c *Client) RootTaskCreate(ctx context.Context, req TaskRequest) (*TaskResult, error) {
+	return api.Post[TaskResult](c.client, ctx, &req, methods.RootTaskCreate)
+}
+
+func (c *Client) RootTaskUpdate(ctx context.Context, req TaskRequest) (*TaskResult, error) {
+	return api.Post[TaskResult](c.client, ctx, &req, methods.RootTaskUpdate)
+}
+
+func (c *Client) TaskCreate(ctx context.Context, req TaskRequest) (*TaskResult, error) {
+	return api.Post[TaskResult](c.client, ctx, &req, methods.TaskCreate)
+}
+
+func (c *Client) TaskUpdate(ctx context.Context, req TaskRequest) (*TaskResult, error) {
+	return api.Post[TaskResult](c.client, ctx, &req, methods.TaskUpdate)
+}
+
+func (c *Client) TaskDelete(ctx context.Context, req TaskDeleteRequest) error {
+	return api.Void(c.client, ctx, &req, methods.TaskDelete)
+}
+
+func (c *Client) TaskGet(ctx context.Context, id int) (*TaskResult, error) {
+	return api.Get[TaskResult](c.client, ctx, &TaskGetRequest{
+		ID: id,
+	}, methods.TaskGet)
+}
+
+func (c *Client) TaskList(ctx context.Context, req ListTaskRequest) (*ListTaskResponse, error) {
+	return api.Get[ListTaskResponse](c.client, ctx, &req, methods.TaskList)
+}
+
+func (c *Client) TaskRun(ctx context.Context, req TaskRunRequest) error {
+	return api.Void(c.client, ctx, &req, methods.TaskRun)
+}
+
 func New(client api.Api) Api {
 	return &Client{client: client}
 }

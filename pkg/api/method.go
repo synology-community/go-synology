@@ -24,4 +24,7 @@ const (
 	MethodCheck       = "check"
 	MethodIsPortBlock = "is_port_block"
 	MethodAdd         = "add"
+	MethodSet         = "set"
+	MethodAuth        = "auth"
+	MethodRun         = "run"
 )

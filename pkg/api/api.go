@@ -21,24 +21,24 @@ const (
 
 var (
 	Login = Method{
-		API:          API_Auth,
-		Version:      7,
-		Method:       "login",
-		ErrorSummary: GlobalErrors,
+		API:            API_Auth,
+		Version:        7,
+		Method:         "login",
+		ErrorSummaries: GlobalErrors,
 	}
 	Compound = Method{
-		API:          Entry_Request,
-		Version:      1,
-		Method:       "request",
-		ErrorSummary: GlobalErrors,
+		API:            Entry_Request,
+		Version:        1,
+		Method:         "request",
+		ErrorSummaries: GlobalErrors,
 	}
 )
 
 var API_METHODS = APIMethodLookup{
 	"Login": {
-		API:          API_Auth,
-		Version:      7,
-		Method:       "login",
-		ErrorSummary: GlobalErrors,
+		API:            API_Auth,
+		Version:        7,
+		Method:         "login",
+		ErrorSummaries: GlobalErrors,
 	},
 }

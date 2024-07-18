@@ -1,80 +1,75 @@
 package core
 
-type CreateTaskRequest struct {
-	SortBy     string   `form:"sort_by" url:"sort_by"`
-	FileType   string   `form:"file_type" url:"file_type"`
-	CheckDir   bool     `form:"check_dir" url:"check_dir"`
-	Additional []string `form:"additional" url:"additional"`
+type TaskExtra struct {
+	NotifyEnable  bool   `json:"notify_enable,omitempty"`
+	Script        string `json:"script,omitempty"`
+	NotifyMail    string `json:"notify_mail,omitempty"`
+	NotifyIfError bool   `json:"notify_if_error,omitempty"`
 }
 
-type CreateTaskResponse struct {
-	Offset int `json:"offset"`
+type TaskSchedule struct {
+	DateType              int    `json:"date_type,omitempty"`
+	Date                  string `json:"date,omitempty"`
+	WeekDay               string `json:"week_day,omitempty"`
+	RepeatDate            int    `json:"repeat_date,omitempty"`
+	MonthlyWeek           []any  `json:"monthly_week,omitempty"`
+	Hour                  int    `json:"hour,omitempty"`
+	Minute                int    `json:"minute,omitempty"`
+	RepeatHour            int    `json:"repeat_hour,omitempty"`
+	RepeatMin             int    `json:"repeat_min,omitempty"`
+	LastWorkHour          int    `json:"last_work_hour,omitempty"`
+	RepeatMinStoreConfig  []int  `json:"repeat_min_store_config,omitempty"`
+	RepeatHourStoreConfig []int  `json:"repeat_hour_store_config,omitempty"`
+}
 
-	Total int `json:"total"`
+type TaskRequest struct {
+	Name               string       `url:"owner,omitempty" json:"name,omitempty"`
+	RealOwner          string       `url:"owner,omitempty" json:"real_owner,omitempty"`
+	Owner              string       `url:"owner,omitempty" json:"owner,omitempty"`
+	Schedule           TaskSchedule `url:"schedule,json,omitempty" json:"schedule,omitempty"`
+	Extra              TaskExtra    `url:"extra,json,omitempty" json:"extra,omitempty"`
+	Type               string       `url:"type,omitempty" json:"type,omitempty"`
+	Enable             bool         `url:"enable,omitempty" json:"enable,omitempty"`
+	ID                 *int64       `url:"id,omitempty" json:"id,omitempty"`
+	SynoConfirmPWToken string       `url:"SynoConfirmPWToken,omitempty" json:"SynoConfirmPWToken,omitempty"`
 }
 
 type ListTaskRequest struct {
-	SortBy     string   `form:"sort_by" url:"sort_by"`
-	FileType   string   `form:"file_type" url:"file_type"`
-	CheckDir   bool     `form:"check_dir" url:"check_dir"`
-	Additional []string `form:"additional" url:"additional"`
-	GoToPath   string   `form:"goto_path" url:"goto_path"`
-	FolderPath string   `form:"folder_path" url:"folder_path"`
+	SortBy string `form:"sort_by,omitempty" url:"sort_by,omitempty"`
+}
+
+type TaskResult struct {
+	ID              int    `json:"id,omitempty"`
+	Name            string `json:"name,omitempty"`
+	Action          string `json:"action,omitempty"`
+	CanDelete       bool   `json:"can_delete,omitempty"`
+	CanEdit         bool   `json:"can_edit,omitempty"`
+	CanRun          bool   `json:"can_run,omitempty"`
+	Enable          bool   `json:"enable,omitempty"`
+	NextTriggerTime string `json:"next_trigger_time,omitempty"`
+	Owner           string `json:"owner,omitempty"`
+	RealOwner       string `json:"real_owner,omitempty"`
+	Type            string `json:"type,omitempty"`
 }
 
 type ListTaskResponse struct {
-	Offset int `json:"offset"`
+	Tasks  []TaskResult `json:"tasks,omitempty"`
+	Total  int          `json:"total,omitempty"`
+	Offset int          `json:"offset,omitempty"`
+}
 
-	Tasks []struct {
-		Name       string `json:"name"`
-		Path       string `json:"path"`
-		IsDir      bool   `json:"isdir"`
-		Additional struct {
-			Indexed        bool   `json:"indexed"`
-			IsHybridTask   bool   `json:"is_hybrid_share"`
-			IsWormTask     bool   `json:"is_worm_share"`
-			MountPointType string `json:"mount_point_type"`
-			Owner          struct {
-				Group   string `json:"group"`
-				GroupID int    `json:"gid"`
-				User    string `json:"user"`
-				UserID  int    `json:"uid"`
-			} `json:"owner"`
-			Perm struct {
-				ACL struct {
-					Append bool `json:"append"`
-					Del    bool `json:"del"`
-					Exec   bool `json:"exec"`
-					Read   bool `json:"read"`
-					Write  bool `json:"write"`
-				} `json:"acl"`
-				ACLEnable bool `json:"acl_enable"`
-				AdvRight  struct {
-					DisableDownload bool `json:"disable_download"`
-					DisableList     bool `json:"disable_list"`
-					DisableModify   bool `json:"disable_modify"`
-				} `json:"adv_right"`
-				IsACLMode      bool   `json:"is_acl_mode"`
-				IsTaskReadonly bool   `json:"is_share_readonly"`
-				Posix          int    `json:"posix"`
-				TaskRight      string `json:"share_right"`
-			} `json:"perm"`
-			RealPath string `json:"real_path"`
-			SyncTask bool   `json:"sync_share"`
-			Time     struct {
-				Atime  int `json:"atime"`
-				Crtime int `json:"crtime"`
-				Ctime  int `json:"ctime"`
-				Mtime  int `json:"mtime"`
-			} `json:"time"`
-			VolumeStatus struct {
-				Freespace  int64 `json:"freespace"`
-				Readonly   bool  `json:"readonly"`
-				Totalspace int64 `json:"totalspace"`
-			} `json:"volume_status"`
-			WormState int `json:"worm_state"`
-		} `json:"additional"`
-	} `json:"shares"`
+type TaskGetRequest struct {
+	ID int `url:"id"`
+}
 
-	Total int `json:"total"`
+type TaskRef struct {
+	ID        int    `json:"id,omitempty"`
+	RealOwner string `json:"name,omitempty"`
+}
+
+type TaskDeleteRequest struct {
+	Tasks []TaskRef `url:"tasks,json"`
+}
+type TaskRunRequest struct {
+	Tasks []TaskRef `url:"tasks,json"`
 }

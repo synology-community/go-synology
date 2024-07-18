@@ -7,8 +7,20 @@ import (
 	"strings"
 )
 
+type ErrorSummaries func() ErrorSummary
+
+func (es ErrorSummaries) Combine(errs ErrorSummary) ErrorSummaries {
+	return func() ErrorSummary {
+		return es().Combine(errs)
+	}
+}
+
+var GlobalErrors ErrorSummaries = func() ErrorSummary {
+	return globalErrors
+}
+
 // GlobalErrors holds mapping of global errors not related to particular API endpoint.
-var GlobalErrors ErrorSummary = ErrorSummary{
+var globalErrors ErrorSummary = ErrorSummary{
 	0:    "common - commfail",
 	101:  "No parameter of API, method or version",
 	102:  "The requested API does not exist",

@@ -374,14 +374,14 @@ func handleResponse[T Response](resp *http.Response) (*T, error) {
 	}
 }
 
-func handleErrors[T Response](response ApiResponse[T], knownErrors ErrorSummary) error {
+func handleErrors[T Response](response ApiResponse[T], knownErrors ErrorSummaries) error {
 	if response.Error.Code == 0 {
 		return nil
 	}
 
 	var result error
 
-	if errDesc, ok := knownErrors[response.Error.Code]; ok {
+	if errDesc, ok := knownErrors()[response.Error.Code]; ok {
 		result = multierror.Append(result, fmt.Errorf("api response error code %d: %v", response.Error.Code, errDesc))
 	} else {
 		result = multierror.Append(result, fmt.Errorf("api response error code %d: %v", response.Error.Code, response.Error))
@@ -389,7 +389,7 @@ func handleErrors[T Response](response ApiResponse[T], knownErrors ErrorSummary)
 
 	if response.Error.Errors != nil {
 		for i, err := range response.Error.Errors {
-			if errDesc, ok := knownErrors[err.Code]; ok {
+			if errDesc, ok := knownErrors()[err.Code]; ok {
 				result = multierror.Append(result, fmt.Errorf("api response error[%d] code %d: %v", i, err.Code, errDesc))
 			} else {
 				result = multierror.Append(result, fmt.Errorf("api response error[%d] code %d: %v", i, err.Code, err))

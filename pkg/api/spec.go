@@ -3,10 +3,10 @@ package api
 import "net/url"
 
 type Method struct {
-	API          string       `form:"api" url:"api"`
-	Version      int          `form:"version" url:"version"`
-	Method       string       `form:"method" url:"method"`
-	ErrorSummary ErrorSummary `json:"-" form:"-" url:"-"`
+	API            string         `form:"api" url:"api"`
+	Version        int            `form:"version" url:"version"`
+	Method         string         `form:"method" url:"method"`
+	ErrorSummaries ErrorSummaries `json:"-" form:"-" url:"-"`
 }
 
 func (m Method) AsApiParams() ApiParams {

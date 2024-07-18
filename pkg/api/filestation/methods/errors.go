@@ -4,7 +4,7 @@ import (
 	"github.com/synology-community/go-synology/pkg/api"
 )
 
-var CommonErrors api.ErrorSummary = api.GlobalErrors.Combine(api.ErrorSummary{
+var CommonErrors api.ErrorSummaries = api.GlobalErrors.Combine(api.ErrorSummary{
 	400: "Invalid parameter of file operation",
 	401: "Unknown error of file operation",
 	402: "System is too busy",

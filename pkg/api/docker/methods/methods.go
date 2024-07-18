@@ -17,111 +17,111 @@ var (
 		API:     API_DockerContainer,
 		Version: 1,
 		Method:  api.MethodCreate,
-		ErrorSummary: CommonErrors.Combine(api.ErrorSummary{
+		ErrorSummaries: CommonErrors.Combine(api.ErrorSummary{
 			1100: "Failed to create a folder. More information in <errors> object.",
 			1101: "The number of folders to the parent folder would exceed the system limitation.",
 		}),
 	}
 	Get = api.Method{
-		API:          API_DockerContainer,
-		Version:      1,
-		Method:       api.MethodGet,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerContainer,
+		Version:        1,
+		Method:         api.MethodGet,
+		ErrorSummaries: CommonErrors,
 	}
 	List = api.Method{
-		API:          API_DockerContainer,
-		Version:      1,
-		Method:       api.MethodList,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerContainer,
+		Version:        1,
+		Method:         api.MethodList,
+		ErrorSummaries: CommonErrors,
 	}
 	Delete = api.Method{
-		API:          API_DockerContainer,
-		Version:      1,
-		Method:       api.MethodDelete,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerContainer,
+		Version:        1,
+		Method:         api.MethodDelete,
+		ErrorSummaries: CommonErrors,
 	}
 	RegistryList = api.Method{
-		API:          API_DockerRegistry,
-		Version:      1,
-		Method:       api.MethodGet,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerRegistry,
+		Version:        1,
+		Method:         api.MethodGet,
+		ErrorSummaries: CommonErrors,
 	}
 	ImagePullStart = api.Method{
-		API:          API_DockerImage,
-		Version:      1,
-		Method:       api.MethodPullStart,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerImage,
+		Version:        1,
+		Method:         api.MethodPullStart,
+		ErrorSummaries: CommonErrors,
 	}
 	ImagePullStatus = api.Method{
-		API:          API_DockerImage,
-		Version:      1,
-		Method:       api.MethodPullStatus,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerImage,
+		Version:        1,
+		Method:         api.MethodPullStatus,
+		ErrorSummaries: CommonErrors,
 	}
 	ImageDelete = api.Method{
-		API:          API_DockerImage,
-		Version:      1,
-		Method:       api.MethodDelete,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerImage,
+		Version:        1,
+		Method:         api.MethodDelete,
+		ErrorSummaries: CommonErrors,
 	}
 	ProjectGet = api.Method{
-		API:          API_DockerProject,
-		Version:      1,
-		Method:       api.MethodGet,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerProject,
+		Version:        1,
+		Method:         api.MethodGet,
+		ErrorSummaries: CommonErrors,
 	}
 	ProjectList = api.Method{
-		API:          API_DockerProject,
-		Version:      1,
-		Method:       api.MethodList,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerProject,
+		Version:        1,
+		Method:         api.MethodList,
+		ErrorSummaries: CommonErrors,
 	}
 	ProjectCreate = api.Method{
-		API:          API_DockerProject,
-		Version:      1,
-		Method:       api.MethodCreate,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerProject,
+		Version:        1,
+		Method:         api.MethodCreate,
+		ErrorSummaries: CommonErrors,
 	}
 	ProjectUpdate = api.Method{
-		API:          API_DockerProject,
-		Version:      1,
-		Method:       api.MethodUpdate,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerProject,
+		Version:        1,
+		Method:         api.MethodUpdate,
+		ErrorSummaries: CommonErrors,
 	}
 	ProjectDelete = api.Method{
-		API:          API_DockerProject,
-		Version:      1,
-		Method:       api.MethodDelete,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerProject,
+		Version:        1,
+		Method:         api.MethodDelete,
+		ErrorSummaries: CommonErrors,
 	}
 	ProjectCleanStream = api.Method{
-		API:          API_DockerProject,
-		Version:      1,
-		Method:       api.MethodCleanStream,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerProject,
+		Version:        1,
+		Method:         api.MethodCleanStream,
+		ErrorSummaries: CommonErrors,
 	}
 	ProjectStopStream = api.Method{
-		API:          API_DockerProject,
-		Version:      1,
-		Method:       api.MethodStopStream,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerProject,
+		Version:        1,
+		Method:         api.MethodStopStream,
+		ErrorSummaries: CommonErrors,
 	}
 	ProjectStartStream = api.Method{
-		API:          API_DockerProject,
-		Version:      1,
-		Method:       api.MethodStartStream,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerProject,
+		Version:        1,
+		Method:         api.MethodStartStream,
+		ErrorSummaries: CommonErrors,
 	}
 	ProjectBuildStream = api.Method{
-		API:          API_DockerProject,
-		Version:      1,
-		Method:       api.MethodBuildStream,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerProject,
+		Version:        1,
+		Method:         api.MethodBuildStream,
+		ErrorSummaries: CommonErrors,
 	}
 	NetworkCreate = api.Method{
-		API:          API_DockerNetwork,
-		Version:      1,
-		Method:       api.MethodCreate,
-		ErrorSummary: CommonErrors,
+		API:            API_DockerNetwork,
+		Version:        1,
+		Method:         api.MethodCreate,
+		ErrorSummaries: CommonErrors,
 	}
 )

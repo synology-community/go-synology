@@ -27,4 +27,15 @@ type Api interface {
 	ShareCreate(ctx context.Context, share ShareInfo) error
 	ShareDelete(ctx context.Context, name string) error
 	VolumeList(ctx context.Context) (*VolumeListResponse, error)
+
+	TaskList(ctx context.Context, req ListTaskRequest) (*ListTaskResponse, error)
+	TaskCreate(ctx context.Context, req TaskRequest) (*TaskResult, error)
+	RootTaskCreate(ctx context.Context, req TaskRequest) (*TaskResult, error)
+	TaskUpdate(ctx context.Context, req TaskRequest) (*TaskResult, error)
+	RootTaskUpdate(ctx context.Context, req TaskRequest) (*TaskResult, error)
+	TaskDelete(ctx context.Context, req TaskDeleteRequest) error
+	TaskRun(ctx context.Context, req TaskRunRequest) error
+	TaskGet(ctx context.Context, id int) (*TaskResult, error)
+
+	PasswordConfirm(ctx context.Context, password string) (*PasswordConfirmResponse, error)
 }

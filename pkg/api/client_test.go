@@ -138,10 +138,12 @@ func TestMarshalURL(t *testing.T) {
 }
 
 func TestHandleErrors(t *testing.T) {
-	globalErrors := ErrorSummary{
-		100: "global error 100",
-		101: "global error 101",
-		102: "global error 102",
+	globalErrors := func() ErrorSummary {
+		return ErrorSummary{
+			100: "global error 100",
+			101: "global error 101",
+			102: "global error 102",
+		}
 	}
 
 	testCases := []struct {

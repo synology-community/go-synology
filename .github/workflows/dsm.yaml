@@ -9,8 +9,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: DeterminateSystems/nix-installer-action@main
-      - name: Virtual DSM
-        id: vdsm
-        uses: synology-community/virtual-dsm-action@main
-        with:
-          disk-size: "6G"
+      # - run: nix-env -iA nixpkgs.docker
+      - run: docker run -it --rm -p 5000:5000 --device=/dev/kvm --cap-add NET_ADMIN --stop-timeout 120 vdsm/virtual-dsm
+      # - name: Virtual DSM
+      #   id: vdsm
+      #   uses: synology-community/virtual-dsm-action@main
+      #   with:
+      #     disk-size: "6G"

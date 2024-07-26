@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: DeterminateSystems/nix-installer-action@main
       - name: Virtual DSM
         id: vdsm
         uses: synology-community/virtual-dsm-action@main

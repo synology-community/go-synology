@@ -25,6 +25,10 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
+const (
+	API_BASE = "/webapi/entry.cgi"
+)
+
 var defaultTimeout = 15 * time.Second
 
 type Client struct {
@@ -70,7 +74,7 @@ func New(o Options) (Api, error) {
 	baseURL, err := url.Parse(o.Host)
 
 	baseURL.Scheme = "https"
-	baseURL.Path = "/webapi/entry.cgi"
+	baseURL.Path = API_BASE
 
 	if err != nil {
 		return nil, err
@@ -171,6 +175,58 @@ func PostFileUpload[TResp Response](c Api, ctx context.Context, name string, con
 	req.Header.Add("Content-Type", fmt.Sprintf("multipart/form-data; boundary=%s", w.Boundary()))
 
 	return Do[TResp](c.Client(), req)
+}
+
+func PostFileWithQuery[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
+	aq, err := query.Values(method) //.AsApiParams())
+	if err != nil {
+		return nil, err
+	}
+	dq, err := query.Values(r)
+	if err != nil {
+		return nil, err
+	}
+
+	u2 := c.BaseUrl()
+
+	qu := maps.Clone(u2.Query())
+	maps.Copy(qu, aq)
+	maps.Copy(qu, dq)
+
+	if u2 == nil {
+		return nil, errors.New("base url is nil")
+	}
+	u := new(url.URL)
+	*u = *u2
+
+	u.RawQuery = qu.Encode()
+
+	buf := new(bytes.Buffer)
+
+	// Prepare a form that you will submit to that URL.
+	if w, fs, err := form.Marshal(buf, r); err != nil {
+		w.Close()
+		return nil, err
+	} else {
+		defer w.Close()
+
+		// Only set a timeout if one isn't already set
+		var cancel context.CancelFunc
+		if _, ok := ctx.Deadline(); !ok {
+			ctx, cancel = context.WithTimeout(ctx, defaultTimeout)
+			defer cancel()
+		}
+
+		req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodPost, u.String(), buf)
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Add("Content-Length", fmt.Sprintf("%d", fs))
+		req.Header.Add("Content-Type", fmt.Sprintf("multipart/form-data; boundary=%s", w.Boundary()))
+
+		return Do[TResp](c.Client(), req)
+	}
 }
 
 func PostFile[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {

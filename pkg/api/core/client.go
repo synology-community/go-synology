@@ -3,11 +3,14 @@ package core
 import (
 	"context"
 	"fmt"
+	"os"
+	"path"
 	"slices"
 	"time"
 
 	"github.com/synology-community/go-synology/pkg/api"
 	"github.com/synology-community/go-synology/pkg/api/core/methods"
+	"github.com/synology-community/go-synology/pkg/util/form"
 )
 
 type Client struct {
@@ -112,7 +115,38 @@ func (c Client) PackageUninstallCompound(ctx context.Context, name string) error
 	return nil
 }
 
+func readFile(path string) (string, error) {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
 func (c Client) PackageInstallCompound(ctx context.Context, req PackageInstallCompoundRequest) error {
+
+	if req.File != "" {
+		b, err := readFile(req.File)
+		if err != nil {
+			return err
+		}
+
+		fileName := path.Base(req.File)
+
+		ctx, cancel := context.WithTimeout(ctx, 120*time.Minute)
+		defer cancel()
+
+		got, err := c.PackageInstallUpload(ctx, form.File{
+			Name:    fileName,
+			Content: b,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		req.Name = got.Name
+	}
 
 	pkgSetting, err := c.PackageSettingGet(ctx, PackageSettingGetRequest{})
 
@@ -230,6 +264,13 @@ func (c Client) PackageInstallDelete(ctx context.Context, req PackageInstallDele
 
 func (c Client) PackageUninstall(ctx context.Context, req PackageUninstallRequest) (*PackageUninstallResponse, error) {
 	return api.Get[PackageUninstallResponse](c.client, ctx, &req, methods.PackageUnistallationUninstall)
+}
+
+func (c Client) PackageInstallUpload(ctx context.Context, req form.File) (*PackageInstallUploadResponse, error) {
+	return api.PostFileWithQuery[PackageInstallUploadResponse](c.client, ctx, &PackageInstallUploadRequest{
+		Additional: []string{"description", "maintainer", "distributor", "startable", "dsm_apps", "status", "install_reboot", "install_type", "install_on_cold_storage", "break_pkgs", "replace_pkgs"},
+		File:       req,
+	}, methods.PackageInstallationUpload)
 }
 
 func (c Client) PackageFeedList(ctx context.Context) (*PackageFeedListResponse, error) {

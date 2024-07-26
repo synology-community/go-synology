@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/synology-community/go-synology/pkg/util"
+	"github.com/synology-community/go-synology/pkg/util/form"
 )
 
 type PackageListRequest struct {
@@ -271,6 +272,7 @@ func (s ExtraValues) EncodeValues(k string, v *url.Values) error {
 
 type PackageInstallCompoundRequest struct {
 	Name        string            `url:"name"`
+	File        string            `url:"file"`
 	URL         string            `url:"url"`
 	Size        int64             `url:"size"`
 	Run         bool              `url:"run"`
@@ -297,4 +299,35 @@ type PackageSettingGetResponse struct {
 		VolDesc        string `json:"vol_desc,omitempty"`
 		VolumeFeatures []any  `json:"volume_features,omitempty"`
 	} `json:"volume_list,omitempty"`
+}
+
+type PackageInstallUploadRequest struct {
+	Additional []string  `form:"additional,json" url:"additional,json"`
+	File       form.File `form:"file" kind:"file"`
+}
+
+type PackageInstallUploadResponse struct {
+	CodesignError int    `json:"codesign_error,omitempty"`
+	ID            string `json:"id,omitempty"`
+	InstallPages  string `json:"install_pages,omitempty"`
+	Licence       string `json:"licence,omitempty"`
+	Name          string `json:"name,omitempty"`
+	TaskID        string `json:"task_id,omitempty"`
+	Version       string `json:"version,omitempty"`
+	Additional    struct {
+		BreakPkgs            any    `json:"break_pkgs,omitempty"`
+		Description          string `json:"description,omitempty"`
+		Distributor          string `json:"distributor,omitempty"`
+		DsmApps              string `json:"dsm_apps,omitempty"`
+		InstallOnColdStorage bool   `json:"install_on_cold_storage,omitempty"`
+		InstallReboot        bool   `json:"install_reboot,omitempty"`
+		InstallType          string `json:"install_type,omitempty"`
+		Maintainer           string `json:"maintainer,omitempty"`
+		ReplacePkgs          any    `json:"replace_pkgs,omitempty"`
+		Startable            bool   `json:"startable,omitempty"`
+		Status               string `json:"status,omitempty"`
+		StatusCode           int    `json:"status_code,omitempty"`
+		StatusDescription    string `json:"status_description,omitempty"`
+		StatusOrigin         string `json:"status_origin,omitempty"`
+	} `json:"additional,omitempty"`
 }

@@ -3,12 +3,14 @@ package core
 import (
 	"context"
 	"os"
+	"path"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 	"github.com/synology-community/go-synology/pkg/api"
+	"github.com/synology-community/go-synology/pkg/util/form"
 )
 
 func newClient(t *testing.T) Api {
@@ -495,6 +497,63 @@ func TestClient_PackageFind(t *testing.T) {
 			}
 			if got.Package != tt.args.name {
 				t.Errorf("Client.PackageFind() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestClient_PackageInstallUpload(t *testing.T) {
+	type fields struct {
+		client Api
+	}
+	type args struct {
+		ctx      context.Context
+		filePath string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		// want    *PackageInstallUploadResponse
+		wantErr bool
+	}{
+		{
+			name: "Install ZSH Static Package",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx:      context.Background(),
+				filePath: "/Users/atkini01/src/synology-community/spksrc/packages/nomad_1.8.2_linux_amd64.spk",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b, err := readFile(tt.args.filePath)
+			if err != nil {
+				t.Errorf("Client.PackageInstallUpload() error = %v", err)
+				return
+			}
+
+			fileName := path.Base(tt.args.filePath)
+
+			ctx, cancel := context.WithTimeout(tt.args.ctx, 120*time.Minute)
+			defer cancel()
+
+			c := tt.fields.client
+			got, err := c.PackageInstallUpload(ctx, form.File{
+				Name:    fileName,
+				Content: b,
+			})
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.PackageInstallUpload() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if got.ID != "nomad" {
+				t.Errorf("Client.PackageInstallUpload() = %v, want %v", got, "nomad")
 			}
 		})
 	}

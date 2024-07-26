@@ -2,6 +2,8 @@ package core
 
 import (
 	"context"
+
+	"github.com/synology-community/go-synology/pkg/util/form"
 )
 
 type Api interface {
@@ -14,6 +16,7 @@ type Api interface {
 	PackageInstallCompound(ctx context.Context, req PackageInstallCompoundRequest) error
 	PackageInstallStatus(ctx context.Context, req PackageInstallStatusRequest) (*PackageInstallStatusResponse, error)
 	PackageInstallDelete(ctx context.Context, req PackageInstallDeleteRequest) error
+	PackageInstallUpload(ctx context.Context, req form.File) (*PackageInstallUploadResponse, error)
 	PackageUninstall(ctx context.Context, req PackageUninstallRequest) (*PackageUninstallResponse, error)
 	PackageUninstallCompound(ctx context.Context, name string) error
 	ContentLength(ctx context.Context, url string) (int64, error)

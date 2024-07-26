@@ -57,6 +57,12 @@ var (
 		Method:         api.MethodDelete,
 		ErrorSummaries: api.GlobalErrors,
 	}
+	PackageInstallationUpload = api.Method{
+		API:            Core_Package_Installation,
+		Version:        1,
+		Method:         "upload",
+		ErrorSummaries: api.GlobalErrors,
+	}
 	PackageUnistallationUninstall = api.Method{
 		API:            Core_Package_Uninstallation,
 		Version:        1,

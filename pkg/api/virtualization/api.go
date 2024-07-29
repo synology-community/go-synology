@@ -2,6 +2,8 @@ package virtualization
 
 import (
 	"context"
+
+	"github.com/synology-community/go-synology/pkg/util/form"
 )
 
 type Api interface {
@@ -15,6 +17,7 @@ type Api interface {
 
 	ImageList(ctx context.Context) (*ImageList, error)
 	ImageCreate(ctx context.Context, image Image) (*Task, error)
+	ImageUploadAndCreate(ctx context.Context, file form.File, imageRepos []string, imageType string) (*Task, error)
 	ImageDelete(ctx context.Context, imageID string) error
 
 	TaskGet(ctx context.Context, taskID string) (*Task, error)

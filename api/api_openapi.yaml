@@ -27,7 +27,7 @@ tags:
     description: Search a data set
 paths:
   # Login
-  ? /webapi/entry.cgi?api=SYNO.API.Auth&version=6&method=login&format=sid&enable_syno_token=yes
+  ? /webapi/entry.cgi/SYNO.API.Auth?api=SYNO.API.Auth&version=6&method=login&format=sid&enable_syno_token=yes
   : get:
       operationId: Login
       summary: Logs in and returns the authentication tokens

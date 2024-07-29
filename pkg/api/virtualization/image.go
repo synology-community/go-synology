@@ -3,6 +3,8 @@ package virtualization
 import (
 	"fmt"
 	"net/url"
+
+	"github.com/synology-community/go-synology/pkg/util/form"
 )
 
 type ImageType string
@@ -28,4 +30,13 @@ type Image struct {
 
 type ImageList struct {
 	Images []Image `json:"images"`
+}
+
+type UploadAndCreateRequest struct {
+	Name       string    `url:"name" form:"-"`
+	DsFilePath string    `url:"ds_file_path" form:"-"`
+	ImageRepos []string  `url:"image_repos,json,quoted" form:"-"`
+	Type       string    `url:"type" form:"-"`
+	GetPatchBy string    `url:"get_patch_by" form:"-"`
+	File       form.File `url:"-" form:"file" kind:"file"`
 }

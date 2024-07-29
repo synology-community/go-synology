@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	_ "embed"
 	"encoding/json"
 	"log"
@@ -26,4 +27,8 @@ type InfoData struct {
 	MinVersion    int    `json:"minVersion"`
 	MaxVersion    int    `json:"maxVersion"`
 	RequestFormat string `json:"requestFormat"`
+}
+
+func (c *Client) GetApiInfo(ctx context.Context) (*map[string]InfoData, error) {
+	return List[ApiInfo](c, ctx, Api_Info)
 }

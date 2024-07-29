@@ -12,15 +12,23 @@ type Api interface {
 	BaseUrl() *url.URL
 	Credentials() Credentials
 	Login(ctx context.Context, user, password, otpSecret string) (*LoginResponse, error)
+	GetApiInfo(ctx context.Context) (*ApiInfo, error)
 	Password() string
 }
 
 const (
 	Entry_Request = "SYNO.Entry.Request"
 	API_Auth      = "SYNO.API.Auth"
+	API_Info      = "SYNO.API.Info"
 )
 
 var (
+	Api_Info = Method{
+		API:            API_Info,
+		Version:        1,
+		Method:         "query",
+		ErrorSummaries: GlobalErrors,
+	}
 	Login = Method{
 		API:            API_Auth,
 		Version:        7,

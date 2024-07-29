@@ -1,6 +1,10 @@
 package filestation
 
 import (
+	"fmt"
+	"log"
+	"time"
+
 	"context"
 	"os"
 	"reflect"
@@ -10,7 +14,101 @@ import (
 	"github.com/synology-community/go-synology/pkg/api"
 	"github.com/synology-community/go-synology/pkg/models"
 	"github.com/synology-community/go-synology/pkg/util/form"
+
+	"github.com/ory/dockertest/v3"
+	"github.com/ory/dockertest/v3/docker"
 )
+
+func TestMain(m *testing.M) {
+	useDocker := os.Getenv("USE_DOCKER")
+	enableDocker := false
+	if useDocker != "" {
+		enableDocker = true
+	}
+
+	if enableDocker {
+		// uses a sensible default on windows (tcp/http) and linux/osx (socket)
+		pool, err := dockertest.NewPool("")
+		if err != nil {
+			log.Fatalf("Could not construct pool: %s", err)
+		}
+
+		// uses pool to try to connect to Docker
+		err = pool.Client.Ping()
+		if err != nil {
+			log.Fatalf("Could not connect to Docker: %s", err)
+		}
+
+		resource, err := pool.RunWithOptions(&dockertest.RunOptions{
+			Name:         "synology",
+			Repository:   "vdsm/virtual-dsm",
+			CapAdd:       []string{"NET_ADMIN"},
+			ExposedPorts: []string{"5000/tcp", "5001/tcp"},
+			Env:          []string{"RAM_SIZE=1G"},
+		}, func(config *docker.HostConfig) {
+			config.Devices = []docker.Device{
+				{
+					PathOnHost:      "/dev/kvm",
+					PathInContainer: "/dev/kvm",
+				},
+			}
+			config.Memory = 2000000000
+		})
+		if err != nil {
+			log.Fatalf("Could not start resource: %s", err)
+		}
+
+		// as of go1.15 testing.M returns the exit code of m.Run(), so it is safe to use defer here
+		defer func() {
+			if err := pool.Purge(resource); err != nil {
+				log.Fatalf("Could not purge resource: %s", err)
+			}
+
+		}()
+
+		err = os.Setenv("SYNOLOGY_HOST", fmt.Sprintf("https://localhost:%s", resource.GetPort("5001/tcp")))
+		if err != nil {
+			log.Fatalf("Could not set environment variable: %s", err)
+		}
+
+		err = os.Setenv("SYNOLOGY_USER", "admin")
+		if err != nil {
+			log.Fatalf("Could not set environment variable: %s", err)
+		}
+
+		err = os.Setenv("SYNOLOGY_PASSWORD", "")
+		if err != nil {
+			log.Fatalf("Could not set environment variable: %s", err)
+		}
+
+		time.Sleep(60 * time.Second)
+
+		// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
+		if err := pool.Retry(func() error {
+			c, err := api.New(api.Options{
+				Host:       os.Getenv("SYNOLOGY_HOST"),
+				VerifyCert: false,
+			})
+
+			if err != nil {
+				log.Fatalf("Could not create client: %s", err)
+				return err
+			}
+
+			_, err = c.GetApiInfo(context.Background())
+			if err != nil {
+				log.Fatalf("Could not get api info: %s", err)
+				return err
+			}
+
+			return nil
+		}); err != nil {
+			log.Fatalf("Could not connect to database: %s", err)
+		}
+
+		m.Run()
+	}
+}
 
 func newClient(t *testing.T) Api {
 	c, err := api.New(api.Options{
@@ -85,20 +183,26 @@ func Test_Client_Delete(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *DeleteStatusResponse
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Delete",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				paths:            []string{"/data/foo/test.txt"},
+				accurateProgress: true,
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.fields.client.Delete(tt.args.ctx, tt.args.paths, tt.args.accurateProgress)
+			_, err := tt.fields.client.Delete(tt.args.ctx, tt.args.paths, tt.args.accurateProgress)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.Delete() error = %v, wantErr %v", err, tt.wantErr)
 				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Client.Delete() = %v, want %v", got, tt.want)
 			}
 		})
 	}

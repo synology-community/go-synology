@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/synology-community/go-synology/pkg/api"
+	"github.com/synology-community/go-synology/pkg/util/form"
 )
 
 func newClient(t *testing.T) Api {
@@ -33,6 +34,20 @@ func newClient(t *testing.T) Api {
 
 func Test_Virtualization_Image(t *testing.T) {
 	c := newClient(t)
+
+	b, err := readFile("/Users/atkini01/Downloads/nocloud_alpine-3.20.2-x86_64-bios-tiny-r0.qcow2")
+	if err != nil {
+		t.Error(err)
+		require.NoError(t, err)
+	}
+
+	f := form.File{
+		Name:    "nocloud_alpine-3.20.2-x86_64-bios-tiny-r0.qcow2",
+		Content: b,
+	}
+
+	testImageUploadAndCreate(t, c, f, []string{"96914092-6022-4c21-8493-a3e1be165a1f"}, "disk")
+
 	image := Image{
 		Name: "testmantic",
 		Storages: Storages{
@@ -110,7 +125,13 @@ func testGuestUpdate(t *testing.T, v Api, guest GuestUpdate) {
 func testImageCreate(t *testing.T, v Api, image Image) {
 	got, err := v.ImageCreate(context.Background(), image)
 	require.Nil(t, err)
-	require.NotNil(t, got, "TaskRef is nil")
+	require.NotNil(t, got, "ImageCreate: TaskRef is nil")
+}
+
+func testImageUploadAndCreate(t *testing.T, v Api, file form.File, imageRepos []string, imageType string) {
+	got, err := v.ImageUploadAndCreate(context.Background(), file, imageRepos, imageType)
+	require.Nil(t, err)
+	require.NotNil(t, got, "ImageUploadAndCreate: TaskRef is nil")
 }
 
 func testImageDelete(t *testing.T, v Api, imageName string) {

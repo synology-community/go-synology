@@ -68,6 +68,12 @@ var (
 		Method:         "create",
 		ErrorSummaries: api.GlobalErrors,
 	}
+	ImageUploadAndCreate = api.Method{
+		API:            API_Guest_Image,
+		Version:        1,
+		Method:         "upload_and_create",
+		ErrorSummaries: api.GlobalErrors,
+	}
 	ImageDelete = api.Method{
 		API:            API_Guest_Image,
 		Version:        1,

@@ -177,63 +177,53 @@ func PostFileUpload[TResp Response](c Api, ctx context.Context, name string, con
 	return Do[TResp](c.Client(), req)
 }
 
-func PostFileWithQuery[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
-	aq, err := query.Values(method) //.AsApiParams())
-	if err != nil {
-		return nil, err
-	}
-	dq, err := query.Values(r)
-	if err != nil {
-		return nil, err
-	}
-
-	u2 := c.BaseUrl()
-
-	qu := maps.Clone(u2.Query())
-	maps.Copy(qu, aq)
-	maps.Copy(qu, dq)
-
-	if u2 == nil {
-		return nil, errors.New("base url is nil")
-	}
-	u := new(url.URL)
-	*u = *u2
-
-	u.RawQuery = qu.Encode()
-
-	buf := new(bytes.Buffer)
-
-	// Prepare a form that you will submit to that URL.
-	if w, fs, err := form.Marshal(buf, r); err != nil {
-		w.Close()
-		return nil, err
-	} else {
-		defer w.Close()
-
-		// Only set a timeout if one isn't already set
-		var cancel context.CancelFunc
-		if _, ok := ctx.Deadline(); !ok {
-			ctx, cancel = context.WithTimeout(ctx, defaultTimeout)
-			defer cancel()
-		}
-
-		req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodPost, u.String(), buf)
+func mergeQueries(qs ...interface{}) (url.Values, error) {
+	res := map[string][]string{}
+	for _, q := range qs {
+		qq, err := query.Values(q)
 		if err != nil {
 			return nil, err
 		}
-
-		req.Header.Add("Content-Length", fmt.Sprintf("%d", fs))
-		req.Header.Add("Content-Type", fmt.Sprintf("multipart/form-data; boundary=%s", w.Boundary()))
-
-		return Do[TResp](c.Client(), req)
+		maps.Copy(res, qq)
 	}
+	return res, nil
+}
+
+func getQuery(c Api, p ...interface{}) (string, error) {
+	if c.BaseUrl() == nil {
+		return "", errors.New("base url is nil")
+	}
+
+	ps := make([]interface{}, 0, len(p)+1)
+	ps = append(ps, c.BaseUrl().Query())
+	ps = append(ps, p...)
+
+	q, err := mergeQueries(ps)
+	if err != nil {
+		return "", err
+	}
+
+	return q.Encode(), nil
+}
+
+func PostFileWithQuery[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
+	q, err := getQuery(c, method, r)
+	if err != nil {
+		return nil, err
+	}
+	u := *c.BaseUrl()
+	u.RawQuery = q
+
+	return postFile[TResp](c.Client(), ctx, u.String(), r)
 }
 
 func PostFile[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
-	buf := new(bytes.Buffer)
+	return postFile[TResp](c.Client(), ctx, c.BaseUrl().String(), method, r)
+}
 
-	// Prepare a form that you will submit to that URL.
-	if w, fs, err := form.Marshal(buf, method, r); err != nil {
+func postFile[TResp Response](c *retryablehttp.Client, ctx context.Context, url string, input ...any) (*TResp, error) {
+	buf := new(bytes.Buffer)
+	if w, fs, err := form.Marshal(buf, input...); err != nil {
 		w.Close()
 		return nil, err
 	} else {
@@ -246,8 +236,7 @@ func PostFile[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq,
 			defer cancel()
 		}
 
-		u := c.BaseUrl()
-		req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodPost, u.String(), buf)
+		req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodPost, url, buf)
 		if err != nil {
 			return nil, err
 		}
@@ -255,7 +244,7 @@ func PostFile[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq,
 		req.Header.Add("Content-Length", fmt.Sprintf("%d", fs))
 		req.Header.Add("Content-Type", fmt.Sprintf("multipart/form-data; boundary=%s", w.Boundary()))
 
-		return Do[TResp](c.Client(), req)
+		return Do[TResp](c, req)
 	}
 }
 

@@ -3,14 +3,46 @@ package virtualization
 import (
 	"context"
 	"fmt"
+	"os"
+	"path"
+	"strings"
 	"time"
 
 	"github.com/synology-community/go-synology/pkg/api"
 	"github.com/synology-community/go-synology/pkg/api/virtualization/methods"
+	"github.com/synology-community/go-synology/pkg/util/form"
 )
 
 type Client struct {
 	client api.Api
+}
+
+func readFile(path string) (string, error) {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
+// ImageUploadAndCreate implements Api.
+func (v *Client) ImageUploadAndCreate(ctx context.Context, file form.File, imageRepos []string, imageType string) (*Task, error) {
+	name := strings.TrimSuffix(path.Base(file.Name), path.Ext(file.Name))
+
+	resp, err := api.PostFileWithQuery[TaskRef](v.client, ctx, &UploadAndCreateRequest{
+		Name:       name,
+		DsFilePath: path.Base(file.Name),
+		ImageRepos: imageRepos,
+		Type:       imageType,
+		GetPatchBy: "upload",
+		File:       file,
+	}, methods.ImageUploadAndCreate)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return v.TaskGet(ctx, resp.TaskID)
 }
 
 func (v *Client) GuestPowerOn(ctx context.Context, guest Guest) error {

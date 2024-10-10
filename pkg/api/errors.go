@@ -626,6 +626,21 @@ var globalErrors ErrorSummary = ErrorSummary{
 	100:  "Unknown error",
 }
 
+var loginErrors ErrorSummaries = func() ErrorSummary {
+	return ErrorSummary{
+		400: "No such account or incorrect password",
+		401: "Disabled account",
+		402: "Denied permission",
+		403: "2-factor authentication code required",
+		404: "Failed to authenticate 2-factor authentication code",
+		406: "Enforce to authenticate with 2-factor authentication code",
+		407: "Blocked IP source",
+		408: "Expired password cannot change",
+		409: "Expired password",
+		410: "Password must be changed",
+	}
+}
+
 func (es ErrorSummary) Combine(params ...ErrorSummary) ErrorSummary {
 	for _, p := range params {
 		maps.Copy(es, p)

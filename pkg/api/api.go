@@ -33,7 +33,7 @@ var (
 		API:            API_Auth,
 		Version:        7,
 		Method:         "login",
-		ErrorSummaries: GlobalErrors,
+		ErrorSummaries: loginErrors,
 	}
 	Compound = Method{
 		API:            Entry_Request,

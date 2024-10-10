@@ -18,7 +18,10 @@ func newClient(suite *suite.Suite) docker.Api {
 	})
 	suite.Require().NoError(err)
 
-	r, err := c.Login(context.Background(), os.Getenv("SYNOLOGY_USER"), os.Getenv("SYNOLOGY_PASSWORD"), "")
+	r, err := c.Login(context.Background(), api.LoginOptions{
+		Username: os.Getenv("SYNOLOGY_USER"),
+		Password: os.Getenv("SYNOLOGY_PASSWORD"),
+	})
 	suite.Require().NoError(err)
 
 	suite.T().Log("Login successful")

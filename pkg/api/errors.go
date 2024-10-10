@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"maps"
-	"strings"
+
+	"github.com/hashicorp/go-multierror"
 )
 
 type ErrorSummaries func() ErrorSummary
@@ -660,42 +661,66 @@ type ErrorDescriber interface {
 type ApiError struct {
 	Code    int         `json:"code,omitempty"`
 	Summary string      `json:"-"`
-	Errors  []ErrorItem `json:"-"`
-}
+	Errors  ErrorFields `json:"errors,omitempty"`
 
-// ErrorItem defines detailed request error.
-type ErrorItem struct {
-	Code    int
-	Summary string
-	Details ErrorFields
+	underlying error `json:"-"`
 }
 
 // ErrorSummary is a simple mapping of code->text to translate error codes to readable text.
 type ErrorSummary map[int]string
 
 // ErrorFields defines extra fields for particular detailed error.
-type ErrorFields map[string]any
+type ErrorFields map[string]interface{}
+
+func (ef ErrorFields) WithSummaries(knownErrors ErrorSummaries) error {
+	var err error
+	for k, v := range ef {
+		b, e := json.Marshal(v)
+		if e != nil {
+			err = multierror.Append(err, fmt.Errorf("%s: %v", k, e))
+		} else {
+			err = multierror.Append(err, fmt.Errorf("%s: %v", k, string(b)))
+		}
+	}
+	return err
+}
+
+func (s ApiError) WithSummaries(errorSummaries ErrorSummaries) error {
+	s.Summary = DescribeError(s.Code, errorSummaries())
+	return s
+}
+
+func (ef ErrorFields) Underlying() error {
+	var err error
+	for k, v := range ef {
+		b, e := json.Marshal(v)
+		if e != nil {
+			err = multierror.Append(err, fmt.Errorf("%s: %v", k, e))
+		} else {
+			err = multierror.Append(err, fmt.Errorf("%s: %v", k, string(b)))
+		}
+	}
+	return err
+}
+
+func (ef ErrorFields) Prefix(prefix string) error {
+	return multierror.Prefix(ef.Underlying(), prefix)
+}
+
+func (ef ErrorFields) Error() string {
+	return ef.Underlying().Error()
+}
 
 // Error satisfies error interface for SynologyError type.
 func (se ApiError) Error() string {
-	buf := strings.Builder{}
-	buf.WriteString(fmt.Sprintf("[%d] %s", se.Code, se.Summary))
+
+	se.underlying = fmt.Errorf(fmt.Sprintf("[%d] %s", se.Code, se.Summary))
+
 	if len(se.Errors) > 0 {
-		buf.WriteString("\n\tDetails:")
+		se.underlying = multierror.Append(se.underlying, se.Errors)
 	}
 
-	for _, e := range se.Errors {
-		detailedFields := []string{}
-		buf.WriteString(fmt.Sprintf("\n\t\t[%d] %s", e.Code, e.Summary))
-		if len(e.Details) > 0 {
-			for k, v := range e.Details {
-				detailedFields = append(detailedFields, k+": "+fmt.Sprintf("%v", v))
-			}
-			buf.WriteString(": [" + strings.Join(detailedFields, ",") + "]")
-		}
-	}
-
-	return buf.String()
+	return se.underlying.Error()
 }
 
 // DescribeError translates error code to human-readable summary text.
@@ -709,34 +734,4 @@ func DescribeError(code int, summaries ...ErrorSummary) string {
 	}
 
 	return "Unknown error code"
-}
-
-// UnmarshalJSON fullfills Unmarshaler interface for JSON objects.
-func (ei *ErrorItem) UnmarshalJSON(b []byte) error {
-	fields := map[string]any{}
-	err := json.Unmarshal(b, &fields)
-	if err != nil {
-		return err
-	}
-
-	var code int
-
-	if c, ok := fields["code"]; ok {
-		if cc, ok := c.(float64); ok {
-			code = int(cc)
-		}
-	}
-
-	result := ErrorItem{
-		Code: code,
-	}
-	if len(fields) > 0 {
-		result.Details = ErrorFields{}
-		for k, v := range fields {
-			result.Details[k] = v
-		}
-	}
-	*ei = result
-
-	return nil
 }

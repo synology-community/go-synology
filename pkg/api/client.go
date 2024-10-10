@@ -15,6 +15,7 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/hashicorp/go-multierror"
@@ -40,6 +41,8 @@ type Client struct {
 
 	username string
 	password string
+
+	once sync.Once
 }
 
 func New(o Options) (Api, error) {
@@ -107,41 +110,86 @@ func (c *Client) Credentials() Credentials {
 }
 
 // Login runs a login flow to retrieve session token from Synology.
-func (c *Client) Login(ctx context.Context, user, password, otpSecret string) (*LoginResponse, error) {
+func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginResponse, error) {
+	username := options.Username
+	password := options.Password
+	otpSecret := options.OTPSecret
+	var token, sessionID string
 
-	c.username = user
+	c.username = username
 	c.password = password
 
 	req := LoginRequest{
-		Account:  user,
+		Account:  username,
 		Password: password,
 		// Session:         sessionName,
 		Format:          "sid", //"cookie",
 		EnableSynoToken: "yes",
+		// LoginType:       "local",
+		TimeZone: "-06:00",
 	}
 
 	if otpSecret != "" {
 		otpCode, err := generateTotp(otpSecret)
-		if err != nil {
-			return nil, err
+		if err == nil {
+			req.OTPCode = otpCode
+		} else {
+			return nil, multierror.Append(err, errors.New("unable to generate otp code"))
 		}
-		req.OTPCode = otpCode
 	}
 
 	resp, err := Get[LoginResponse](c, ctx, &req, Login)
 	if err != nil {
-		return nil, err
+		if terr, ok := err.(PermissionDeniedError); ok {
+			tmpToken, err := terr.GetToken()
+			if err != nil {
+				return nil, multierror.Append(err, errors.New("unable to get token from error"))
+			}
+			req.OTPCode, err = generateTotp(otpSecret)
+			if err != nil {
+				return nil, multierror.Append(err, errors.New("unable to generate otp code"))
+			}
+			req.Password = tmpToken
+			resp, err = Get[LoginResponse](c, ctx, &req, Login)
+			if err != nil {
+				return nil, multierror.Append(err, fmt.Errorf("unable to login with token: %v", tmpToken))
+			} else {
+				if resp.Token != "" {
+					token = resp.Token
+				}
+				if resp.SessionID != "" {
+					sessionID = resp.SessionID
+				}
+			}
+		} else {
+			return nil, multierror.Append(err, errors.New("unable to login using token and password"))
+		}
+	} else {
+		if resp.Token != "" {
+			token = resp.Token
+		}
+		if resp.SessionID != "" {
+			sessionID = resp.SessionID
+		}
 	}
-	c.ApiCredentials = Credentials{
-		SessionID: resp.SessionID,
-		Token:     resp.Token,
-	}
-	q := c.BaseURL.Query()
-	q.Set("_sid", resp.SessionID)
-	q.Set("SynoToken", resp.Token)
 
-	c.BaseURL.RawQuery = q.Encode()
-	return resp, nil
+	if token != "" && sessionID != "" {
+		c.ApiCredentials = Credentials{
+			SessionID: sessionID,
+			Token:     token,
+		}
+		q := c.BaseURL.Query()
+		q.Set("_sid", sessionID)
+		if token != "" {
+			q.Set("SynoToken", token)
+		}
+
+		c.BaseURL.RawQuery = q.Encode()
+
+		return resp, nil
+	} else {
+		return resp, errors.New("unable to login")
+	}
 }
 
 func PostFileUpload[TResp Response](c Api, ctx context.Context, name string, content string, method Method) (*TResp, error) {
@@ -174,7 +222,7 @@ func PostFileUpload[TResp Response](c Api, ctx context.Context, name string, con
 	req.Header.Add("Content-Length", fmt.Sprintf("%d", fs))
 	req.Header.Add("Content-Type", fmt.Sprintf("multipart/form-data; boundary=%s", w.Boundary()))
 
-	return Do[TResp](c.Client(), req)
+	return Do[TResp](c.Client(), req, method.ErrorSummaries)
 }
 
 func mergeQueries(qs ...interface{}) (url.Values, error) {
@@ -222,6 +270,14 @@ func PostFile[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq,
 }
 
 func postFile[TResp Response](c *retryablehttp.Client, ctx context.Context, url string, input ...any) (*TResp, error) {
+	var errorSummaries ErrorSummaries
+
+	if method, ok := input[0].(Method); !ok {
+		errorSummaries = GlobalErrors
+	} else {
+		errorSummaries = method.ErrorSummaries
+	}
+
 	buf := new(bytes.Buffer)
 	if w, fs, err := form.Marshal(buf, input...); err != nil {
 		w.Close()
@@ -244,7 +300,7 @@ func postFile[TResp Response](c *retryablehttp.Client, ctx context.Context, url 
 		req.Header.Add("Content-Length", fmt.Sprintf("%d", fs))
 		req.Header.Add("Content-Type", fmt.Sprintf("multipart/form-data; boundary=%s", w.Boundary()))
 
-		return Do[TResp](c, req)
+		return Do[TResp](c, req, errorSummaries)
 	}
 }
 
@@ -284,9 +340,11 @@ func Post[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, met
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("X-SYNO-TOKEN", c.Credentials().Token)
+	if c.Credentials().Token != "" {
+		req.Header.Set("X-SYNO-TOKEN", c.Credentials().Token)
+	}
 
-	return Do[TResp](c.Client(), req)
+	return Do[TResp](c.Client(), req, method.ErrorSummaries)
 }
 
 func GetQuery[TResp any](c Api, ctx context.Context, r interface{}, method Method) (*TResp, error) {
@@ -302,12 +360,12 @@ func GetQuery[TResp any](c Api, ctx context.Context, r interface{}, method Metho
 	url := c.BaseUrl()
 
 	qu := maps.Clone(url.Query())
-	maps.Copy(qu, aq)
-	maps.Copy(qu, dq)
+	maps.Copy(aq, qu)
+	maps.Copy(aq, dq)
 
 	u := c.BaseUrl()
 
-	u.RawQuery = qu.Encode()
+	u.RawQuery = aq.Encode()
 
 	// Only set a timeout if one isn't already set
 	var cancel context.CancelFunc
@@ -321,46 +379,47 @@ func GetQuery[TResp any](c Api, ctx context.Context, r interface{}, method Metho
 		return nil, err
 	}
 
-	return Do[TResp](c.Client(), req)
+	return Do[TResp](c.Client(), req, method.ErrorSummaries)
 }
 
 func Get[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
-	aq, err := query.Values(method) //.AsApiParams())
-	if err != nil {
-		return nil, err
-	}
-	dq, err := query.Values(r)
-	if err != nil {
-		return nil, err
-	}
+	return GetQuery[TResp](c, ctx, r, method)
+	// aq, err := query.Values(method) //.AsApiParams())
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// dq, err := query.Values(r)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	u2 := c.BaseUrl()
+	// u2 := c.BaseUrl()
 
-	qu := maps.Clone(u2.Query())
-	maps.Copy(qu, aq)
-	maps.Copy(qu, dq)
+	// qu := maps.Clone(u2.Query())
+	// maps.Copy(qu, aq)
+	// maps.Copy(qu, dq)
 
-	if u2 == nil {
-		return nil, errors.New("base url is nil")
-	}
-	u := new(url.URL)
-	*u = *u2
+	// if u2 == nil {
+	// 	return nil, errors.New("base url is nil")
+	// }
+	// u := new(url.URL)
+	// *u = *u2
 
-	u.RawQuery = qu.Encode()
+	// u.RawQuery = qu.Encode()
 
-	// Only set a timeout if one isn't already set
-	var cancel context.CancelFunc
-	if _, ok := ctx.Deadline(); !ok {
-		ctx, cancel = context.WithTimeout(ctx, defaultTimeout)
-		defer cancel()
-	}
+	// // Only set a timeout if one isn't already set
+	// var cancel context.CancelFunc
+	// if _, ok := ctx.Deadline(); !ok {
+	// 	ctx, cancel = context.WithTimeout(ctx, defaultTimeout)
+	// 	defer cancel()
+	// }
 
-	req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, err
-	}
+	// req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	return Do[TResp](c.Client(), req)
+	// return Do[TResp](c.Client(), req, method.ErrorSummaries)
 }
 
 func download(r io.ReadCloser) (interface{}, error) {
@@ -376,7 +435,7 @@ func download(r io.ReadCloser) (interface{}, error) {
 	}, nil
 }
 
-func Do[T Response](client *retryablehttp.Client, req *retryablehttp.Request) (*T, error) {
+func Do[T Response](client *retryablehttp.Client, req *retryablehttp.Request, errorSummaries ErrorSummaries) (*T, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -386,19 +445,10 @@ func Do[T Response](client *retryablehttp.Client, req *retryablehttp.Request) (*
 		_ = resp.Body.Close()
 	}()
 
-	return handleResponse[T](resp)
+	return handle[T](resp, errorSummaries)
 }
 
-func handle[T Response](resp *http.Response, res *T) error {
-	r, err := handleResponse[T](resp)
-	if err != nil {
-		return err
-	}
-	*res = *r
-	return nil
-}
-
-func handleResponse[T Response](resp *http.Response) (*T, error) {
+func handle[T Response](resp *http.Response, errorSummaries ErrorSummaries) (*T, error) {
 	var synoResponse ApiResponse[T]
 
 	contentType := resp.Header.Get("Content-Type")
@@ -425,7 +475,7 @@ func handleResponse[T Response](resp *http.Response) (*T, error) {
 	if synoResponse.Success {
 		return &synoResponse.Data, nil
 	} else {
-		return nil, handleErrors(synoResponse, GlobalErrors)
+		return nil, handleErrors(synoResponse, errorSummaries)
 	}
 }
 
@@ -434,23 +484,30 @@ func handleErrors[T Response](response ApiResponse[T], knownErrors ErrorSummarie
 		return nil
 	}
 
-	var result error
-
-	if errDesc, ok := knownErrors()[response.Error.Code]; ok {
-		result = multierror.Append(result, fmt.Errorf("api response error code %d: %v", response.Error.Code, errDesc))
-	} else {
-		result = multierror.Append(result, fmt.Errorf("api response error code %d: %v", response.Error.Code, response.Error))
+	if response.Error.Code == 403 {
+		return PermissionDeniedError(response.Error)
 	}
 
-	if response.Error.Errors != nil {
-		for i, err := range response.Error.Errors {
-			if errDesc, ok := knownErrors()[err.Code]; ok {
-				result = multierror.Append(result, fmt.Errorf("api response error[%d] code %d: %v", i, err.Code, errDesc))
+	return response.Error.WithSummaries(knownErrors)
+}
+
+type PermissionDeniedError ApiError
+
+func (e PermissionDeniedError) Error() string {
+	return multierror.Append(fmt.Errorf("Permission denied"), e).Error()
+}
+
+func (e PermissionDeniedError) GetToken() (token string, err error) {
+	if len(e.Errors) > 0 {
+		if f, ok := e.Errors["token"]; ok {
+			if t, ok := f.(string); ok {
+				token = t
 			} else {
-				result = multierror.Append(result, fmt.Errorf("api response error[%d] code %d: %v", i, err.Code, err))
+				err = errors.New("unable to parse token")
 			}
+		} else {
+			err = errors.New("token not found")
 		}
 	}
-
-	return result
+	return
 }

@@ -23,7 +23,11 @@ func newClient(t *testing.T) Api {
 		require.NoError(t, err)
 	}
 
-	if r, err := c.Login(context.Background(), os.Getenv("SYNOLOGY_USER"), os.Getenv("SYNOLOGY_PASSWORD"), os.Getenv("SYNOLOGY_OTP_SECRET")); err != nil {
+	if r, err := c.Login(context.Background(), LoginOptions{
+		Username:  os.Getenv("SYNOLOGY_USER"),
+		Password:  os.Getenv("SYNOLOGY_PASSWORD"),
+		OTPSecret: os.Getenv("SYNOLOGY_OTP_SECRET"),
+	}); err != nil {
 		t.Error(err)
 		require.NoError(t, err)
 	} else {
@@ -32,6 +36,29 @@ func newClient(t *testing.T) Api {
 	}
 
 	return c
+}
+
+func TestLogin(t *testing.T) {
+	c, err := New(Options{
+		Host:       os.Getenv("SYNOLOGY_HOST"),
+		VerifyCert: false,
+	})
+	if err != nil {
+		t.Error(err)
+		require.NoError(t, err)
+	}
+
+	if r, err := c.Login(context.Background(), LoginOptions{
+		Username:  os.Getenv("SYNOLOGY_USER"),
+		Password:  os.Getenv("SYNOLOGY_PASSWORD"),
+		OTPSecret: os.Getenv("SYNOLOGY_OTP_SECRET"),
+	}); err != nil {
+		t.Error(err)
+		require.NoError(t, err)
+	} else {
+		log.Infoln("Login successful")
+		log.Infof("[INFO] Session: %s\nDeviceID: %s", r.SessionID, r.DeviceID)
+	}
 }
 
 func TestMarshalURL(t *testing.T) {
@@ -158,27 +185,14 @@ func TestHandleErrors(t *testing.T) {
 				Success: false,
 				Data:    struct{}{},
 				Error: ApiError{
-					Code: 100,
-					Errors: []ErrorItem{
-						{Code: 101},
-						{Code: 102, Details: ErrorFields{"path": "/some/path", "code": 102, "reason": "a reason"}},
-					},
+					Code:   100,
+					Errors: ErrorFields{"path": "/some/path", "code": 102, "reason": "a reason"},
 				},
 			},
 			expected: ApiError{
 				Code:    100,
 				Summary: "global error 100",
-				Errors: []ErrorItem{
-					{
-						Code:    101,
-						Summary: "global error 101",
-					},
-					{
-						Code:    102,
-						Summary: "global error 102",
-						Details: ErrorFields{"path": "/some/path", "code": 102, "reason": "a reason"},
-					},
-				},
+				Errors:  ErrorFields{"path": "/some/path", "code": 102, "reason": "a reason"},
 			},
 		},
 		{
@@ -187,11 +201,8 @@ func TestHandleErrors(t *testing.T) {
 				Success: false,
 				Data:    struct{}{},
 				Error: ApiError{
-					Code: 100,
-					Errors: []ErrorItem{
-						{Code: 101},
-						{Code: 202, Details: ErrorFields{"code": 202}},
-					},
+					Code:   100,
+					Errors: ErrorFields{"code": 202},
 				},
 			},
 			responseKnownErrors: []ErrorSummary{
@@ -202,17 +213,7 @@ func TestHandleErrors(t *testing.T) {
 			expected: ApiError{
 				Code:    100,
 				Summary: "global error 100",
-				Errors: []ErrorItem{
-					{
-						Code:    101,
-						Summary: "global error 101",
-					},
-					{
-						Code:    202,
-						Summary: "response error 202",
-						Details: ErrorFields{"code": 202},
-					},
-				},
+				Errors:  ErrorFields{"code": 202},
 			},
 		},
 	}

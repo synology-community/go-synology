@@ -383,43 +383,43 @@ func GetQuery[TResp any](c Api, ctx context.Context, r interface{}, method Metho
 }
 
 func Get[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
-	return GetQuery[TResp](c, ctx, r, method)
-	// aq, err := query.Values(method) //.AsApiParams())
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// dq, err := query.Values(r)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	// return GetQuery[TResp](c, ctx, r, method)
+	aq, err := query.Values(method) //.AsApiParams())
+	if err != nil {
+		return nil, err
+	}
+	dq, err := query.Values(r)
+	if err != nil {
+		return nil, err
+	}
 
-	// u2 := c.BaseUrl()
+	u2 := c.BaseUrl()
 
-	// qu := maps.Clone(u2.Query())
-	// maps.Copy(qu, aq)
-	// maps.Copy(qu, dq)
+	qu := maps.Clone(u2.Query())
+	maps.Copy(qu, aq)
+	maps.Copy(qu, dq)
 
-	// if u2 == nil {
-	// 	return nil, errors.New("base url is nil")
-	// }
-	// u := new(url.URL)
-	// *u = *u2
+	if u2 == nil {
+		return nil, errors.New("base url is nil")
+	}
+	u := new(url.URL)
+	*u = *u2
 
-	// u.RawQuery = qu.Encode()
+	u.RawQuery = qu.Encode()
 
-	// // Only set a timeout if one isn't already set
-	// var cancel context.CancelFunc
-	// if _, ok := ctx.Deadline(); !ok {
-	// 	ctx, cancel = context.WithTimeout(ctx, defaultTimeout)
-	// 	defer cancel()
-	// }
+	// Only set a timeout if one isn't already set
+	var cancel context.CancelFunc
+	if _, ok := ctx.Deadline(); !ok {
+		ctx, cancel = context.WithTimeout(ctx, defaultTimeout)
+		defer cancel()
+	}
 
-	// req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
-	// return Do[TResp](c.Client(), req, method.ErrorSummaries)
+	return Do[TResp](c.Client(), req, method.ErrorSummaries)
 }
 
 func download(r io.ReadCloser) (interface{}, error) {

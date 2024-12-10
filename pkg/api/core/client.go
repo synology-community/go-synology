@@ -372,6 +372,72 @@ func (c *Client) RootTaskUpdate(ctx context.Context, req TaskRequest) (*TaskResu
 	return api.Post[TaskResult](c.client, ctx, &req, methods.RootTaskUpdate)
 }
 
+func (c *Client) RootEventCreate(ctx context.Context, req EventRequest) (*EventResult, error) {
+	pwtoken := req.SynoConfirmPWToken
+	if pwtoken == "" {
+		res, err := c.PasswordConfirm(ctx, c.client.Password())
+		if err != nil {
+			return nil, err
+		}
+		pwtoken = res.SynoConfirmPWToken
+	}
+
+	req.SynoConfirmPWToken = pwtoken
+
+	return api.Post[EventResult](c.client, ctx, &req, methods.RootEventCreate)
+}
+
+func (c *Client) RootEventUpdate(ctx context.Context, req EventRequest) (*EventResult, error) {
+	pwtoken := req.SynoConfirmPWToken
+	if pwtoken == "" {
+		res, err := c.PasswordConfirm(ctx, c.client.Password())
+		if err != nil {
+			return nil, err
+		}
+		pwtoken = res.SynoConfirmPWToken
+	}
+
+	req.SynoConfirmPWToken = pwtoken
+
+	return api.Post[EventResult](c.client, ctx, &req, methods.RootEventUpdate)
+}
+
+func (c *Client) RootEventDelete(ctx context.Context, req EventRequest) error {
+	return api.Void(c.client, ctx, &req, methods.RootEventDelete)
+}
+
+func (c *Client) EventCreate(ctx context.Context, req EventRequest) (*EventResult, error) {
+	return api.Post[EventResult](c.client, ctx, &req, methods.EventCreate)
+}
+
+func (c *Client) EventUpdate(ctx context.Context, req EventRequest) (*EventResult, error) {
+	return api.Post[EventResult](c.client, ctx, &req, methods.EventUpdate)
+}
+
+func (c *Client) EventDelete(ctx context.Context, req EventRequest) error {
+	return api.Void(c.client, ctx, &req, methods.EventDelete)
+}
+
+func (c *Client) EventRun(ctx context.Context, name string) error {
+	return api.Void(c.client, ctx, &EventRequest{
+		Name: name,
+	}, methods.EventRun)
+}
+
+func (c *Client) EventGet(ctx context.Context, name string) (*TaskResult, error) {
+	tasks, err := c.TaskList(ctx, ListTaskRequest{})
+	if err != nil {
+		return nil, err
+	}
+	i := slices.IndexFunc(tasks.Tasks, func(t TaskResult) bool {
+		return t.Name == name && t.Type == "event_script"
+	})
+	if i < 0 {
+		return nil, TaskNotFoundError{}
+	}
+	return &tasks.Tasks[i], nil
+}
+
 func (c *Client) TaskCreate(ctx context.Context, req TaskRequest) (*TaskResult, error) {
 	return api.Post[TaskResult](c.client, ctx, &req, methods.TaskCreate)
 }

@@ -41,5 +41,13 @@ type Api interface {
 	TaskGet(ctx context.Context, id int64) (*TaskResult, error)
 	TaskFind(ctx context.Context, name string) (*TaskResult, error)
 
+	EventCreate(ctx context.Context, req EventRequest) (*EventResult, error)
+	EventUpdate(ctx context.Context, req EventRequest) (*EventResult, error)
+	RootEventCreate(ctx context.Context, req EventRequest) (*EventResult, error)
+	RootEventUpdate(ctx context.Context, req EventRequest) (*EventResult, error)
+	EventGet(ctx context.Context, name string) (*TaskResult, error)
+	EventDelete(ctx context.Context, req EventRequest) error
+	EventRun(ctx context.Context, name string) error
+
 	PasswordConfirm(ctx context.Context, password string) (*PasswordConfirmResponse, error)
 }

@@ -18,6 +18,8 @@ const (
 	Core_TaskScheduler          = "SYNO.Core.TaskScheduler"
 	Core_Task_Root              = "SYNO.Core.TaskScheduler.Root"
 	Core_Password_Confirm       = "SYNO.Core.User.PasswordConfirm"
+	Core_Event_Root             = "SYNO.Core.EventScheduler.Root"
+	Core_Event                  = "SYNO.Core.EventScheduler"
 )
 
 var (
@@ -198,6 +200,48 @@ var (
 	RootTaskDelete = api.Method{
 		API:            Core_Task_Root,
 		Version:        4,
+		Method:         api.MethodDelete,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	EventCreate = api.Method{
+		API:            Core_Event,
+		Version:        1,
+		Method:         api.MethodCreate,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	EventUpdate = api.Method{
+		API:            Core_Event,
+		Version:        1,
+		Method:         api.MethodSet,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	EventDelete = api.Method{
+		API:            Core_Event,
+		Version:        1,
+		Method:         api.MethodDelete,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	EventRun = api.Method{
+		API:            Core_Event,
+		Version:        1,
+		Method:         api.MethodRun,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	RootEventCreate = api.Method{
+		API:            Core_Event_Root,
+		Version:        1,
+		Method:         api.MethodCreate,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	RootEventUpdate = api.Method{
+		API:            Core_Event_Root,
+		Version:        1,
+		Method:         api.MethodSet,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	RootEventDelete = api.Method{
+		API:            Core_Event,
+		Version:        1,
 		Method:         api.MethodDelete,
 		ErrorSummaries: api.GlobalErrors,
 	}

@@ -45,9 +45,11 @@ type Api interface {
 	EventUpdate(ctx context.Context, req EventRequest) (*EventResult, error)
 	RootEventCreate(ctx context.Context, req EventRequest) (*EventResult, error)
 	RootEventUpdate(ctx context.Context, req EventRequest) (*EventResult, error)
-	EventGet(ctx context.Context, name string) (*TaskResult, error)
+	EventGet(ctx context.Context, name string) (*EventRequest, error)
 	EventDelete(ctx context.Context, req EventRequest) error
 	EventRun(ctx context.Context, name string) error
+
+	UserList(ctx context.Context) (*UserListResponse, error)
 
 	PasswordConfirm(ctx context.Context, password string) (*PasswordConfirmResponse, error)
 }

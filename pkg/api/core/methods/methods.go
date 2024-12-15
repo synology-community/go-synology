@@ -20,6 +20,7 @@ const (
 	Core_Password_Confirm       = "SYNO.Core.User.PasswordConfirm"
 	Core_Event_Root             = "SYNO.Core.EventScheduler.Root"
 	Core_Event                  = "SYNO.Core.EventScheduler"
+	Core_User                   = "SYNO.Core.User"
 )
 
 var (
@@ -227,6 +228,12 @@ var (
 		Method:         api.MethodRun,
 		ErrorSummaries: api.GlobalErrors,
 	}
+	EventGet = api.Method{
+		API:            Core_Event,
+		Version:        1,
+		Method:         api.MethodGet,
+		ErrorSummaries: api.GlobalErrors,
+	}
 	RootEventCreate = api.Method{
 		API:            Core_Event_Root,
 		Version:        1,
@@ -249,6 +256,12 @@ var (
 		API:            Core_Password_Confirm,
 		Version:        2,
 		Method:         api.MethodAuth,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	UserList = api.Method{
+		API:            Core_User,
+		Version:        1,
+		Method:         api.MethodList,
 		ErrorSummaries: api.GlobalErrors,
 	}
 )

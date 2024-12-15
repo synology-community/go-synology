@@ -424,18 +424,10 @@ func (c *Client) EventRun(ctx context.Context, name string) error {
 	}, methods.EventRun)
 }
 
-func (c *Client) EventGet(ctx context.Context, name string) (*TaskResult, error) {
-	tasks, err := c.TaskList(ctx, ListTaskRequest{})
-	if err != nil {
-		return nil, err
-	}
-	i := slices.IndexFunc(tasks.Tasks, func(t TaskResult) bool {
-		return t.Name == name && t.Type == "event_script"
-	})
-	if i < 0 {
-		return nil, TaskNotFoundError{}
-	}
-	return &tasks.Tasks[i], nil
+func (c *Client) EventGet(ctx context.Context, name string) (*EventRequest, error) {
+	return api.Get[EventRequest](c.client, ctx, &EventRequest{
+		Name: name,
+	}, methods.EventGet)
 }
 
 func (c *Client) TaskCreate(ctx context.Context, req TaskRequest) (*TaskResult, error) {
@@ -472,6 +464,12 @@ func (c *Client) TaskRun(ctx context.Context, ids ...int64) error {
 	return api.Void(c.client, ctx, &TaskRunRequest{
 		Tasks: tasks,
 	}, methods.TaskRun)
+}
+
+func (c *Client) UserList(ctx context.Context) (*UserListResponse, error) {
+	return api.Get[UserListResponse](c.client, ctx, &UserListRequest{
+		Additional: []string{"uid"},
+	}, methods.UserList)
 }
 
 func New(client api.Api) Api {

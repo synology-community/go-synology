@@ -15,7 +15,6 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/hashicorp/go-multierror"
@@ -42,7 +41,7 @@ type Client struct {
 	username string
 	password string
 
-	once sync.Once
+	// once sync.Once
 }
 
 func New(o Options) (Api, error) {

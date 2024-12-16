@@ -104,18 +104,6 @@ func Test_Virtualization_Guest(t *testing.T) {
 	})
 }
 
-func testGuestGet(t *testing.T, v Api, guest Guest) *Guest {
-	g, err := v.GuestGet(context.Background(), guest)
-	require.Nil(t, err)
-	return g
-}
-
-func testGuestCreate(t *testing.T, v Api, guest Guest) *Guest {
-	g, err := v.GuestCreate(context.Background(), guest)
-	require.Nil(t, err)
-	return g
-}
-
 func testGuestDelete(t *testing.T, v Api, guest Guest) {
 	err := v.GuestDelete(context.Background(), guest)
 	require.Nil(t, err)

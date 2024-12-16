@@ -439,7 +439,7 @@ func TestValues_InvalidInput(t *testing.T) {
 	}
 }
 
-// customEncodedStrings is a slice of strings with a custom URL encoding
+// customEncodedStrings is a slice of strings with a custom URL encoding.
 type customEncodedStrings []string
 
 // EncodeValues using key name of the form "{key}.N" where N increments with
@@ -519,10 +519,10 @@ func TestValues_CustomEncoding_Error(t *testing.T) {
 	}
 }
 
-// customEncodedInt is an int with a custom URL encoding
+// customEncodedInt is an int with a custom URL encoding.
 type customEncodedInt int
 
-// EncodeValues encodes values with leading underscores
+// EncodeValues encodes values with leading underscores.
 func (m customEncodedInt) EncodeValues(key string, v *url.Values) error {
 	v.Set(key, fmt.Sprintf("_%d", m))
 	return nil

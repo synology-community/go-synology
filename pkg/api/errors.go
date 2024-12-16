@@ -714,7 +714,7 @@ func (ef ErrorFields) Error() string {
 // Error satisfies error interface for SynologyError type.
 func (se ApiError) Error() string {
 
-	se.underlying = fmt.Errorf(fmt.Sprintf("[%d] %s", se.Code, se.Summary))
+	se.underlying = fmt.Errorf("[%d] %s", se.Code, se.Summary)
 
 	if len(se.Errors) > 0 {
 		se.underlying = multierror.Append(se.underlying, se.Errors)

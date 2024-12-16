@@ -198,11 +198,14 @@ func reflectValue(values url.Values, val reflect.Value, scope string) error {
 				sv = reflect.New(sv.Type().Elem())
 			}
 
-			m := sv.Interface().(Encoder)
-			if err := m.EncodeValues(name, &values); err != nil {
-				return err
+			if m, ok := sv.Interface().(Encoder); ok {
+				if err := m.EncodeValues(name, &values); err != nil {
+					return err
+				}
+				continue
+			} else {
+				return fmt.Errorf("query: Values() expects Encoder interface. Got %v", sv.Type())
 			}
-			continue
 		}
 
 		// recursively dereference pointers. break on nil pointers
@@ -322,20 +325,23 @@ func valueStringInner(v reflect.Value, opts tagOptions, sf reflect.StructField) 
 	}
 
 	if v.Type() == timeType {
-		t := v.Interface().(time.Time)
-		if opts.Contains("unix") {
-			return strconv.FormatInt(t.Unix(), 10)
+		if t, ok := v.Interface().(time.Time); ok {
+			if opts.Contains("unix") {
+				return strconv.FormatInt(t.Unix(), 10)
+			}
+			if opts.Contains("unixmilli") {
+				return strconv.FormatInt((t.UnixNano() / 1e6), 10)
+			}
+			if opts.Contains("unixnano") {
+				return strconv.FormatInt(t.UnixNano(), 10)
+			}
+			if layout := sf.Tag.Get("layout"); layout != "" {
+				return t.Format(layout)
+			}
+			return t.Format(time.RFC3339)
+		} else {
+			return ""
 		}
-		if opts.Contains("unixmilli") {
-			return strconv.FormatInt((t.UnixNano() / 1e6), 10)
-		}
-		if opts.Contains("unixnano") {
-			return strconv.FormatInt(t.UnixNano(), 10)
-		}
-		if layout := sf.Tag.Get("layout"); layout != "" {
-			return t.Format(layout)
-		}
-		return t.Format(time.RFC3339)
 	}
 
 	return fmt.Sprint(v.Interface())

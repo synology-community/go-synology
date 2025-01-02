@@ -29,7 +29,7 @@ const (
 	API_BASE = "/webapi/entry.cgi"
 )
 
-var defaultTimeout = 15 * time.Second
+var defaultTimeout = 30 * time.Second
 
 type Client struct {
 	httpClient *retryablehttp.Client

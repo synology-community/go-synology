@@ -487,7 +487,17 @@ func handleErrors[T Response](response ApiResponse[T], knownErrors ErrorSummarie
 		return PermissionDeniedError(response.Error)
 	}
 
+	if response.Error.Code == 404 {
+		return NotFoundError(response.Error)
+	}
+
 	return response.Error.WithSummaries(knownErrors)
+}
+
+type NotFoundError ApiError
+
+func (e NotFoundError) Error() string {
+	return multierror.Append(fmt.Errorf("Not found"), e).Error()
 }
 
 type PermissionDeniedError ApiError

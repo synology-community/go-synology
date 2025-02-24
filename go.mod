@@ -3,7 +3,7 @@ module github.com/synology-community/go-synology
 go 1.22.4
 
 require (
-	github.com/google/go-cmp v0.6.0
+	github.com/google/go-cmp v0.7.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/ory/dockertest/v3 v3.11.0

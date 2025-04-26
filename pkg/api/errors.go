@@ -670,7 +670,7 @@ type ApiError struct {
 type ErrorSummary map[int]string
 
 // ErrorFields defines extra fields for particular detailed error.
-type ErrorFields map[string]interface{}
+type ErrorFields map[string]any
 
 func (ef ErrorFields) WithSummaries(knownErrors ErrorSummaries) error {
 	var err error

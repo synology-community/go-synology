@@ -128,7 +128,7 @@ type Encoder interface {
 //
 // Multiple fields that encode to the same URL parameter name will be included
 // as multiple URL values of the same name.
-func Values(v interface{}) (url.Values, error) {
+func Values(v any) (url.Values, error) {
 	values := make(url.Values)
 	val := reflect.ValueOf(v)
 	for val.Kind() == reflect.Ptr {

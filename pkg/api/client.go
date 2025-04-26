@@ -224,7 +224,7 @@ func PostFileUpload[TResp Response](c Api, ctx context.Context, name string, con
 	return Do[TResp](c.Client(), req, method.ErrorSummaries)
 }
 
-func mergeQueries(qs ...interface{}) (url.Values, error) {
+func mergeQueries(qs ...any) (url.Values, error) {
 	res := map[string][]string{}
 	for _, q := range qs {
 		qq, err := query.Values(q)
@@ -236,12 +236,12 @@ func mergeQueries(qs ...interface{}) (url.Values, error) {
 	return res, nil
 }
 
-func getQuery(c Api, p ...interface{}) (string, error) {
+func getQuery(c Api, p ...any) (string, error) {
 	if c.BaseUrl() == nil {
 		return "", errors.New("base url is nil")
 	}
 
-	ps := make([]interface{}, 0, len(p)+1)
+	ps := make([]any, 0, len(p)+1)
 	ps = append(ps, c.BaseUrl().Query())
 	ps = append(ps, p...)
 
@@ -346,7 +346,7 @@ func Post[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, met
 	return Do[TResp](c.Client(), req, method.ErrorSummaries)
 }
 
-func GetQuery[TResp any](c Api, ctx context.Context, r interface{}, method Method) (*TResp, error) {
+func GetQuery[TResp any](c Api, ctx context.Context, r any, method Method) (*TResp, error) {
 	aq, err := query.Values(method) //.AsApiParams())
 	if err != nil {
 		return nil, err
@@ -421,7 +421,7 @@ func Get[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, meth
 	return Do[TResp](c.Client(), req, method.ErrorSummaries)
 }
 
-func download(r io.ReadCloser) (interface{}, error) {
+func download(r io.ReadCloser) (any, error) {
 	var buf bytes.Buffer
 	_, err := io.Copy(&buf, r)
 	if err != nil {

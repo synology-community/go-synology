@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func EncodeValues(s interface{}, k string, v *url.Values) error {
+func EncodeValues(s any, k string, v *url.Values) error {
 
 	encoded, err := json.Marshal(s)
 	if err != nil {
@@ -17,7 +17,7 @@ func EncodeValues(s interface{}, k string, v *url.Values) error {
 	return nil
 }
 
-func EncodeValuesWrap(s interface{}, k string, v *url.Values) error {
+func EncodeValuesWrap(s any, k string, v *url.Values) error {
 
 	encoded, err := json.Marshal(s)
 	if err != nil {

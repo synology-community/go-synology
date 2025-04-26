@@ -12,7 +12,7 @@ import (
 )
 
 // test that Values(input) matches want.  If not, report an error on t.
-func testValue(t *testing.T, input interface{}, want url.Values) {
+func testValue(t *testing.T, input any, want url.Values) {
 	v, err := Values(input)
 	if err != nil {
 		t.Errorf("Values(%q) returned error: %v", input, err)
@@ -24,7 +24,7 @@ func testValue(t *testing.T, input interface{}, want url.Values) {
 
 func TestValues_BasicTypes(t *testing.T) {
 	tests := []struct {
-		input interface{}
+		input any
 		want  url.Values
 	}{
 		// zero values
@@ -98,7 +98,7 @@ func TestValues_Pointers(t *testing.T) {
 	strPtr := &str
 
 	tests := []struct {
-		input interface{}
+		input any
 		want  url.Values
 	}{
 		// nil pointers (zero values)
@@ -131,7 +131,7 @@ func TestValues_Pointers(t *testing.T) {
 
 func TestValues_Slices(t *testing.T) {
 	tests := []struct {
-		input interface{}
+		input any
 		want  url.Values
 	}{
 		// slices of strings
@@ -292,7 +292,7 @@ func TestValues_NestedTypes(t *testing.T) {
 	}
 
 	tests := []struct {
-		input interface{}
+		input any
 		want  url.Values
 	}{
 		{
@@ -341,7 +341,7 @@ func TestValues_OmitEmpty(t *testing.T) {
 	str := ""
 
 	tests := []struct {
-		input interface{}
+		input any
 		want  url.Values
 	}{
 		{struct{ v string }{}, url.Values{}}, // non-exported field
@@ -400,7 +400,7 @@ func TestValues_EmbeddedStructs(t *testing.T) {
 	}
 
 	tests := []struct {
-		input interface{}
+		input any
 		want  url.Values
 	}{
 		{
@@ -456,7 +456,7 @@ func (m customEncodedStrings) EncodeValues(key string, v *url.Values) error {
 
 func TestValues_CustomEncodingSlice(t *testing.T) {
 	tests := []struct {
-		input interface{}
+		input any
 		want  url.Values
 	}{
 		{
@@ -499,7 +499,7 @@ func TestValues_CustomEncoding_Error(t *testing.T) {
 		V customEncodedStrings
 	}
 	tests := []struct {
-		input interface{}
+		input any
 	}{
 		{
 			st{[]string{"err"}},
@@ -532,7 +532,7 @@ func TestValues_CustomEncodingInt(t *testing.T) {
 	var zero customEncodedInt = 0
 	var one customEncodedInt = 1
 	tests := []struct {
-		input interface{}
+		input any
 		want  url.Values
 	}{
 		{
@@ -607,7 +607,7 @@ func TestValues_CustomEncodingPointer(t *testing.T) {
 	var zero customEncodedIntPtr = 0
 	var one customEncodedIntPtr = 1
 	tests := []struct {
-		input interface{}
+		input any
 		want  url.Values
 	}{
 		// non-pointer values do not get the custom encoding because
@@ -672,7 +672,7 @@ func TestValues_CustomEncodingPointer(t *testing.T) {
 func TestIsEmptyValue(t *testing.T) {
 	str := "string"
 	tests := []struct {
-		value interface{}
+		value any
 		empty bool
 	}{
 		// slices, arrays, and maps

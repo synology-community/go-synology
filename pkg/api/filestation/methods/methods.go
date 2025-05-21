@@ -70,13 +70,13 @@ var (
 	MD5Start = api.Method{
 		API:            "SYNO.FileStation.MD5",
 		Version:        2,
-		Method:         api.MethodStatus,
+		Method:         api.MethodStart,
 		ErrorSummaries: CommonErrors,
 	}
 	MD5Status = api.Method{
 		API:            "SYNO.FileStation.MD5",
 		Version:        2,
-		Method:         "status",
+		Method:         api.MethodStatus,
 		ErrorSummaries: CommonErrors,
 	}
 	BackgroundTask = api.Method{

@@ -83,15 +83,30 @@ func (f *Client) DeleteStatus(ctx context.Context, taskID string) (*DeleteStatus
 }
 
 func (f *Client) MD5(ctx context.Context, path string) (*MD5StatusResponse, error) {
+	deadline, ok := ctx.Deadline()
+	if !ok {
+		deadline = time.Now().Add(60 * time.Second)
+	}
+
 	rmd5, err := f.MD5Start(ctx, path)
-
-	time.Sleep(5000 * time.Millisecond)
-
 	if err != nil {
 		return nil, fmt.Errorf("unable to get file md5, got error: %s", err)
 	}
 
-	return f.MD5Status(ctx, rmd5.TaskID)
+	delay := 1 * time.Second
+	for {
+		task, err := f.MD5Status(ctx, rmd5.TaskID)
+		if err != nil && task == nil {
+			return nil, err
+		}
+		if task.Finished {
+			return task, nil
+		}
+		if time.Now().After(deadline.Add(delay)) {
+			return nil, fmt.Errorf("timeout waiting for task to complete")
+		}
+		time.Sleep(delay)
+	}
 }
 
 func (f *Client) MD5Start(ctx context.Context, path string) (*MD5StartResponse, error) {

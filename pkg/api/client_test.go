@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	log "github.com/sirupsen/logrus"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/synology-community/go-synology/pkg/util"
@@ -64,7 +63,7 @@ func TestLogin(t *testing.T) {
 func TestMarshalURL(t *testing.T) {
 	type embeddedStruct struct {
 		EmbeddedString string `form:"embedded_string" url:"embedded_string"`
-		EmbeddedInt    int    `form:"embedded_int" url:"embedded_int"`
+		EmbeddedInt    int    `form:"embedded_int"    url:"embedded_int"`
 	}
 
 	testCases := []struct {

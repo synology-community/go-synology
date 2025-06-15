@@ -26,7 +26,12 @@ func readFile(path string) (string, error) {
 }
 
 // ImageUploadAndCreate implements Api.
-func (v *Client) ImageUploadAndCreate(ctx context.Context, file form.File, imageRepos []string, imageType string) (*Task, error) {
+func (v *Client) ImageUploadAndCreate(
+	ctx context.Context,
+	file form.File,
+	imageRepos []string,
+	imageType string,
+) (*Task, error) {
 	name := strings.TrimSuffix(path.Base(file.Name), path.Ext(file.Name))
 
 	resp, err := api.PostFileWithQuery[TaskRef](v.client, ctx, &UploadAndCreateRequest{
@@ -37,7 +42,6 @@ func (v *Client) ImageUploadAndCreate(ctx context.Context, file form.File, image
 		GetPatchBy: "upload",
 		File:       file,
 	}, methods.ImageUploadAndCreate)
-
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +72,6 @@ func (v *Client) StorageList(ctx context.Context) (*StorageList, error) {
 // ImageCreate implements VirtualizationAPI.
 func (v *Client) ImageCreate(ctx context.Context, image Image) (*Task, error) {
 	resp, err := api.Post[TaskRef](v.client, ctx, &image, methods.ImageCreate)
-
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +95,6 @@ func (v *Client) ImageList(ctx context.Context) (*ImageList, error) {
 
 // TaskGet implements VirtualizationAPI.
 func (v *Client) TaskGet(ctx context.Context, taskID string) (*Task, error) {
-
 	deadline, ok := ctx.Deadline()
 	if !ok {
 		deadline = time.Now().Add(60 * time.Second)

@@ -23,14 +23,14 @@ type TaskSchedule struct {
 }
 
 type TaskRequest struct {
-	Name               string       `url:"name" json:"name,omitempty"`
-	RealOwner          string       `url:"real_owner" json:"real_owner,omitempty"`
-	Owner              string       `url:"owner" json:"owner,omitempty"`
-	Schedule           TaskSchedule `url:"schedule,json,omitempty" json:"schedule,omitempty"`
-	Extra              TaskExtra    `url:"extra,json,omitempty" json:"extra,omitempty"`
-	Type               string       `url:"type,omitempty" json:"type,omitempty"`
-	Enable             bool         `url:"enable,omitempty" json:"enable,omitempty"`
-	ID                 *int64       `url:"id,omitempty" json:"id,omitempty"`
+	Name               string       `url:"name"                         json:"name,omitempty"`
+	RealOwner          string       `url:"real_owner"                   json:"real_owner,omitempty"`
+	Owner              string       `url:"owner"                        json:"owner,omitempty"`
+	Schedule           TaskSchedule `url:"schedule,json,omitempty"      json:"schedule,omitempty"`
+	Extra              TaskExtra    `url:"extra,json,omitempty"         json:"extra,omitempty"`
+	Type               string       `url:"type,omitempty"               json:"type,omitempty"`
+	Enable             bool         `url:"enable,omitempty"             json:"enable,omitempty"`
+	ID                 *int64       `url:"id,omitempty"                 json:"id,omitempty"`
 	SynoConfirmPWToken string       `url:"SynoConfirmPWToken,omitempty" json:"SynoConfirmPWToken,omitempty"`
 }
 

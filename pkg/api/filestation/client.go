@@ -33,8 +33,17 @@ func (e FileNotFoundError) Error() string {
 func (f *Client) List(ctx context.Context, folderPath string) (*models.FileList, error) {
 	return api.Get[models.FileList](f.client, ctx, &models.FileListRequest{
 		FolderPath: folderPath,
-		Additional: []string{"real_path", "size", "owner", "time", "perm", "mount_point_type", "type", "fileid"},
-		FileType:   "all",
+		Additional: []string{
+			"real_path",
+			"size",
+			"owner",
+			"time",
+			"perm",
+			"mount_point_type",
+			"type",
+			"fileid",
+		},
+		FileType: "all",
 	}, methods.List)
 }
 
@@ -59,7 +68,11 @@ func (f *Client) Get(ctx context.Context, path string) (*models.File, error) {
 	return &resp.Files[i], nil
 }
 
-func (f *Client) Delete(ctx context.Context, paths []string, accurateProgress bool) (*DeleteStatusResponse, error) {
+func (f *Client) Delete(
+	ctx context.Context,
+	paths []string,
+	accurateProgress bool,
+) (*DeleteStatusResponse, error) {
 	// Start Delete the file
 	rdel, err := f.DeleteStart(ctx, paths, true)
 	if err != nil {
@@ -68,7 +81,11 @@ func (f *Client) Delete(ctx context.Context, paths []string, accurateProgress bo
 	return f.DeleteStatus(ctx, rdel.TaskID)
 }
 
-func (f *Client) DeleteStart(ctx context.Context, paths []string, accurateProgress bool) (*DeleteStartResponse, error) {
+func (f *Client) DeleteStart(
+	ctx context.Context,
+	paths []string,
+	accurateProgress bool,
+) (*DeleteStartResponse, error) {
 	method := methods.DeleteStart
 	return api.Get[DeleteStartResponse](f.client, ctx, &DeleteStartRequest{
 		Paths:            paths,
@@ -130,7 +147,12 @@ func (f *Client) Download(ctx context.Context, path string, mode string) (*form.
 }
 
 // Rename implements FileStationApi.
-func (f *Client) Rename(ctx context.Context, path string, name string, newName string) (*models.FileList, error) {
+func (f *Client) Rename(
+	ctx context.Context,
+	path string,
+	name string,
+	newName string,
+) (*models.FileList, error) {
 	return api.Get[models.FileList](f.client, ctx, &RenameRequest{
 		Path:    path,
 		Name:    name,
@@ -139,7 +161,12 @@ func (f *Client) Rename(ctx context.Context, path string, name string, newName s
 }
 
 // CreateFolder implements FileStationApi.
-func (f *Client) CreateFolder(ctx context.Context, paths []string, names []string, forceParent bool) (*models.FolderList, error) {
+func (f *Client) CreateFolder(
+	ctx context.Context,
+	paths []string,
+	names []string,
+	forceParent bool,
+) (*models.FolderList, error) {
 	return api.Get[models.FolderList](f.client, ctx, &CreateFolderRequest{
 		Paths:       paths,
 		Names:       names,
@@ -153,7 +180,13 @@ func (f *Client) ListShares(ctx context.Context) (*models.ShareList, error) {
 }
 
 // Upload implements FileStationApi.
-func (f *Client) Upload(ctx context.Context, path string, file form.File, createParents bool, overwrite bool) (*UploadResponse, error) {
+func (f *Client) Upload(
+	ctx context.Context,
+	path string,
+	file form.File,
+	createParents bool,
+	overwrite bool,
+) (*UploadResponse, error) {
 	return api.PostFile[UploadResponse](f.client, ctx, &UploadRequest{
 		Path:          path,
 		File:          file,

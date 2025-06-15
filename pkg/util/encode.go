@@ -7,7 +7,6 @@ import (
 )
 
 func EncodeValues(s any, k string, v *url.Values) error {
-
 	encoded, err := json.Marshal(s)
 	if err != nil {
 		return err
@@ -18,7 +17,6 @@ func EncodeValues(s any, k string, v *url.Values) error {
 }
 
 func EncodeValuesWrap(s any, k string, v *url.Values) error {
-
 	encoded, err := json.Marshal(s)
 	if err != nil {
 		return err

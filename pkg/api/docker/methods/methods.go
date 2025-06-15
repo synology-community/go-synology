@@ -124,4 +124,22 @@ var (
 		Method:         api.MethodCreate,
 		ErrorSummaries: CommonErrors,
 	}
+	NetworkList = api.Method{
+		API:            API_DockerNetwork,
+		Version:        1,
+		Method:         api.MethodList,
+		ErrorSummaries: CommonErrors,
+	}
+	NetworkDelete = api.Method{
+		API:            API_DockerNetwork,
+		Version:        1,
+		Method:         api.MethodDelete,
+		ErrorSummaries: CommonErrors,
+	}
+	NetworkGet = api.Method{
+		API:            API_DockerNetwork,
+		Version:        1,
+		Method:         api.MethodGet,
+		ErrorSummaries: CommonErrors,
+	}
 )

@@ -52,7 +52,7 @@ func MarshalCollection(r any, add func(string, string)) error {
 		if tags, ok := vT.Field(i).Tag.Lookup("form"); ok {
 			synologyTags = strings.Split(tags, ",")
 		}
-		if !(vT.Field(i).IsExported() || vT.Field(i).Anonymous || len(synologyTags) > 0) {
+		if !vT.Field(i).IsExported() && !vT.Field(i).Anonymous && len(synologyTags) <= 0 {
 			continue
 		}
 		if len(synologyTags) > 0 {

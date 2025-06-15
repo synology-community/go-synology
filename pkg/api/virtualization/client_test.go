@@ -15,7 +15,6 @@ func newClient(t *testing.T) Api {
 	c, err := api.New(api.Options{
 		Host: os.Getenv("SYNOLOGY_HOST"),
 	})
-
 	if err != nil {
 		t.Error(err)
 		require.NoError(t, err)
@@ -86,7 +85,6 @@ func Test_Virtualization_Guest(t *testing.T) {
 	}
 
 	g, err := v.GuestGet(context.Background(), guest)
-
 	if err != nil {
 		g, err = v.GuestCreate(context.Background(), guest)
 
@@ -120,7 +118,13 @@ func testImageCreate(t *testing.T, v Api, image Image) {
 	require.NotNil(t, got, "ImageCreate: TaskRef is nil")
 }
 
-func testImageUploadAndCreate(t *testing.T, v Api, file form.File, imageRepos []string, imageType string) {
+func testImageUploadAndCreate(
+	t *testing.T,
+	v Api,
+	file form.File,
+	imageRepos []string,
+	imageType string,
+) {
 	got, err := v.ImageUploadAndCreate(context.Background(), file, imageRepos, imageType)
 	require.Nil(t, err)
 	require.NotNil(t, got, "ImageUploadAndCreate: TaskRef is nil")
@@ -349,7 +353,14 @@ func Test_Client_StorageList(t *testing.T) {
 				t.Errorf("Client.StorageList() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			require.Equal(t, len(got.Storages), len(tt.want.Storages), "Client.StorageList() = %v, want %v", got, tt.want)
+			require.Equal(
+				t,
+				len(got.Storages),
+				len(tt.want.Storages),
+				"Client.StorageList() = %v, want %v",
+				got,
+				tt.want,
+			)
 		})
 	}
 }

@@ -8,7 +8,7 @@ import (
 
 type ImagePullStartRequest struct {
 	Repository string `form:"repository" url:"repository,quoted"`
-	Tag        string `form:"tag" url:"tag,quoted"`
+	Tag        string `form:"tag"        url:"tag,quoted"`
 }
 
 type ImagePullStartResponse struct {

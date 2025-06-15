@@ -17,7 +17,6 @@ func newClient(t *testing.T) Api {
 	c, err := api.New(api.Options{
 		Host: os.Getenv("SYNOLOGY_HOST"),
 	})
-
 	if err != nil {
 		t.Error(err)
 		require.NoError(t, err)
@@ -65,9 +64,10 @@ func TestClient_PackageSettingGet(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
-			setting, err := tt.fields.client.PackageSettingGet(tt.args.ctx, PackageSettingGetRequest{})
-
+			setting, err := tt.fields.client.PackageSettingGet(
+				tt.args.ctx,
+				PackageSettingGetRequest{},
+			)
 			if err != nil {
 				t.Errorf("Client.PackageFind() error = %v", err)
 				return
@@ -121,7 +121,6 @@ func TestClient_PackageInstall(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			pkg, err := tt.fields.client.PackageFind(tt.args.ctx, tt.args.packageName)
 			if err != nil {
 				t.Errorf("Client.PackageFind() error = %v", err)
@@ -139,17 +138,19 @@ func TestClient_PackageInstall(t *testing.T) {
 				}
 			}
 
-			err = tt.fields.client.PackageInstallCompound(tt.args.ctx, PackageInstallCompoundRequest{
-				Name: tt.args.packageName,
-				URL:  pkg.Link,
-				Size: size,
-			})
+			err = tt.fields.client.PackageInstallCompound(
+				tt.args.ctx,
+				PackageInstallCompoundRequest{
+					Name: tt.args.packageName,
+					URL:  pkg.Link,
+					Size: size,
+				},
+			)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.PackageInstall() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-
 		})
 	}
 }

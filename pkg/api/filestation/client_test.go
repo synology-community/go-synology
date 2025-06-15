@@ -1,30 +1,25 @@
 package filestation
 
 import (
+	"context"
 	"fmt"
 	"log"
-	"time"
-
-	"context"
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
+	"github.com/ory/dockertest/v3"
+	"github.com/ory/dockertest/v3/docker"
 	"github.com/stretchr/testify/require"
 	"github.com/synology-community/go-synology/pkg/api"
 	"github.com/synology-community/go-synology/pkg/models"
 	"github.com/synology-community/go-synology/pkg/util/form"
-
-	"github.com/ory/dockertest/v3"
-	"github.com/ory/dockertest/v3/docker"
 )
 
 func TestMain(m *testing.M) {
 	useDocker := os.Getenv("USE_DOCKER")
-	enableDocker := false
-	if useDocker != "" {
-		enableDocker = true
-	}
+	enableDocker := useDocker != ""
 
 	if enableDocker {
 		// uses a sensible default on windows (tcp/http) and linux/osx (socket)
@@ -63,10 +58,12 @@ func TestMain(m *testing.M) {
 			if err := pool.Purge(resource); err != nil {
 				log.Fatalf("Could not purge resource: %s", err)
 			}
-
 		}()
 
-		err = os.Setenv("SYNOLOGY_HOST", fmt.Sprintf("https://localhost:%s", resource.GetPort("5001/tcp")))
+		err = os.Setenv(
+			"SYNOLOGY_HOST",
+			fmt.Sprintf("https://localhost:%s", resource.GetPort("5001/tcp")),
+		)
 		if err != nil {
 			log.Fatalf("Could not set environment variable: %s", err)
 		}
@@ -89,7 +86,6 @@ func TestMain(m *testing.M) {
 				Host:       os.Getenv("SYNOLOGY_HOST"),
 				VerifyCert: false,
 			})
-
 			if err != nil {
 				log.Fatalf("Could not create client: %s", err)
 				return err
@@ -114,7 +110,6 @@ func newClient(t *testing.T) Api {
 	c, err := api.New(api.Options{
 		Host: os.Getenv("SYNOLOGY_HOST"),
 	})
-
 	if err != nil {
 		t.Error(err)
 		require.NoError(t, err)
@@ -231,7 +226,11 @@ func Test_Client_DeleteStart(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.fields.client.DeleteStart(tt.args.ctx, tt.args.paths, tt.args.accurateProgress)
+			got, err := tt.fields.client.DeleteStart(
+				tt.args.ctx,
+				tt.args.paths,
+				tt.args.accurateProgress,
+			)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.DeleteStart() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -409,7 +408,12 @@ func Test_Client_Rename(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.fields.client.Rename(tt.args.ctx, tt.args.path, tt.args.name, tt.args.newName)
+			got, err := tt.fields.client.Rename(
+				tt.args.ctx,
+				tt.args.path,
+				tt.args.name,
+				tt.args.newName,
+			)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.Rename() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -442,7 +446,12 @@ func Test_Client_CreateFolder(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.fields.client.CreateFolder(tt.args.ctx, tt.args.paths, tt.args.names, tt.args.forceParent)
+			got, err := tt.fields.client.CreateFolder(
+				tt.args.ctx,
+				tt.args.paths,
+				tt.args.names,
+				tt.args.forceParent,
+			)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.CreateFolder() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -557,7 +566,13 @@ func Test_Client_Upload(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.fields.client.Upload(tt.args.ctx, tt.args.path, tt.args.file, tt.args.createParents, tt.args.overwrite)
+			got, err := tt.fields.client.Upload(
+				tt.args.ctx,
+				tt.args.path,
+				tt.args.file,
+				tt.args.createParents,
+				tt.args.overwrite,
+			)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.Upload() error = %v, wantErr %v", err, tt.wantErr)
 				return

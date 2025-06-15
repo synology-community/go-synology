@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
-
 	"github.com/synology-community/go-synology/pkg/query"
 	"github.com/synology-community/go-synology/pkg/util"
 )
@@ -21,8 +20,8 @@ type EncodeRequest interface {
 
 type ApiParams struct {
 	Version int    `form:"version" query:"version"`
-	API     string `form:"api" query:"version"`
-	Method  string `form:"method" query:"version"`
+	API     string `form:"api"     query:"version"`
+	Method  string `form:"method"  query:"version"`
 }
 
 type ApiRequest[TRequest Request] struct {
@@ -62,7 +61,9 @@ func (b *ApiRequestBuilder[TRequest]) Build() ApiRequest[TRequest] {
 	}
 }
 
-func (b *ApiRequestBuilder[TRequest]) With(callback func(base *ApiParams, params *TRequest)) *ApiRequestBuilder[TRequest] {
+func (b *ApiRequestBuilder[TRequest]) With(
+	callback func(base *ApiParams, params *TRequest),
+) *ApiRequestBuilder[TRequest] {
 	callback(&b.baseRequest, &b.paramRequest)
 	return b
 }
@@ -116,7 +117,12 @@ func RequestBuilder[TRequest Request](params TRequest) *ApiRequestBuilder[TReque
 	return b
 }
 
-func CreateRequest[TRequest Request](version int, apiName string, apiMethod string, request TRequest) ApiRequest[TRequest] {
+func CreateRequest[TRequest Request](
+	version int,
+	apiName string,
+	apiMethod string,
+	request TRequest,
+) ApiRequest[TRequest] {
 	b := RequestBuilder(request)
 	return b.WithVersion(version).WithAPIName(apiName).WithAPIMethod(apiMethod).Build()
 }

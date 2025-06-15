@@ -12,14 +12,15 @@ import (
 )
 
 func IsClientMethod(caller string) (bool, string, error) {
-
 	re1 := regexp.MustCompile(`\.\(\*\w+Client\)\.[\w\.]+$`)
 
 	if !re1.MatchString(caller) {
 		return false, "", nil
 	}
 
-	re := regexp.MustCompile(`(?:package\.\(\*)(?P<Package>\w+)(?:Client[\)\.]{2})(?P<Method>[\w\.]+)$`)
+	re := regexp.MustCompile(
+		`(?:package\.\(\*)(?P<Package>\w+)(?:Client[\)\.]{2})(?P<Method>[\w\.]+)$`,
+	)
 
 	matches := re.FindStringSubmatch(caller)
 
@@ -107,7 +108,9 @@ func Sanitize(ctx context.Context, caller string) (string, error) {
 
 	// log.Infof("[INFO] Caller Basename: %s\n", name)
 
-	re := regexp.MustCompile(`(?:package\.\(\*)(?P<Package>\w+)(?:Client[\)\.]{2})(?P<Method>[\w\.]+)`)
+	re := regexp.MustCompile(
+		`(?:package\.\(\*)(?P<Package>\w+)(?:Client[\)\.]{2})(?P<Method>[\w\.]+)`,
+	)
 
 	if !re.MatchString(name) {
 		return caller, nil

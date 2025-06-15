@@ -151,7 +151,10 @@ func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginRespons
 			req.Password = tmpToken
 			resp, err = Get[LoginResponse](c, ctx, &req, Login)
 			if err != nil {
-				return nil, multierror.Append(err, fmt.Errorf("unable to login with token: %v", tmpToken))
+				return nil, multierror.Append(
+					err,
+					fmt.Errorf("unable to login with token: %v", tmpToken),
+				)
 			} else {
 				if resp.Token != "" {
 					token = resp.Token
@@ -191,7 +194,13 @@ func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginRespons
 	}
 }
 
-func PostFileUpload[TResp Response](c Api, ctx context.Context, name string, content string, method Method) (*TResp, error) {
+func PostFileUpload[TResp Response](
+	c Api,
+	ctx context.Context,
+	name string,
+	content string,
+	method Method,
+) (*TResp, error) {
 	buf := new(bytes.Buffer)
 	w := multipart.NewWriter(buf)
 	defer w.Close()
@@ -203,13 +212,11 @@ func PostFileUpload[TResp Response](c Api, ctx context.Context, name string, con
 	if fw, err := w.CreateFormFile("file", name); err != nil {
 		return nil, err
 	} else {
-
 		if size, err := io.Copy(fw, fileReader); err != nil {
 			return nil, err
 		} else {
 			fs = size
 		}
-
 	}
 
 	u := c.BaseUrl()
@@ -253,7 +260,12 @@ func getQuery(c Api, p ...any) (string, error) {
 	return q.Encode(), nil
 }
 
-func PostFileWithQuery[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
+func PostFileWithQuery[TResp Response, TReq Request](
+	c Api,
+	ctx context.Context,
+	r *TReq,
+	method Method,
+) (*TResp, error) {
 	q, err := getQuery(c, method, r)
 	if err != nil {
 		return nil, err
@@ -264,11 +276,21 @@ func PostFileWithQuery[TResp Response, TReq Request](c Api, ctx context.Context,
 	return postFile[TResp](c.Client(), ctx, u.String(), r)
 }
 
-func PostFile[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
+func PostFile[TResp Response, TReq Request](
+	c Api,
+	ctx context.Context,
+	r *TReq,
+	method Method,
+) (*TResp, error) {
 	return postFile[TResp](c.Client(), ctx, c.BaseUrl().String(), method, r)
 }
 
-func postFile[TResp Response](c *retryablehttp.Client, ctx context.Context, url string, input ...any) (*TResp, error) {
+func postFile[TResp Response](
+	c *retryablehttp.Client,
+	ctx context.Context,
+	url string,
+	input ...any,
+) (*TResp, error) {
 	var errorSummaries ErrorSummaries
 
 	if method, ok := input[0].(Method); !ok {
@@ -312,11 +334,21 @@ func Void[TReq Request](c Api, ctx context.Context, r *TReq, method Method) erro
 	return err
 }
 
-func GetEncode[TResp Response, TReq EncodeRequest](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
+func GetEncode[TResp Response, TReq EncodeRequest](
+	c Api,
+	ctx context.Context,
+	r *TReq,
+	method Method,
+) (*TResp, error) {
 	return Get[TResp](c, ctx, r, method)
 }
 
-func Post[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
+func Post[TResp Response, TReq Request](
+	c Api,
+	ctx context.Context,
+	r *TReq,
+	method Method,
+) (*TResp, error) {
 	qu, err := util.Query(method, r, c.Credentials())
 	if err != nil {
 		return nil, err
@@ -332,8 +364,12 @@ func Post[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, met
 		defer cancel()
 	}
 
-	req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodPost, u.String(), strings.NewReader(qu.Encode()))
-
+	req, err := retryablehttp.NewRequestWithContext(
+		ctx,
+		http.MethodPost,
+		u.String(),
+		strings.NewReader(qu.Encode()),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -381,7 +417,12 @@ func GetQuery[TResp any](c Api, ctx context.Context, r any, method Method) (*TRe
 	return Do[TResp](c.Client(), req, method.ErrorSummaries)
 }
 
-func Get[TResp Response, TReq Request](c Api, ctx context.Context, r *TReq, method Method) (*TResp, error) {
+func Get[TResp Response, TReq Request](
+	c Api,
+	ctx context.Context,
+	r *TReq,
+	method Method,
+) (*TResp, error) {
 	// return GetQuery[TResp](c, ctx, r, method)
 	aq, err := query.Values(method) //.AsApiParams())
 	if err != nil {
@@ -434,7 +475,11 @@ func download(r io.ReadCloser) (any, error) {
 	}, nil
 }
 
-func Do[T Response](client *retryablehttp.Client, req *retryablehttp.Request, errorSummaries ErrorSummaries) (*T, error) {
+func Do[T Response](
+	client *retryablehttp.Client,
+	req *retryablehttp.Request,
+	errorSummaries ErrorSummaries,
+) (*T, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err

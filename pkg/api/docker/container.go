@@ -57,7 +57,7 @@ func (s Container) EncodeValues(k string, v *url.Values) error {
 }
 
 type CreateContainerRequest struct {
-	Container      Container `json:"profile,omitempty" url:"profile"`
+	Container      Container `json:"profile,omitempty"          url:"profile"`
 	IsRunInstantly bool      `json:"is_run_instantly,omitempty" url:"is_run_instantly"`
 }
 

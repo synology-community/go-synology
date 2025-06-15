@@ -12,7 +12,7 @@ import (
 )
 
 type File struct {
-	Name    string `form:"name" url:"name"`
+	Name    string `form:"name"    url:"name"`
 	Content string `form:"content" url:"content"`
 }
 
@@ -57,7 +57,10 @@ func Marshal(b *bytes.Buffer, input ...any) (*multipart.Writer, int64, error) {
 			v = reflect.ValueOf(r)
 		}
 		if v.Kind() != reflect.Struct {
-			return nil, fileSize, fmt.Errorf("expected type struct, got %T", reflect.TypeOf(r).Name())
+			return nil, fileSize, fmt.Errorf(
+				"expected type struct, got %T",
+				reflect.TypeOf(r).Name(),
+			)
 		}
 		n := v.NumField()
 		vT := v.Type()
@@ -81,7 +84,7 @@ func Marshal(b *bytes.Buffer, input ...any) (*multipart.Writer, int64, error) {
 			if tags, ok := field.Tag.Lookup("kind"); ok {
 				kindTags = strings.Split(tags, ",")
 			}
-			if !(field.IsExported() || field.Anonymous || len(formTags) > 0) {
+			if !field.IsExported() && !field.Anonymous && len(formTags) <= 0 {
 				continue
 			}
 			if len(formTags) > 0 {
@@ -180,13 +183,11 @@ func Marshal(b *bytes.Buffer, input ...any) (*multipart.Writer, int64, error) {
 					if fw, err := w.CreateFormFile(formFieldName, fileName); err != nil {
 						return nil, fileSize, err
 					} else {
-
 						if size, err := io.Copy(fw, fileReader); err != nil {
 							return nil, fileSize, err
 						} else {
 							fileSize = size
 						}
-
 					}
 				}
 			}

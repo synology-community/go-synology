@@ -713,7 +713,6 @@ func (ef ErrorFields) Error() string {
 
 // Error satisfies error interface for SynologyError type.
 func (se ApiError) Error() string {
-
 	se.underlying = fmt.Errorf("[%d] %s", se.Code, se.Summary)
 
 	if len(se.Errors) > 0 {

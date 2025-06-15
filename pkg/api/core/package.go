@@ -22,22 +22,21 @@ type InstalledPackage struct {
 	Timestamp  int64  `json:"timestamp,omitempty"`
 	Version    string `json:"version,omitempty"`
 	Additional struct {
-		Autoupdate          bool `json:"autoupdate,omitempty"`
-		AutoupdateImportant bool `json:"autoupdate_important,omitempty"`
-		AvailableOperation  struct {
-		} `json:"available_operation,omitempty"`
-		Beta              bool   `json:"beta,omitempty"`
-		CtlUninstall      bool   `json:"ctl_uninstall,omitempty"`
-		DependentPackages any    `json:"dependent_packages,omitempty"`
-		Description       string `json:"description,omitempty"`
-		DescriptionEnu    string `json:"description_enu,omitempty"`
-		Distributor       string `json:"distributor,omitempty"`
-		DistributorURL    string `json:"distributor_url,omitempty"`
-		DsmAppLaunchName  string `json:"dsm_app_launch_name,omitempty"`
-		DsmAppPage        string `json:"dsm_app_page,omitempty"`
-		DsmApps           string `json:"dsm_apps,omitempty"`
-		InstallType       string `json:"install_type,omitempty"`
-		InstalledInfo     struct {
+		Autoupdate          bool     `json:"autoupdate,omitempty"`
+		AutoupdateImportant bool     `json:"autoupdate_important,omitempty"`
+		AvailableOperation  struct{} `json:"available_operation,omitempty"`
+		Beta                bool     `json:"beta,omitempty"`
+		CtlUninstall        bool     `json:"ctl_uninstall,omitempty"`
+		DependentPackages   any      `json:"dependent_packages,omitempty"`
+		Description         string   `json:"description,omitempty"`
+		DescriptionEnu      string   `json:"description_enu,omitempty"`
+		Distributor         string   `json:"distributor,omitempty"`
+		DistributorURL      string   `json:"distributor_url,omitempty"`
+		DsmAppLaunchName    string   `json:"dsm_app_launch_name,omitempty"`
+		DsmAppPage          string   `json:"dsm_app_page,omitempty"`
+		DsmApps             string   `json:"dsm_apps,omitempty"`
+		InstallType         string   `json:"install_type,omitempty"`
+		InstalledInfo       struct {
 			IsBrick  bool   `json:"is_brick,omitempty"`
 			IsBroken bool   `json:"is_broken,omitempty"`
 			Path     string `json:"path,omitempty"`
@@ -141,8 +140,7 @@ type PackageInstallCheckRequest struct {
 	ReplacePkgs          string `url:"replacepkgs"`
 }
 
-type PackageInstallCheckResponse struct {
-}
+type PackageInstallCheckResponse struct{}
 
 type PackageInstallStatusResponse struct {
 	Beta       bool   `json:"beta,omitempty"`
@@ -246,7 +244,6 @@ type PackageSettingGetRequest struct {
 type ExtraValues map[string]string
 
 func (s ExtraValues) EncodeValues(k string, v *url.Values) error {
-
 	if len(s) == 0 {
 		v.Set(k, `"{}"`)
 		return nil
@@ -303,7 +300,7 @@ type PackageSettingGetResponse struct {
 
 type PackageInstallUploadRequest struct {
 	Additional []string  `form:"additional,json" url:"additional,json"`
-	File       form.File `form:"file" kind:"file"`
+	File       form.File `form:"file"                                  kind:"file"`
 }
 
 type PackageInstallUploadResponse struct {

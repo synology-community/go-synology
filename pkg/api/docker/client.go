@@ -15,32 +15,50 @@ type Client struct {
 }
 
 // ProjectCleanStream implements DockerApi.
-func (d *Client) ProjectCleanStream(ctx context.Context, req ProjectStreamRequest) (*ProjectStreamResponse, error) {
+func (d *Client) ProjectCleanStream(
+	ctx context.Context,
+	req ProjectStreamRequest,
+) (*ProjectStreamResponse, error) {
 	return api.Post[ProjectStreamResponse](d.client, ctx, &req, methods.ProjectCleanStream)
 }
 
 // ProjectStopStream implements DockerApi.
-func (d *Client) ProjectStopStream(ctx context.Context, req ProjectStreamRequest) (*ProjectStreamResponse, error) {
+func (d *Client) ProjectStopStream(
+	ctx context.Context,
+	req ProjectStreamRequest,
+) (*ProjectStreamResponse, error) {
 	return api.Post[ProjectStreamResponse](d.client, ctx, &req, methods.ProjectStopStream)
 }
 
 // ProjectStartStream implements DockerApi.
-func (d *Client) ProjectStartStream(ctx context.Context, req ProjectStreamRequest) (*ProjectStreamResponse, error) {
+func (d *Client) ProjectStartStream(
+	ctx context.Context,
+	req ProjectStreamRequest,
+) (*ProjectStreamResponse, error) {
 	return api.Post[ProjectStreamResponse](d.client, ctx, &req, methods.ProjectStartStream)
 }
 
 // ProjectBuildStream implements DockerApi.
-func (d *Client) ProjectBuildStream(ctx context.Context, req ProjectStreamRequest) (*ProjectStreamResponse, error) {
+func (d *Client) ProjectBuildStream(
+	ctx context.Context,
+	req ProjectStreamRequest,
+) (*ProjectStreamResponse, error) {
 	return api.Post[ProjectStreamResponse](d.client, ctx, &req, methods.ProjectBuildStream)
 }
 
 // ProjectCreate implements DockerApi.
-func (d *Client) ProjectCreate(ctx context.Context, req ProjectCreateRequest) (*ProjectCreateResponse, error) {
+func (d *Client) ProjectCreate(
+	ctx context.Context,
+	req ProjectCreateRequest,
+) (*ProjectCreateResponse, error) {
 	return api.Post[ProjectCreateResponse](d.client, ctx, &req, methods.ProjectCreate)
 }
 
 // ProjectDelete implements DockerApi.
-func (d *Client) ProjectDelete(ctx context.Context, req ProjectDeleteRequest) (*ProjectDeleteResponse, error) {
+func (d *Client) ProjectDelete(
+	ctx context.Context,
+	req ProjectDeleteRequest,
+) (*ProjectDeleteResponse, error) {
 	return api.Post[ProjectDeleteResponse](d.client, ctx, &req, methods.ProjectDelete)
 }
 
@@ -62,7 +80,6 @@ func (d *Client) ProjectGetByName(ctx context.Context, name string) (*Project, e
 		Offset: 0,
 		Limit:  -1,
 	})
-
 	if err != nil {
 		return nil, err
 	}
@@ -85,17 +102,27 @@ func (d *Client) ProjectList(ctx context.Context, req ProjectListRequest) ([]Pro
 }
 
 // ProjectUpdate implements DockerApi.
-func (d *Client) ProjectUpdate(ctx context.Context, req ProjectUpdateRequest) (*ProjectUpdateResponse, error) {
+func (d *Client) ProjectUpdate(
+	ctx context.Context,
+	req ProjectUpdateRequest,
+) (*ProjectUpdateResponse, error) {
 	return api.Post[ProjectUpdateResponse](d.client, ctx, &req, methods.ProjectUpdate)
 }
 
 // ImageDelete implements DockerApi.
-func (d *Client) ImageDelete(ctx context.Context, req ImageDeleteRequest) (*ImageDeleteResponse, error) {
+func (d *Client) ImageDelete(
+	ctx context.Context,
+	req ImageDeleteRequest,
+) (*ImageDeleteResponse, error) {
 	return api.Post[ImageDeleteResponse](d.client, ctx, &req, methods.ImageDelete)
 }
 
 // ImagePull implements DockerApi.
-func (d *Client) ImagePull(ctx context.Context, repository string, tag string) (*ImagePullStatusResponse, error) {
+func (d *Client) ImagePull(
+	ctx context.Context,
+	repository string,
+	tag string,
+) (*ImagePullStatusResponse, error) {
 	res, err := d.ImagePullStart(ctx, ImagePullStartRequest{
 		Repository: repository,
 		Tag:        tag,
@@ -128,23 +155,110 @@ func (d *Client) ImagePull(ctx context.Context, repository string, tag string) (
 }
 
 // ImagePullStart implements DockerApi.
-func (d *Client) ImagePullStart(ctx context.Context, req ImagePullStartRequest) (*ImagePullStartResponse, error) {
+func (d *Client) ImagePullStart(
+	ctx context.Context,
+	req ImagePullStartRequest,
+) (*ImagePullStartResponse, error) {
 	return api.Post[ImagePullStartResponse](d.client, ctx, &req, methods.ImagePullStart)
 }
 
 // ImagePullStatus implements DockerApi.
-func (d *Client) ImagePullStatus(ctx context.Context, req ImagePullStatusRequest) (*ImagePullStatusResponse, error) {
+func (d *Client) ImagePullStatus(
+	ctx context.Context,
+	req ImagePullStatusRequest,
+) (*ImagePullStatusResponse, error) {
 	return api.Post[ImagePullStatusResponse](d.client, ctx, &req, methods.ImagePullStatus)
 }
 
 // ContainerCreate implements DockerApi.
-func (d *Client) ContainerCreate(ctx context.Context, req CreateContainerRequest) (*CreateContainerResponse, error) {
+func (d *Client) ContainerCreate(
+	ctx context.Context,
+	req CreateContainerRequest,
+) (*CreateContainerResponse, error) {
 	return api.Post[CreateContainerResponse](d.client, ctx, &req, methods.Create)
 }
 
 // RegistryList implements DockerApi.
-func (d *Client) RegistryList(ctx context.Context, req ListRegistryRequest) (*ListRegistryResponse, error) {
+func (d *Client) RegistryList(
+	ctx context.Context,
+	req ListRegistryRequest,
+) (*ListRegistryResponse, error) {
 	return api.Post[ListRegistryResponse](d.client, ctx, &req, methods.RegistryList)
+}
+
+// NetworkCreate implements DockerApi.
+func (d *Client) NetworkCreate(
+	ctx context.Context,
+	req NetworkCreateRequest,
+) (*NetworkCreateResponse, error) {
+	return api.Post[NetworkCreateResponse](d.client, ctx, &req, methods.NetworkCreate)
+}
+
+// NetworkList implements DockerApi.
+func (d *Client) NetworkList(
+	ctx context.Context,
+	req NetworkListRequest,
+) (*NetworkListResponse, error) {
+	return api.Post[NetworkListResponse](d.client, ctx, &req, methods.NetworkList)
+}
+
+// NetworkGet implements DockerApi.
+func (d *Client) NetworkGet(
+	ctx context.Context,
+	req NetworkGetRequest,
+) (*NetworkGetResponse, error) {
+	return api.Post[NetworkGetResponse](d.client, ctx, &req, methods.NetworkGet)
+}
+
+// NetworkDelete implements DockerApi.
+func (d *Client) NetworkDelete(
+	ctx context.Context,
+	req NetworkDeleteRequest,
+) (*NetworkDeleteResponse, error) {
+	return api.Post[NetworkDeleteResponse](d.client, ctx, &req, methods.NetworkDelete)
+}
+
+// NetworkGetByName is a convenience method to get a network by name.
+func (d *Client) NetworkGetByName(ctx context.Context, name string) (*Network, error) {
+	resp, err := d.NetworkList(ctx, NetworkListRequest{})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, network := range resp.Data.Network {
+		if network.Name == name {
+			return &network, nil
+		}
+	}
+	return nil, fmt.Errorf("network with name '%s' not found", name)
+}
+
+// NetworkGetByID is a convenience method to get a network by ID.
+func (d *Client) NetworkGetByID(ctx context.Context, id string) (*Network, error) {
+	resp, err := d.NetworkList(ctx, NetworkListRequest{})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, network := range resp.Data.Network {
+		if network.ID == id {
+			return &network, nil
+		}
+	}
+	return nil, fmt.Errorf("network with ID '%s' not found", id)
+}
+
+// NetworkDeleteByName is a convenience method to delete a network by name.
+func (d *Client) NetworkDeleteByName(
+	ctx context.Context,
+	name string,
+) (*NetworkDeleteResponse, error) {
+	return d.NetworkDelete(ctx, NetworkDeleteRequest{Name: name})
+}
+
+// NetworkDeleteByID is a convenience method to delete a network by ID.
+func (d *Client) NetworkDeleteByID(ctx context.Context, id string) (*NetworkDeleteResponse, error) {
+	return d.NetworkDelete(ctx, NetworkDeleteRequest{ID: id})
 }
 
 func New(client api.Api) Api {

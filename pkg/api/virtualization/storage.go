@@ -6,13 +6,13 @@ import (
 )
 
 type Storage struct {
-	ID         string `url:"storage_id" json:"storage_id"`
-	Name       string `url:"storage_name" json:"storage_name"`
-	Status     string `url:"status" json:"status"`
-	HostName   string `url:"host_name,omitempty" json:"host_name,omitempty"`
-	HostID     string `url:"host_id,omitempty" json:"host_id,omitempty"`
-	Size       int    `url:"size,omitempty" json:"size,omitempty"`
-	Used       int    `url:"used,omitempty" json:"used,omitempty"`
+	ID         string `url:"storage_id"            json:"storage_id"`
+	Name       string `url:"storage_name"          json:"storage_name"`
+	Status     string `url:"status"                json:"status"`
+	HostName   string `url:"host_name,omitempty"   json:"host_name,omitempty"`
+	HostID     string `url:"host_id,omitempty"     json:"host_id,omitempty"`
+	Size       int    `url:"size,omitempty"        json:"size,omitempty"`
+	Used       int    `url:"used,omitempty"        json:"used,omitempty"`
 	VolumePath string `url:"volume_path,omitempty" json:"volume_path,omitempty"`
 }
 

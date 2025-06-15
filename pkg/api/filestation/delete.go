@@ -13,7 +13,7 @@ func (s Paths) EncodeValues(k string, v *url.Values) error {
 }
 
 type DeleteStartRequest struct {
-	Paths            Paths `form:"path" url:"path"`
+	Paths            Paths `form:"path"              url:"path"`
 	AccurateProgress bool  `form:"accurate_progress" url:"accurate_progress"`
 }
 

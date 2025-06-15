@@ -5,12 +5,18 @@ import (
 )
 
 type Api interface {
-	ContainerCreate(ctx context.Context, container CreateContainerRequest) (*CreateContainerResponse, error)
+	ContainerCreate(
+		ctx context.Context,
+		container CreateContainerRequest,
+	) (*CreateContainerResponse, error)
 
 	RegistryList(ctx context.Context, req ListRegistryRequest) (*ListRegistryResponse, error)
 
 	ImagePullStart(ctx context.Context, req ImagePullStartRequest) (*ImagePullStartResponse, error)
-	ImagePullStatus(ctx context.Context, req ImagePullStatusRequest) (*ImagePullStatusResponse, error)
+	ImagePullStatus(
+		ctx context.Context,
+		req ImagePullStatusRequest,
+	) (*ImagePullStatusResponse, error)
 	ImagePull(ctx context.Context, repository, tag string) (*ImagePullStatusResponse, error)
 	ImageDelete(ctx context.Context, req ImageDeleteRequest) (*ImageDeleteResponse, error)
 
@@ -20,8 +26,26 @@ type Api interface {
 	ProjectCreate(ctx context.Context, req ProjectCreateRequest) (*ProjectCreateResponse, error)
 	ProjectUpdate(ctx context.Context, req ProjectUpdateRequest) (*ProjectUpdateResponse, error)
 	ProjectDelete(ctx context.Context, req ProjectDeleteRequest) (*ProjectDeleteResponse, error)
-	ProjectCleanStream(ctx context.Context, req ProjectStreamRequest) (*ProjectStreamResponse, error)
+	ProjectCleanStream(
+		ctx context.Context,
+		req ProjectStreamRequest,
+	) (*ProjectStreamResponse, error)
 	ProjectStopStream(ctx context.Context, req ProjectStreamRequest) (*ProjectStreamResponse, error)
-	ProjectStartStream(ctx context.Context, req ProjectStreamRequest) (*ProjectStreamResponse, error)
-	ProjectBuildStream(ctx context.Context, req ProjectStreamRequest) (*ProjectStreamResponse, error)
+	ProjectStartStream(
+		ctx context.Context,
+		req ProjectStreamRequest,
+	) (*ProjectStreamResponse, error)
+	ProjectBuildStream(
+		ctx context.Context,
+		req ProjectStreamRequest,
+	) (*ProjectStreamResponse, error)
+
+	NetworkCreate(ctx context.Context, req NetworkCreateRequest) (*NetworkCreateResponse, error)
+	NetworkList(ctx context.Context, req NetworkListRequest) (*NetworkListResponse, error)
+	NetworkGet(ctx context.Context, req NetworkGetRequest) (*NetworkGetResponse, error)
+	NetworkDelete(ctx context.Context, req NetworkDeleteRequest) (*NetworkDeleteResponse, error)
+	NetworkGetByName(ctx context.Context, name string) (*Network, error)
+	NetworkGetByID(ctx context.Context, id string) (*Network, error)
+	NetworkDeleteByName(ctx context.Context, name string) (*NetworkDeleteResponse, error)
+	NetworkDeleteByID(ctx context.Context, id string) (*NetworkDeleteResponse, error)
 }

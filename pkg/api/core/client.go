@@ -223,7 +223,7 @@ func (c Client) PackageInstallCompound(
 	defaultVol := pkgSetting.DefaultVol
 
 	if defaultVol == "" {
-		return fmt.Errorf("Default volume empty")
+		return fmt.Errorf("default volume empty")
 	}
 
 	dlRes, err := c.PackageInstall(ctx, PackageInstallRequest{
@@ -238,7 +238,7 @@ func (c Client) PackageInstallCompound(
 	}
 
 	if dlRes.TaskID == "" {
-		return fmt.Errorf("Task ID empty")
+		return fmt.Errorf("task ID empty")
 	}
 
 	status := new(PackageInstallStatusResponse)
@@ -256,7 +256,7 @@ func (c Client) PackageInstallCompound(
 		}
 
 		if retry > 10 {
-			return fmt.Errorf("Maximum retries exceeded: Package install status - compound")
+			return fmt.Errorf("maximum retries exceeded: package install status - compound")
 		}
 
 		if !status.Finished {
@@ -293,7 +293,7 @@ func (c Client) PackageInstallCompound(
 	}
 
 	if instRes.PackageName == "" {
-		return fmt.Errorf("Installation package name response empty")
+		return fmt.Errorf("installation package name response empty")
 	}
 
 	return nil

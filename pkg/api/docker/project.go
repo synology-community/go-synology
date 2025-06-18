@@ -11,7 +11,7 @@ type Project struct {
 	ContainerIds          []string  `json:"containerIds,omitempty"`
 	Containers            []any     `json:"containers,omitempty"`
 	Content               string    `json:"content,omitempty"`
-	CreatedAt             time.Time `json:"created_at,omitempty"`
+	CreatedAt             time.Time `json:"created_at,omitzero"`
 	EnableServicePortal   bool      `json:"enable_service_portal,omitempty"`
 	IsPackage             bool      `json:"is_package,omitempty"`
 	Path                  string    `json:"path,omitempty"`
@@ -28,7 +28,7 @@ type Project struct {
 	SharePath string    `json:"share_path,omitempty"`
 	State     string    `json:"state,omitempty"`
 	Status    string    `json:"status,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitzero"`
 	Version   int       `json:"version,omitempty"`
 }
 

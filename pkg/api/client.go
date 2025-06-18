@@ -19,6 +19,7 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/go-retryablehttp"
+	"github.com/pquerna/otp/totp"
 	"github.com/synology-community/go-synology/pkg/query"
 	"github.com/synology-community/go-synology/pkg/util"
 	"github.com/synology-community/go-synology/pkg/util/form"
@@ -118,18 +119,18 @@ func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginRespons
 	c.username = username
 	c.password = password
 
+	now := time.Now()
+
 	req := LoginRequest{
-		Account:  username,
-		Password: password,
-		// Session:         sessionName,
-		Format:          "sid", //"cookie",
+		Account:         username,
+		Password:        password,
+		Format:          "sid",
 		EnableSynoToken: "yes",
-		// LoginType:       "local",
-		TimeZone: "-06:00",
+		TimeZone:        now.Format("-07:00"),
 	}
 
 	if otpSecret != "" {
-		otpCode, err := generateTotp(otpSecret)
+		otpCode, err := totp.GenerateCode(otpSecret, now.Local())
 		if err == nil {
 			req.OTPCode = otpCode
 		} else {
@@ -144,7 +145,7 @@ func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginRespons
 			if err != nil {
 				return nil, multierror.Append(err, errors.New("unable to get token from error"))
 			}
-			req.OTPCode, err = generateTotp(otpSecret)
+			req.OTPCode, err = totp.GenerateCode(otpSecret, now.Local())
 			if err != nil {
 				return nil, multierror.Append(err, errors.New("unable to generate otp code"))
 			}
@@ -182,9 +183,7 @@ func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginRespons
 		}
 		q := c.BaseURL.Query()
 		q.Set("_sid", sessionID)
-		if token != "" {
-			q.Set("SynoToken", token)
-		}
+		q.Set("SynoToken", token)
 
 		c.BaseURL.RawQuery = q.Encode()
 
@@ -203,7 +202,7 @@ func PostFileUpload[TResp Response](
 ) (*TResp, error) {
 	buf := new(bytes.Buffer)
 	w := multipart.NewWriter(buf)
-	defer w.Close()
+	defer func() { _ = w.Close() }()
 
 	fs := int64(0)
 
@@ -301,10 +300,10 @@ func postFile[TResp Response](
 
 	buf := new(bytes.Buffer)
 	if w, fs, err := form.Marshal(buf, input...); err != nil {
-		w.Close()
+		_ = w.Close()
 		return nil, err
 	} else {
-		defer w.Close()
+		defer func() { _ = w.Close() }()
 
 		// Only set a timeout if one isn't already set
 		var cancel context.CancelFunc
@@ -542,13 +541,13 @@ func handleErrors[T Response](response ApiResponse[T], knownErrors ErrorSummarie
 type NotFoundError ApiError
 
 func (e NotFoundError) Error() string {
-	return multierror.Append(fmt.Errorf("Not found"), e).Error()
+	return multierror.Append(fmt.Errorf("not found"), e).Error()
 }
 
 type PermissionDeniedError ApiError
 
 func (e PermissionDeniedError) Error() string {
-	return multierror.Append(fmt.Errorf("Permission denied"), e).Error()
+	return multierror.Append(fmt.Errorf("permission denied"), e).Error()
 }
 
 func (e PermissionDeniedError) GetToken() (token string, err error) {

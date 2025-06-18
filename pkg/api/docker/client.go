@@ -128,7 +128,7 @@ func (d *Client) ImagePull(
 		Tag:        tag,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("Unable to delete file, got error: %s", err)
+		return nil, fmt.Errorf("unable to delete file, got error: %s", err)
 	}
 
 	deadline, ok := ctx.Deadline()
@@ -148,7 +148,7 @@ func (d *Client) ImagePull(
 			return task, nil
 		}
 		if time.Now().After(deadline.Add(delay)) {
-			return nil, fmt.Errorf("Timeout waiting for task to complete")
+			return nil, fmt.Errorf("timeout waiting for task to complete")
 		}
 		time.Sleep(delay)
 	}
@@ -186,46 +186,28 @@ func (d *Client) RegistryList(
 	return api.Post[ListRegistryResponse](d.client, ctx, &req, methods.RegistryList)
 }
 
-// NetworkCreate implements DockerApi.
-func (d *Client) NetworkCreate(
-	ctx context.Context,
-	req NetworkCreateRequest,
-) (*NetworkCreateResponse, error) {
-	return api.Post[NetworkCreateResponse](d.client, ctx, &req, methods.NetworkCreate)
-}
-
 // NetworkList implements DockerApi.
 func (d *Client) NetworkList(
 	ctx context.Context,
-	req NetworkListRequest,
-) (*NetworkListResponse, error) {
-	return api.Post[NetworkListResponse](d.client, ctx, &req, methods.NetworkList)
-}
-
-// NetworkGet implements DockerApi.
-func (d *Client) NetworkGet(
-	ctx context.Context,
-	req NetworkGetRequest,
-) (*NetworkGetResponse, error) {
-	return api.Post[NetworkGetResponse](d.client, ctx, &req, methods.NetworkGet)
-}
-
-// NetworkDelete implements DockerApi.
-func (d *Client) NetworkDelete(
-	ctx context.Context,
-	req NetworkDeleteRequest,
-) (*NetworkDeleteResponse, error) {
-	return api.Post[NetworkDeleteResponse](d.client, ctx, &req, methods.NetworkDelete)
+) ([]Network, error) {
+	resp, err := api.List[NetworkListResponse](d.client, ctx, methods.NetworkList)
+	if err != nil {
+		return nil, fmt.Errorf("unable to list networks, got error: %s", err)
+	}
+	if resp == nil {
+		return nil, fmt.Errorf("no networks found")
+	}
+	return resp.Network, nil
 }
 
 // NetworkGetByName is a convenience method to get a network by name.
 func (d *Client) NetworkGetByName(ctx context.Context, name string) (*Network, error) {
-	resp, err := d.NetworkList(ctx, NetworkListRequest{})
+	resp, err := d.NetworkList(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, network := range resp.Data.Network {
+	for _, network := range resp {
 		if network.Name == name {
 			return &network, nil
 		}
@@ -235,12 +217,12 @@ func (d *Client) NetworkGetByName(ctx context.Context, name string) (*Network, e
 
 // NetworkGetByID is a convenience method to get a network by ID.
 func (d *Client) NetworkGetByID(ctx context.Context, id string) (*Network, error) {
-	resp, err := d.NetworkList(ctx, NetworkListRequest{})
+	resp, err := d.NetworkList(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, network := range resp.Data.Network {
+	for _, network := range resp {
 		if network.ID == id {
 			return &network, nil
 		}
@@ -248,17 +230,49 @@ func (d *Client) NetworkGetByID(ctx context.Context, id string) (*Network, error
 	return nil, fmt.Errorf("network with ID '%s' not found", id)
 }
 
-// NetworkDeleteByName is a convenience method to delete a network by name.
-func (d *Client) NetworkDeleteByName(
+// NetworkCreate implements DockerApi.
+func (d *Client) NetworkCreate(
 	ctx context.Context,
-	name string,
-) (*NetworkDeleteResponse, error) {
-	return d.NetworkDelete(ctx, NetworkDeleteRequest{Name: name})
+	req Network,
+) error {
+	_, err := api.Post[api.Data](d.client, ctx, &req, methods.NetworkCreate)
+	if err != nil {
+		return fmt.Errorf("unable to create network, got error: %s", err)
+	}
+	return nil
 }
 
-// NetworkDeleteByID is a convenience method to delete a network by ID.
-func (d *Client) NetworkDeleteByID(ctx context.Context, id string) (*NetworkDeleteResponse, error) {
-	return d.NetworkDelete(ctx, NetworkDeleteRequest{ID: id})
+// NetworkUpdate implements DockerApi.
+func (d *Client) NetworkUpdate(
+	ctx context.Context,
+	req NetworkUpdateRequest,
+) error {
+	resp, err := api.Post[NetworkUpdateResponse](d.client, ctx, &req, methods.NetworkSet)
+	if err != nil {
+		return fmt.Errorf("unable to update network, got error: %s", err)
+	}
+	if len(resp.AddFailed) > 0 || len(resp.RemoveFailed) > 0 {
+		return fmt.Errorf("Network update failed: add_failed=%v, remove_failed=%v",
+			resp.AddFailed, resp.RemoveFailed)
+	}
+	return nil
+}
+
+// NetworkDelete implements DockerApi.
+func (d *Client) NetworkDelete(
+	ctx context.Context,
+	networks ...Network,
+) error {
+	resp, err := api.Post[NetworkDeleteResponse](d.client, ctx, &NetworkDeleteRequest{
+		Networks: networks,
+	}, methods.NetworkDelete)
+	if err != nil {
+		return fmt.Errorf("unable to delete network, got error: %s", err)
+	}
+	if len(resp.Failed) > 0 {
+		return fmt.Errorf("Network deletion failed: %v", resp.Failed)
+	}
+	return nil
 }
 
 func New(client api.Api) Api {

@@ -2,29 +2,17 @@ package docker
 
 type Network struct {
 	ID                string   `json:"id,omitempty"                 url:"-"`
-	Name              string   `json:"name,omitempty"               url:"name"`
-	Subnet            string   `json:"subnet,omitempty"             url:"subnet,omitempty"`
-	IPRange           string   `json:"iprange,omitempty"            url:"iprange,omitempty"`
-	Gateway           string   `json:"gateway,omitempty"            url:"gateway,omitempty"`
-	DisableMasquerade bool     `json:"disable_masquerade,omitempty" url:"disable_masquerade"`
-	EnableIPv6        bool     `json:"enable_ipv6,omitempty"        url:"enable_ipv6"`
-	EnableIPv4        bool     `json:"enable_ipv4,omitempty"        url:"enable_ipv4"`
-	Driver            string   `json:"driver,omitempty"             url:"driver"`
-	Auto              bool     `json:"auto,omitempty"               url:"auto"`
-	Containers        []string `json:"containers,omitempty"`
-}
-
-// NetworkCreateRequest represents a network creation request.
-type NetworkCreateRequest struct {
-	Name              string `json:"name"                         url:"name"`
-	Driver            string `json:"driver,omitempty"             url:"driver"`
-	Subnet            string `json:"subnet,omitempty"             url:"subnet,omitempty"`
-	IPRange           string `json:"iprange,omitempty"            url:"iprange,omitempty"`
-	Gateway           string `json:"gateway,omitempty"            url:"gateway,omitempty"`
-	EnableIPv4        bool   `json:"enable_ipv4,omitempty"        url:"enable_ipv4"`
-	EnableIPv6        bool   `json:"enable_ipv6,omitempty"        url:"enable_ipv6"`
-	DisableMasquerade bool   `json:"disable_masquerade,omitempty" url:"disable_masquerade"`
-	Auto              bool   `json:"auto,omitempty"               url:"auto"`
+	Name              string   `json:"name"                         url:"name,quoted"`
+	Subnet            string   `json:"subnet,omitempty"             url:"subnet,quoted,omitempty"`
+	IPRange           string   `json:"iprange,omitempty"            url:"iprange,quoted,omitempty"`
+	Gateway           string   `json:"gateway,omitempty"            url:"gateway,quoted,omitempty"`
+	DisableMasquerade bool     `json:"disable_masquerade,omitempty" url:"disable_masquerade,omitempty"`
+	EnableIPv6        bool     `json:"enable_ipv6"                  url:"enable_ipv6"`
+	IPv6Subnet        string   `json:"ipv6_subnet,omitempty"        url:"ipv6_subnet,quoted,omitempty"`
+	IPv6Gateway       string   `json:"ipv6_gateway,omitempty"       url:"ipv6_gateway,quoted,omitempty"`
+	IPv6IPRange       string   `json:"ipv6_iprange,omitempty"       url:"ipv6_iprange,quoted,omitempty"`
+	Driver            string   `json:"driver"                       url:"driver"`
+	Containers        []string `json:"containers,omitempty"         url:"containers,json,omitempty"`
 }
 
 // NetworkCreateResponse represents a network creation response.
@@ -39,31 +27,27 @@ type NetworkListRequest struct {
 
 // NetworkListResponse represents a network list response.
 type NetworkListResponse struct {
-	Data struct {
-		Network []Network `json:"network"`
-	} `json:"data"`
-	Success bool `json:"success"`
+	Network []Network `json:"network,omitempty"`
 }
 
 // NetworkDeleteRequest represents a network deletion request.
 type NetworkDeleteRequest struct {
-	ID   string `json:"id,omitempty"   url:"id"`
-	Name string `json:"name,omitempty" url:"name"`
+	Networks []Network `json:"networks,omitempty" url:"networks,json"`
 }
 
 // NetworkDeleteResponse represents a network deletion response.
 type NetworkDeleteResponse struct {
-	Success bool `json:"success"`
+	Failed []string `json:"failed,omitempty"`
 }
 
-// NetworkGetRequest represents a network get request.
-type NetworkGetRequest struct {
-	ID   string `json:"id,omitempty"   url:"id"`
-	Name string `json:"name,omitempty" url:"name"`
+type NetworkUpdateRequest struct {
+	Name       string   `url:"networkName,quoted"`
+	Containers []string `url:"containers,json"`
 }
 
-// NetworkGetResponse represents a network get response.
-type NetworkGetResponse struct {
-	Data    Network `json:"data"`
-	Success bool    `json:"success"`
+type NetworkUpdateResponse struct {
+	AddFailed       []string `json:"add_failed,omitempty"`
+	AddSucceeded    []string `json:"add_succeeded,omitempty"`
+	RemoveFailed    []string `json:"remove_failed,omitempty"`
+	RemoveSucceeded []string `json:"remove_succeeded,omitempty"`
 }

@@ -133,13 +133,13 @@ var (
 	NetworkDelete = api.Method{
 		API:            API_DockerNetwork,
 		Version:        1,
-		Method:         api.MethodDelete,
+		Method:         api.MethodRemove,
 		ErrorSummaries: CommonErrors,
 	}
-	NetworkGet = api.Method{
+	NetworkSet = api.Method{
 		API:            API_DockerNetwork,
 		Version:        1,
-		Method:         api.MethodGet,
+		Method:         api.MethodSet,
 		ErrorSummaries: CommonErrors,
 	}
 )

@@ -20,8 +20,8 @@ type EncodeRequest interface {
 
 type ApiParams struct {
 	Version int    `form:"version" query:"version"`
-	API     string `form:"api"     query:"version"`
-	Method  string `form:"method"  query:"version"`
+	API     string `form:"api"     query:"api"`
+	Method  string `form:"method"  query:"method"`
 }
 
 type ApiRequest[TRequest Request] struct {

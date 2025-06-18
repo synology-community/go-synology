@@ -112,7 +112,7 @@ func (v *Client) TaskGet(ctx context.Context, taskID string) (*Task, error) {
 			return task, nil
 		}
 		if time.Now().After(deadline.Add(delay)) {
-			return nil, fmt.Errorf("Timeout waiting for task to complete")
+			return nil, fmt.Errorf("timeout waiting for task to complete")
 		}
 		time.Sleep(delay)
 	}

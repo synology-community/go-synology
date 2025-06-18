@@ -42,7 +42,7 @@ func (v *FormValues) Encode(buf *bytes.Buffer) (*multipart.Writer, int64, error)
 
 func Marshal(b *bytes.Buffer, input ...any) (*multipart.Writer, int64, error) {
 	w := multipart.NewWriter(b)
-	defer w.Close()
+	defer func() { _ = w.Close() }()
 	fileSize := int64(0)
 
 	_ = w.SetBoundary("AaB03x")

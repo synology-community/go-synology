@@ -40,12 +40,10 @@ type Api interface {
 		req ProjectStreamRequest,
 	) (*ProjectStreamResponse, error)
 
-	NetworkCreate(ctx context.Context, req NetworkCreateRequest) (*NetworkCreateResponse, error)
-	NetworkList(ctx context.Context, req NetworkListRequest) (*NetworkListResponse, error)
-	NetworkGet(ctx context.Context, req NetworkGetRequest) (*NetworkGetResponse, error)
-	NetworkDelete(ctx context.Context, req NetworkDeleteRequest) (*NetworkDeleteResponse, error)
+	NetworkList(ctx context.Context) ([]Network, error)
 	NetworkGetByName(ctx context.Context, name string) (*Network, error)
 	NetworkGetByID(ctx context.Context, id string) (*Network, error)
-	NetworkDeleteByName(ctx context.Context, name string) (*NetworkDeleteResponse, error)
-	NetworkDeleteByID(ctx context.Context, id string) (*NetworkDeleteResponse, error)
+	NetworkCreate(ctx context.Context, req Network) error
+	NetworkUpdate(ctx context.Context, req NetworkUpdateRequest) error
+	NetworkDelete(ctx context.Context, networks ...Network) error
 }

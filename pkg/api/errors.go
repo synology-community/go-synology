@@ -659,9 +659,9 @@ type ErrorDescriber interface {
 // ApiError defines a structure for error object returned by Synology API.
 // It is a high-level error for a particular API family.
 type ApiError struct {
-	Code    int         `json:"code,omitempty"`
-	Summary string      `json:"-"`
-	Errors  ErrorFields `json:"errors,omitempty"`
+	Code    int           `json:"code,omitempty"`
+	Summary string        `json:"-"`
+	Errors  []ErrorFields `json:"errors,omitempty"`
 
 	underlying error `json:"-"`
 }
@@ -670,11 +670,20 @@ type ApiError struct {
 type ErrorSummary map[int]string
 
 // ErrorFields defines extra fields for particular detailed error.
-type ErrorFields map[string]any
+// All ErrorFields entries will always include a "code" field with an integer value.
+type ErrorFields struct {
+	Code   int                    `json:"code"`
+	Fields map[string]interface{} `json:",inline"`
+}
 
 func (ef ErrorFields) WithSummaries(knownErrors ErrorSummaries) error {
 	var err error
-	for k, v := range ef {
+
+	// Handle the code field
+	err = multierror.Append(err, fmt.Errorf("code: %d", ef.Code))
+
+	// Handle additional fields
+	for k, v := range ef.Fields {
 		b, e := json.Marshal(v)
 		if e != nil {
 			err = multierror.Append(err, fmt.Errorf("%s: %v", k, e))
@@ -692,7 +701,12 @@ func (s ApiError) WithSummaries(errorSummaries ErrorSummaries) error {
 
 func (ef ErrorFields) Underlying() error {
 	var err error
-	for k, v := range ef {
+
+	// Handle the code field
+	err = multierror.Append(err, fmt.Errorf("code: %d", ef.Code))
+
+	// Handle additional fields
+	for k, v := range ef.Fields {
 		b, e := json.Marshal(v)
 		if e != nil {
 			err = multierror.Append(err, fmt.Errorf("%s: %v", k, e))
@@ -716,7 +730,9 @@ func (se ApiError) Error() string {
 	se.underlying = fmt.Errorf("[%d] %s", se.Code, se.Summary)
 
 	if len(se.Errors) > 0 {
-		se.underlying = multierror.Append(se.underlying, se.Errors)
+		for _, errorFields := range se.Errors {
+			se.underlying = multierror.Append(se.underlying, errorFields)
+		}
 	}
 
 	return se.underlying.Error()
@@ -733,4 +749,57 @@ func DescribeError(code int, summaries ...ErrorSummary) string {
 	}
 
 	return "Unknown error code"
+}
+
+// UnmarshalJSON implements custom JSON unmarshalling for ApiError.
+// This method automatically populates the Summary field based on the error Code
+// using global error mappings.
+func (ae *ApiError) UnmarshalJSON(data []byte) error {
+	// Create a temporary struct to unmarshal the basic fields
+	type Alias ApiError
+	temp := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(ae),
+	}
+
+	// Unmarshal into the temporary struct
+	if err := json.Unmarshal(data, temp); err != nil {
+		return fmt.Errorf("failed to unmarshal ApiError: %w", err)
+	}
+
+	// Automatically populate the Summary field based on the Code
+	if ae.Code != 0 {
+		ae.Summary = DescribeError(ae.Code, GlobalErrors())
+	}
+
+	return nil
+}
+
+// UnmarshalJSON implements custom JSON unmarshaling for ErrorFields.
+// This ensures that the code field is properly extracted while preserving other fields.
+func (ef *ErrorFields) UnmarshalJSON(data []byte) error {
+	// First unmarshal into a generic map
+	var raw map[string]interface{}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return fmt.Errorf("failed to unmarshal ErrorFields: %w", err)
+	}
+
+	// Extract the code field
+	if codeVal, exists := raw["code"]; exists {
+		switch v := codeVal.(type) {
+		case float64:
+			ef.Code = int(v)
+		case int:
+			ef.Code = v
+		default:
+			return fmt.Errorf("code field must be an integer, got %T", v)
+		}
+		delete(raw, "code") // Remove code from the raw map
+	}
+
+	// Store remaining fields
+	ef.Fields = raw
+
+	return nil
 }

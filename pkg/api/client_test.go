@@ -184,14 +184,21 @@ func TestHandleErrors(t *testing.T) {
 				Success: false,
 				Data:    struct{}{},
 				Error: ApiError{
-					Code:   100,
-					Errors: ErrorFields{"path": "/some/path", "code": 102, "reason": "a reason"},
+					Code: 100,
+					Errors: []ErrorFields{
+						{
+							Code:   102,
+							Fields: map[string]any{"path": "/some/path", "reason": "a reason"},
+						},
+					},
 				},
 			},
 			expected: ApiError{
 				Code:    100,
 				Summary: "global error 100",
-				Errors:  ErrorFields{"path": "/some/path", "code": 102, "reason": "a reason"},
+				Errors: []ErrorFields{
+					{Code: 102, Fields: map[string]any{"path": "/some/path", "reason": "a reason"}},
+				},
 			},
 		},
 		{
@@ -200,8 +207,10 @@ func TestHandleErrors(t *testing.T) {
 				Success: false,
 				Data:    struct{}{},
 				Error: ApiError{
-					Code:   100,
-					Errors: ErrorFields{"code": 202},
+					Code: 100,
+					Errors: []ErrorFields{
+						{Code: 202, Fields: map[string]any{}},
+					},
 				},
 			},
 			responseKnownErrors: []ErrorSummary{
@@ -212,7 +221,9 @@ func TestHandleErrors(t *testing.T) {
 			expected: ApiError{
 				Code:    100,
 				Summary: "global error 100",
-				Errors:  ErrorFields{"code": 202},
+				Errors: []ErrorFields{
+					{Code: 202, Fields: map[string]any{}},
+				},
 			},
 		},
 	}

@@ -552,14 +552,16 @@ func (e PermissionDeniedError) Error() string {
 
 func (e PermissionDeniedError) GetToken() (token string, err error) {
 	if len(e.Errors) > 0 {
-		if f, ok := e.Errors["token"]; ok {
-			if t, ok := f.(string); ok {
-				token = t
+		for _, fields := range e.Errors {
+			if f, ok := fields.Fields["token"]; ok {
+				if t, ok := f.(string); ok {
+					token = t
+				} else {
+					err = errors.New("unable to parse token")
+				}
 			} else {
-				err = errors.New("unable to parse token")
+				err = errors.New("token not found")
 			}
-		} else {
-			err = errors.New("token not found")
 		}
 	}
 	return

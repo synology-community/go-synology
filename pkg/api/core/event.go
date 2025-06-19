@@ -16,4 +16,8 @@ type EventRequest struct {
 	SynoConfirmPWToken string     `url:"SynoConfirmPWToken,omitempty" json:"SynoConfirmPWToken,omitempty"`
 }
 
+type EventRunRequest struct {
+	Name string `url:"task_name,quoted" json:"task_name,omitempty"`
+}
+
 type EventResult struct{}

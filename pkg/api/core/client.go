@@ -563,7 +563,7 @@ func (c *Client) EventDelete(ctx context.Context, req EventRequest) error {
 }
 
 func (c *Client) EventRun(ctx context.Context, name string) error {
-	return api.Void(c.client, ctx, &EventRequest{
+	return api.Void(c.client, ctx, &EventRunRequest{
 		Name: name,
 	}, methods.EventRun)
 }

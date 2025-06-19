@@ -64,7 +64,7 @@ var (
 	Download = api.Method{
 		API:            "SYNO.FileStation.Download",
 		Version:        2,
-		Method:         "download",
+		Method:         api.MethodDownload,
 		ErrorSummaries: CommonErrors,
 	}
 	MD5Start = api.Method{

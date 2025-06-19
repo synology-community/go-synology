@@ -563,3 +563,439 @@ func TestClient_PackageInstallUpload(t *testing.T) {
 		})
 	}
 }
+
+func TestClient_EventCreate(t *testing.T) {
+	type fields struct {
+		client Api
+	}
+	type args struct {
+		ctx context.Context
+		req EventRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Create Event",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx: context.Background(),
+				req: EventRequest{
+					Name:          "test_event_create",
+					Event:         "bootup",
+					Operation:     "sleep 1",
+					OperationType: "script",
+					Enable:        true,
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.fields.client.EventCreate(tt.args.ctx, tt.args.req)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.EventCreate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr && result == nil {
+				t.Errorf("Client.EventCreate() returned nil result")
+			}
+		})
+	}
+}
+
+func TestClient_EventUpdate(t *testing.T) {
+	type fields struct {
+		client Api
+	}
+	type args struct {
+		ctx context.Context
+		req EventRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Update Event",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx: context.Background(),
+				req: EventRequest{
+					Name:          "test_event_update",
+					Event:         "shutdown",
+					Operation:     "sleep 2",
+					OperationType: "script",
+					Enable:        false,
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// First create the event
+			_, err := tt.fields.client.EventCreate(tt.args.ctx, EventRequest{
+				Name:          tt.args.req.Name,
+				Event:         "bootup",
+				Operation:     "sleep 1",
+				OperationType: "script",
+				Enable:        true,
+			})
+			if err != nil {
+				t.Logf("Setup error creating event: %v", err)
+			}
+
+			// Then update it
+			result, err := tt.fields.client.EventUpdate(tt.args.ctx, tt.args.req)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.EventUpdate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr && result == nil {
+				t.Errorf("Client.EventUpdate() returned nil result")
+			}
+
+			// Cleanup
+			_ = tt.fields.client.EventDelete(tt.args.ctx, EventRequest{Name: tt.args.req.Name})
+		})
+	}
+}
+
+func TestClient_EventGet(t *testing.T) {
+	type fields struct {
+		client Api
+	}
+	type args struct {
+		ctx  context.Context
+		name string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Get Event",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx:  context.Background(),
+				name: "test_event_get",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// First create the event
+			_, err := tt.fields.client.EventCreate(tt.args.ctx, EventRequest{
+				Name:          tt.args.name,
+				Event:         "bootup",
+				Operation:     "sleep 1",
+				OperationType: "script",
+				Enable:        true,
+			})
+			if err != nil {
+				t.Logf("Setup error creating event: %v", err)
+			}
+
+			// Then get it
+			result, err := tt.fields.client.EventGet(tt.args.ctx, tt.args.name)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.EventGet() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr {
+				if result == nil {
+					t.Errorf("Client.EventGet() returned nil result")
+				} else if result.Name != tt.args.name {
+					t.Errorf("Client.EventGet() returned wrong name: got %v, want %v", result.Name, tt.args.name)
+				}
+			}
+
+			// Cleanup
+			_ = tt.fields.client.EventDelete(tt.args.ctx, EventRequest{Name: tt.args.name})
+		})
+	}
+}
+
+func TestClient_EventRun(t *testing.T) {
+	type fields struct {
+		client Api
+	}
+	type args struct {
+		ctx  context.Context
+		name string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Run Event",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx:  context.Background(),
+				name: "test_event_run",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// First create the event
+			_, err := tt.fields.client.EventCreate(tt.args.ctx, EventRequest{
+				Name:          tt.args.name,
+				Event:         "bootup",
+				Operation:     "echo 'test'",
+				OperationType: "script",
+				Enable:        true,
+			})
+			if err != nil {
+				t.Logf("Setup error creating event: %v", err)
+			}
+
+			// Then run it
+			err = tt.fields.client.EventRun(tt.args.ctx, tt.args.name)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.EventRun() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			// Cleanup
+			_ = tt.fields.client.EventDelete(tt.args.ctx, EventRequest{Name: tt.args.name})
+		})
+	}
+}
+
+func TestClient_EventDelete(t *testing.T) {
+	type fields struct {
+		client Api
+	}
+	type args struct {
+		ctx context.Context
+		req EventRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Delete Event",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx: context.Background(),
+				req: EventRequest{
+					Name: "test_event_delete",
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// First create the event
+			_, err := tt.fields.client.EventCreate(tt.args.ctx, EventRequest{
+				Name:          tt.args.req.Name,
+				Event:         "bootup",
+				Operation:     "sleep 1",
+				OperationType: "script",
+				Enable:        true,
+			})
+			if err != nil {
+				t.Logf("Setup error creating event: %v", err)
+			}
+
+			// Then delete it
+			err = tt.fields.client.EventDelete(tt.args.ctx, tt.args.req)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.EventDelete() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestClient_RootEventCreate(t *testing.T) {
+	type fields struct {
+		client Api
+	}
+	type args struct {
+		ctx context.Context
+		req EventRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Create Root Event",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx: context.Background(),
+				req: EventRequest{
+					Name:          "test_root_event_create",
+					Event:         "bootup",
+					Operation:     "echo \"Root event created\"; sleep 1",
+					OperationType: "script",
+					Enable:        true,
+					Owner: map[string]string{
+						"0": "root",
+					},
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.fields.client.RootEventCreate(tt.args.ctx, tt.args.req)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.RootEventCreate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr && result == nil {
+				t.Errorf("Client.RootEventCreate() returned nil result")
+			}
+
+			// Cleanup
+			_ = tt.fields.client.RootEventDelete(tt.args.ctx, EventRequest{Name: tt.args.req.Name})
+		})
+	}
+}
+
+func TestClient_RootEventUpdate(t *testing.T) {
+	type fields struct {
+		client Api
+	}
+	type args struct {
+		ctx context.Context
+		req EventRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Update Root Event",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx: context.Background(),
+				req: EventRequest{
+					Name:          "test_root_event_update",
+					Event:         "shutdown",
+					Operation:     "sleep 2",
+					OperationType: "script",
+					Enable:        false,
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// First create the root event
+			_, err := tt.fields.client.RootEventCreate(tt.args.ctx, EventRequest{
+				Name:          tt.args.req.Name,
+				Event:         "bootup",
+				Operation:     "sleep 1",
+				OperationType: "script",
+				Enable:        true,
+			})
+			if err != nil {
+				t.Logf("Setup error creating root event: %v", err)
+			}
+
+			// Then update it
+			result, err := tt.fields.client.RootEventUpdate(tt.args.ctx, tt.args.req)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.RootEventUpdate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr && result == nil {
+				t.Errorf("Client.RootEventUpdate() returned nil result")
+			}
+
+			// Cleanup
+			_ = tt.fields.client.RootEventDelete(tt.args.ctx, EventRequest{Name: tt.args.req.Name})
+		})
+	}
+}
+
+func TestClient_RootEventDelete(t *testing.T) {
+	type fields struct {
+		client Api
+	}
+	type args struct {
+		ctx context.Context
+		req EventRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Delete Root Event",
+			fields: fields{
+				client: newClient(t),
+			},
+			args: args{
+				ctx: context.Background(),
+				req: EventRequest{
+					Name: "test_root_event_delete",
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// First create the root event
+			_, err := tt.fields.client.RootEventCreate(tt.args.ctx, EventRequest{
+				Name:          tt.args.req.Name,
+				Event:         "bootup",
+				Operation:     "sleep 1",
+				OperationType: "script",
+				Enable:        true,
+			})
+			if err != nil {
+				t.Logf("Setup error creating root event: %v", err)
+			}
+
+			// Then delete it
+			err = tt.fields.client.RootEventDelete(tt.args.ctx, tt.args.req)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.RootEventDelete() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

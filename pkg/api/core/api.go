@@ -57,6 +57,7 @@ type Api interface {
 	EventUpdate(ctx context.Context, req EventRequest) (*EventResult, error)
 	RootEventCreate(ctx context.Context, req EventRequest) (*EventResult, error)
 	RootEventUpdate(ctx context.Context, req EventRequest) (*EventResult, error)
+	RootEventDelete(ctx context.Context, req EventRequest) error
 	EventGet(ctx context.Context, name string) (*EventRequest, error)
 	EventDelete(ctx context.Context, req EventRequest) error
 	EventRun(ctx context.Context, name string) error

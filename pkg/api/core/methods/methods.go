@@ -63,7 +63,7 @@ var (
 	PackageInstallationUpload = api.Method{
 		API:            Core_Package_Installation,
 		Version:        1,
-		Method:         "upload",
+		Method:         api.MethodUpload,
 		ErrorSummaries: api.GlobalErrors,
 	}
 	PackageUnistallationUninstall = api.Method{
@@ -93,7 +93,7 @@ var (
 	IsPkgEnable = api.Method{
 		API:            DSM_PortEnable,
 		Version:        1,
-		Method:         "is_pkg_enable",
+		Method:         api.MethodIsPkgEnable,
 		ErrorSummaries: api.GlobalErrors,
 	}
 	PackageFeedList = api.Method{

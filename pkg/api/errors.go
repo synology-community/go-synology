@@ -672,8 +672,8 @@ type ErrorSummary map[int]string
 // ErrorFields defines extra fields for particular detailed error.
 // All ErrorFields entries will always include a "code" field with an integer value.
 type ErrorFields struct {
-	Code   int                    `json:"code"`
-	Fields map[string]interface{} `json:",inline"`
+	Code   int            `json:"code"`
+	Fields map[string]any `json:",inline"`
 }
 
 func (ef ErrorFields) WithSummaries(knownErrors ErrorSummaries) error {
@@ -780,7 +780,7 @@ func (ae *ApiError) UnmarshalJSON(data []byte) error {
 // This ensures that the code field is properly extracted while preserving other fields.
 func (ef *ErrorFields) UnmarshalJSON(data []byte) error {
 	// First unmarshal into a generic map
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return fmt.Errorf("failed to unmarshal ErrorFields: %w", err)
 	}

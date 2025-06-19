@@ -616,6 +616,10 @@ func (c *Client) UserList(ctx context.Context) (*UserListResponse, error) {
 	}, methods.UserList)
 }
 
+func (c *Client) NetworkGet(ctx context.Context) (*NetworkConfig, error) {
+	return api.List[NetworkConfig](c.client, ctx, methods.NetworkGet)
+}
+
 func New(client api.Api) Api {
 	return &Client{client: client}
 }

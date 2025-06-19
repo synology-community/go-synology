@@ -146,13 +146,14 @@ func TestApiError_UnmarshalJSON(t *testing.T) {
 					apiError.Summary,
 					"Summary should be populated for non-zero error codes",
 				)
-				if tt.expectedCode == 101 {
+				switch tt.expectedCode {
+				case 101:
 					assert.Equal(t, "No parameter of API, method or version", apiError.Summary)
-				} else if tt.expectedCode == 102 {
+				case 102:
 					assert.Equal(t, "The requested API does not exist", apiError.Summary)
-				} else if tt.expectedCode == 103 {
+				case 103:
 					assert.Equal(t, "The requested method does not exist", apiError.Summary)
-				} else if tt.expectedCode == 9999 {
+				case 9999:
 					assert.Equal(t, "Unknown error code", apiError.Summary)
 				}
 			} else {

@@ -65,4 +65,6 @@ type Api interface {
 	UserList(ctx context.Context) (*UserListResponse, error)
 
 	PasswordConfirm(ctx context.Context, password string) (*PasswordConfirmResponse, error)
+
+	NetworkGet(ctx context.Context) (*NetworkConfig, error)
 }

@@ -114,7 +114,7 @@ func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginRespons
 	username := options.Username
 	password := options.Password
 	otpSecret := options.OTPSecret
-	var token, sessionID string
+	var token, sessionID, deviceID string
 
 	c.username = username
 	c.password = password
@@ -163,6 +163,9 @@ func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginRespons
 				if resp.SessionID != "" {
 					sessionID = resp.SessionID
 				}
+				if resp.DeviceID != "" {
+					deviceID = resp.DeviceID
+				}
 			}
 		} else {
 			return nil, multierror.Append(err, errors.New("unable to login using token and password"))
@@ -174,12 +177,16 @@ func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginRespons
 		if resp.SessionID != "" {
 			sessionID = resp.SessionID
 		}
+		if resp.DeviceID != "" {
+			deviceID = resp.DeviceID
+		}
 	}
 
-	if token != "" && sessionID != "" {
+	if token != "" && sessionID != "" && deviceID != "" {
 		c.ApiCredentials = Credentials{
 			SessionID: sessionID,
 			Token:     token,
+			DeviceID:  deviceID,
 		}
 		q := c.BaseURL.Query()
 		q.Set("_sid", sessionID)
@@ -376,6 +383,7 @@ func Post[TResp Response, TReq Request](
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	if c.Credentials().Token != "" {
 		req.Header.Set("X-SYNO-TOKEN", c.Credentials().Token)
+		req.Header.Set("Cookie", c.Credentials().GetCookie())
 	}
 
 	return Do[TResp](c.Client(), req, method.ErrorSummaries)

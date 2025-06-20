@@ -182,7 +182,7 @@ func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginRespons
 		}
 	}
 
-	if token != "" && sessionID != "" && deviceID != "" {
+	if token != "" && sessionID != "" {
 		c.ApiCredentials = Credentials{
 			SessionID: sessionID,
 			Token:     token,

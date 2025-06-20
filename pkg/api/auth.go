@@ -3,9 +3,9 @@ package api
 import "fmt"
 
 type Credentials struct {
-	SessionID string `url:"_sid"`
-	DeviceID  string `url:"device_id,omitempty"`
-	Token     string `url:"SynoToken,omitempty"`
+	SessionID string `url:"_sid"                json:"sid"`
+	DeviceID  string `url:"-"                   json:"did"`
+	Token     string `url:"SynoToken,omitempty" json:"token"`
 }
 
 func (c Credentials) GetCookie() string {

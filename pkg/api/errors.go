@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"maps"
+	"strconv"
 
 	"github.com/hashicorp/go-multierror"
 )
@@ -633,7 +634,7 @@ var loginErrors ErrorSummaries = func() ErrorSummary {
 		401: "Disabled account",
 		402: "Denied permission",
 		403: "2-factor authentication code required",
-		404: "Failed to authenticate 2-factor authentication code",
+		404: "Failed to authenticate 2-factor authentication code (invalid or reused OTP)", // https://datatracker.ietf.org/doc/html/rfc6238#autoid-11
 		406: "Enforce to authenticate with 2-factor authentication code",
 		407: "Blocked IP source",
 		408: "Expired password cannot change",
@@ -748,7 +749,7 @@ func DescribeError(code int, summaries ...ErrorSummary) string {
 		}
 	}
 
-	return "Unknown error code"
+	return "Unknown error code " + strconv.Itoa(code)
 }
 
 // UnmarshalJSON implements custom JSON unmarshalling for ApiError.

@@ -536,11 +536,11 @@ func handleErrors[T Response](response ApiResponse[T], knownErrors ErrorSummarie
 	}
 
 	if response.Error.Code == 403 {
-		return PermissionDeniedError(response.Error)
+		//return PermissionDeniedError(response.Error) // this removes context of knownErrors and introduces incorrect message for at least Login API
 	}
 
 	if response.Error.Code == 404 {
-		return NotFoundError(response.Error)
+		//return NotFoundError(response.Error) // this removes context of knownErrors and introduces incorrect message for at least Login API
 	}
 
 	return response.Error.WithSummaries(knownErrors)
@@ -549,13 +549,19 @@ func handleErrors[T Response](response ApiResponse[T], knownErrors ErrorSummarie
 type NotFoundError ApiError
 
 func (e NotFoundError) Error() string {
-	return multierror.Append(fmt.Errorf("not found"), e).Error()
+	//return multierror.Append(fmt.Errorf("not found"), e).Error() // avoid printing e directly and using multierror to prevent recursion
+	msg := "not found"
+	multierror.Append(fmt.Errorf(msg), e)
+	return msg
 }
 
 type PermissionDeniedError ApiError
 
 func (e PermissionDeniedError) Error() string {
-	return multierror.Append(fmt.Errorf("permission denied"), e).Error()
+	//return multierror.Append(fmt.Errorf("permission denied"), e).Error() // avoid printing e directly and using multierror to prevent recursion
+	msg := "permission denied"
+	multierror.Append(fmt.Errorf(msg), e)
+	return msg
 }
 
 func (e PermissionDeniedError) GetToken() (token string, err error) {

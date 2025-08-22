@@ -17,9 +17,10 @@ type Api interface {
 }
 
 const (
-	Entry_Request = "SYNO.Entry.Request"
-	API_Auth      = "SYNO.API.Auth"
-	API_Info      = "SYNO.API.Info"
+	Entry_Request   = "SYNO.Entry.Request"
+	API_Auth        = "SYNO.API.Auth"
+	API_Info        = "SYNO.API.Info"
+	Core_NormalUser = "SYNO.Core.NormalUser"
 )
 
 var (
@@ -39,6 +40,12 @@ var (
 		API:            Entry_Request,
 		Version:        1,
 		Method:         "request",
+		ErrorSummaries: GlobalErrors,
+	}
+	Core_UserInfo = Method{
+		API:            Core_NormalUser,
+		Version:        1,
+		Method:         "get",
 		ErrorSummaries: GlobalErrors,
 	}
 )

@@ -156,7 +156,11 @@ func (c *Client) IsSessionAlive(ctx context.Context) (bool, error) {
 		ctx, cancel = context.WithTimeout(ctx, 10*time.Second)
 		defer cancel()
 	}
-	if _, err := c.GetApiInfo(ctx); err == nil {
+
+	if data, err := c.GetUserInfo(ctx); err == nil {
+		if data.UserName == "" {
+			return false, fmt.Errorf("session probe failed to query user info")
+		}
 		return true, nil
 	} else {
 		var ae ApiError

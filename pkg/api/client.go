@@ -577,8 +577,13 @@ func handle[T Response](resp *http.Response, errorSummaries ErrorSummaries) (*T,
 
 	switch contentType {
 	case "application/json":
-		if err := json.NewDecoder(resp.Body).Decode(&synoResponse); err != nil {
-			return nil, err
+		if respBody, readErr := io.ReadAll(resp.Body); readErr == nil {
+			if decodeErr := json.NewDecoder(bytes.NewReader(respBody)).Decode(&synoResponse); decodeErr != nil {
+				return nil, errors.New("unable to decode response: " + decodeErr.Error() + "\n\n" + string(respBody))
+				//return nil, decodeErr
+			}
+		} else {
+			return nil, readErr
 		}
 	case "application/octet-stream":
 		resp, err := download(resp.Body)

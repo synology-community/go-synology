@@ -30,6 +30,14 @@ func (d *Client) ProjectStopStream(
 	return api.Post[ProjectStreamResponse](d.client, ctx, &req, methods.ProjectStopStream)
 }
 
+// ProjectRestartStream implements DockerApi.
+func (d *Client) ProjectRestartStream(
+	ctx context.Context,
+	req ProjectStreamRequest,
+) (*ProjectStreamResponse, error) {
+	return api.Post[ProjectStreamResponse](d.client, ctx, &req, methods.ProjectRestartStream)
+}
+
 // ProjectStartStream implements DockerApi.
 func (d *Client) ProjectStartStream(
 	ctx context.Context,

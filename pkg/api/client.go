@@ -109,6 +109,69 @@ func (c *Client) Credentials() Credentials {
 	return c.ApiCredentials
 }
 
+// Session data to bypass login process
+type Session struct {
+	SessionID string    `json:"sid"`
+	SynoToken string    `json:"syno_token"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+// ExportSession returns the current session structure (SID, token and timestamp).
+func (c *Client) ExportSession() Session {
+	return Session{
+		SessionID: c.ApiCredentials.SessionID,
+		SynoToken: c.ApiCredentials.Token,
+		CreatedAt: time.Now(),
+	}
+}
+
+// ImportSession injects a previously exported session into the client and wires it into the base URL.
+func (c *Client) ImportSession(s Session) {
+	c.ApiCredentials = Credentials{
+		SessionID: s.SessionID,
+		Token:     s.SynoToken,
+	}
+	if c.BaseURL != nil {
+		q := c.BaseURL.Query()
+		if s.SessionID != "" {
+			q.Set("_sid", s.SessionID)
+		}
+		if s.SynoToken != "" {
+			q.Set("SynoToken", s.SynoToken)
+		}
+		c.BaseURL.RawQuery = q.Encode()
+	}
+}
+
+// IsSessionAlive verifies if current session (usually imported) is still valid by calling a info API.
+func (c *Client) IsSessionAlive(ctx context.Context) (bool, error) {
+	if c.BaseURL == nil {
+		return false, errors.New("base url is nil")
+	}
+	if c.ApiCredentials.SessionID == "" && c.ApiCredentials.Token == "" {
+		return false, nil
+	}
+	if _, ok := ctx.Deadline(); !ok {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+	}
+	if _, err := c.GetApiInfo(ctx); err == nil {
+		return true, nil
+	} else {
+		var ae ApiError
+		if errors.As(err, &ae) {
+			if ae.Code == 119 {
+				return false, nil
+			}
+			return false, fmt.Errorf("session probe failed with code %d", ae.Code)
+		}
+		return false, err
+	}
+}
+
+var ErrOtpRejected = errors.New("OTP code rejected (invalid or reused)") // special case to handle retries
+
 // Login runs a login flow to retrieve session token from Synology.
 func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginResponse, error) {
 	username := options.Username
@@ -168,6 +231,9 @@ func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginRespons
 				}
 			}
 		} else {
+			if apiErr, ok := err.(ApiError); ok && apiErr.Code == 404 {
+				return nil, ErrOtpRejected
+			}
 			return nil, multierror.Append(err, errors.New("unable to login using token and password"))
 		}
 	} else {

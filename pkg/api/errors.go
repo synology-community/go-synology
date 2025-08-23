@@ -697,6 +697,12 @@ func (ef ErrorFields) WithSummaries(knownErrors ErrorSummaries) error {
 
 func (s ApiError) WithSummaries(errorSummaries ErrorSummaries) error {
 	s.Summary = DescribeError(s.Code, errorSummaries())
+	if s.Code == 403 {
+		return PermissionDeniedError(s)
+	}
+	if s.Code == 404 {
+		return NotFoundError(s)
+	}
 	return s
 }
 

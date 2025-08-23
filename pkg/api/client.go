@@ -175,6 +175,7 @@ func (c *Client) IsSessionAlive(ctx context.Context) (bool, error) {
 }
 
 var ErrOtpRejected = errors.New("OTP code rejected (invalid or reused)") // special case to handle retries
+var ErrOtpRequired = errors.New("OTP code is required by the server, but was not provided (password was correct)")
 
 // Login runs a login flow to retrieve session token from Synology.
 func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginResponse, error) {
@@ -238,7 +239,11 @@ func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginRespons
 			if apiErr, ok := err.(ApiError); ok && apiErr.Code == 404 {
 				return nil, ErrOtpRejected
 			}
-			return nil, multierror.Append(err, errors.New("unable to login using token and password"))
+			if otpSecret != "" {
+				return nil, multierror.Append(err, errors.New("unable to login using TOTP and password"))
+			} else {
+				return nil, multierror.Append(err, errors.New("unable to login using password"))
+			}
 		}
 	} else {
 		if resp.Token != "" {
@@ -571,6 +576,7 @@ func Do[T Response](
 
 func handle[T Response](resp *http.Response, errorSummaries ErrorSummaries) (*T, error) {
 	var synoResponse ApiResponse[T]
+	var synoResponsePartialAuth ApiResponsePartialAuth[T]
 
 	contentType := resp.Header.Get("Content-Type")
 	contentType = strings.Split(contentType, ";")[0]
@@ -579,7 +585,11 @@ func handle[T Response](resp *http.Response, errorSummaries ErrorSummaries) (*T,
 	case "application/json":
 		if respBody, readErr := io.ReadAll(resp.Body); readErr == nil {
 			if decodeErr := json.NewDecoder(bytes.NewReader(respBody)).Decode(&synoResponse); decodeErr != nil {
-				return nil, errors.New("unable to decode response: " + decodeErr.Error() + "\n\n" + string(respBody))
+				if decodeErr := json.NewDecoder(bytes.NewReader(respBody)).Decode(&synoResponsePartialAuth); decodeErr == nil {
+					return nil, ErrOtpRequired
+				} else {
+					return nil, errors.New("unable to decode response: " + decodeErr.Error() + "\n\n" + string(respBody))
+				}
 			}
 		} else {
 			return nil, readErr
@@ -616,6 +626,9 @@ type NotFoundError ApiError
 
 func (e NotFoundError) Error() string {
 	msg := "not found"
+	if e.Summary != "" {
+		msg = e.Summary
+	}
 	multierror.Append(fmt.Errorf(msg), e)
 	return msg
 }
@@ -624,6 +637,9 @@ type PermissionDeniedError ApiError
 
 func (e PermissionDeniedError) Error() string {
 	msg := "permission denied"
+	if e.Summary != "" {
+		msg = e.Summary
+	}
 	multierror.Append(fmt.Errorf(msg), e)
 	return msg
 }

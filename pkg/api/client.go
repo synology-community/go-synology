@@ -580,7 +580,6 @@ func handle[T Response](resp *http.Response, errorSummaries ErrorSummaries) (*T,
 		if respBody, readErr := io.ReadAll(resp.Body); readErr == nil {
 			if decodeErr := json.NewDecoder(bytes.NewReader(respBody)).Decode(&synoResponse); decodeErr != nil {
 				return nil, errors.New("unable to decode response: " + decodeErr.Error() + "\n\n" + string(respBody))
-				//return nil, decodeErr
 			}
 		} else {
 			return nil, readErr
@@ -610,21 +609,12 @@ func handleErrors[T Response](response ApiResponse[T], knownErrors ErrorSummarie
 		return nil
 	}
 
-	if response.Error.Code == 403 {
-		//return PermissionDeniedError(response.Error) // this removes context of knownErrors and introduces incorrect message for at least Login API
-	}
-
-	if response.Error.Code == 404 {
-		//return NotFoundError(response.Error) // this removes context of knownErrors and introduces incorrect message for at least Login API
-	}
-
 	return response.Error.WithSummaries(knownErrors)
 }
 
 type NotFoundError ApiError
 
 func (e NotFoundError) Error() string {
-	//return multierror.Append(fmt.Errorf("not found"), e).Error() // avoid printing e directly and using multierror to prevent recursion
 	msg := "not found"
 	multierror.Append(fmt.Errorf(msg), e)
 	return msg
@@ -633,7 +623,6 @@ func (e NotFoundError) Error() string {
 type PermissionDeniedError ApiError
 
 func (e PermissionDeniedError) Error() string {
-	//return multierror.Append(fmt.Errorf("permission denied"), e).Error() // avoid printing e directly and using multierror to prevent recursion
 	msg := "permission denied"
 	multierror.Append(fmt.Errorf(msg), e)
 	return msg

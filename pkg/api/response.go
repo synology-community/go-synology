@@ -13,6 +13,20 @@ type Response interface {
 	Data
 }
 
+// This is returned if no OTP code is provided when required: `{"error":{"code":403,"errors":{"token":"<some_token>","types":[{"type":"otp"}]}},"success":false}`
+type ApiResponsePartialAuth[TData Data] struct {
+	Success bool `json:"success"`
+	Error   struct {
+		Code   int32 `json:"code"`
+		Errors struct {
+			Token string `json:"token"`
+			Types []struct {
+				Type string `json:"type"`
+			} `json:"types"`
+		} `json:"errors"`
+	} `json:"error"`
+}
+
 // ApiResponse is a concrete Response implementation.
 // It is a generic struct with common to all Synology response fields.
 type ApiResponse[TData Data] struct {

@@ -1,6 +1,9 @@
 package synology
 
 import (
+	"context"
+	"errors"
+
 	"github.com/synology-community/go-synology/pkg/api"
 	"github.com/synology-community/go-synology/pkg/api/core"
 	"github.com/synology-community/go-synology/pkg/api/docker"
@@ -69,4 +72,27 @@ func New(o api.Options) (Api, error) {
 	synoClient.Docker = docker.New(synoClient)
 
 	return synoClient, nil
+}
+
+// ExportSession exposes the underlying api.Client.ExportSession
+func (c *Client) ExportSession() api.Session {
+	if ac, ok := c.Api.(*api.Client); ok {
+		return ac.ExportSession()
+	}
+	return api.Session{}
+}
+
+// ImportSession exposes the underlying api.Client.ImportSession
+func (c *Client) ImportSession(s api.Session) {
+	if ac, ok := c.Api.(*api.Client); ok {
+		ac.ImportSession(s)
+	}
+}
+
+// IsSessionAlive exposes the underlying api.Client.IsSessionAlive
+func (c *Client) IsSessionAlive(ctx context.Context) (bool, error) {
+	if ac, ok := c.Api.(*api.Client); ok {
+		return ac.IsSessionAlive(ctx)
+	}
+	return false, errors.New("underlying api client does not support IsSessionAlive")
 }

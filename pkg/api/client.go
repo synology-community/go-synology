@@ -109,7 +109,7 @@ func (c *Client) Credentials() Credentials {
 	return c.ApiCredentials
 }
 
-// Session data to bypass login process
+// Session data to bypass login process.
 type Session struct {
 	SessionID string    `json:"sid"`
 	SynoToken string    `json:"syno_token"`
@@ -174,8 +174,14 @@ func (c *Client) IsSessionAlive(ctx context.Context) (bool, error) {
 	}
 }
 
-var ErrOtpRejected = errors.New("OTP code rejected (invalid or reused)") // special case to handle retries
-var ErrOtpRequired = errors.New("OTP code is required by the server, but was not provided (password was correct)")
+var (
+	ErrOtpRejected = errors.New(
+		"OTP code rejected (invalid or reused)",
+	) // special case to handle retries
+	ErrOtpRequired = errors.New(
+		"OTP code is required by the server, but was not provided (password was correct)",
+	)
+)
 
 // Login runs a login flow to retrieve session token from Synology.
 func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginResponse, error) {
@@ -629,7 +635,7 @@ func (e NotFoundError) Error() string {
 	if e.Summary != "" {
 		msg = e.Summary
 	}
-	multierror.Append(fmt.Errorf(msg), e)
+	_ = multierror.Append(fmt.Errorf("%s", msg), e)
 	return msg
 }
 
@@ -640,7 +646,7 @@ func (e PermissionDeniedError) Error() string {
 	if e.Summary != "" {
 		msg = e.Summary
 	}
-	multierror.Append(fmt.Errorf(msg), e)
+	_ = multierror.Append(fmt.Errorf("%s", msg), e)
 	return msg
 }
 

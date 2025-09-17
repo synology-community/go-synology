@@ -13,7 +13,7 @@ type Response interface {
 	Data
 }
 
-// This is returned if no OTP code is provided when required: `{"error":{"code":403,"errors":{"token":"<some_token>","types":[{"type":"otp"}]}},"success":false}`
+// This is returned if no OTP code is provided when required: `{"error":{"code":403,"errors":{"token":"<some_token>","types":[{"type":"otp"}]}},"success":false}`.
 type ApiResponsePartialAuth[TData Data] struct {
 	Success bool `json:"success"`
 	Error   struct {

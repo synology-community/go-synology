@@ -48,7 +48,7 @@ func (c *Client) GetApiInfo(ctx context.Context) (*map[string]InfoData, error) {
 	return List[ApiInfo](c, ctx, Api_Info)
 }
 
-// GetUserInfo queries information about the currently authenticated user; it is globally available to ensure API can be properly validated
+// GetUserInfo queries information about the currently authenticated user; it is globally available to ensure API can be properly validated.
 func (c *Client) GetUserInfo(ctx context.Context) (*UserInfo, error) {
 	uir := UserInfoReq{
 		Method: "get",

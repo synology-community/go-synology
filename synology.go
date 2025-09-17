@@ -74,7 +74,7 @@ func New(o api.Options) (Api, error) {
 	return synoClient, nil
 }
 
-// ExportSession exposes the underlying api.Client.ExportSession
+// ExportSession exposes the underlying api.Client.ExportSession.
 func (c *Client) ExportSession() api.Session {
 	if ac, ok := c.Api.(*api.Client); ok {
 		return ac.ExportSession()
@@ -82,14 +82,14 @@ func (c *Client) ExportSession() api.Session {
 	return api.Session{}
 }
 
-// ImportSession exposes the underlying api.Client.ImportSession
+// ImportSession exposes the underlying api.Client.ImportSession.
 func (c *Client) ImportSession(s api.Session) {
 	if ac, ok := c.Api.(*api.Client); ok {
 		ac.ImportSession(s)
 	}
 }
 
-// IsSessionAlive exposes the underlying api.Client.IsSessionAlive
+// IsSessionAlive exposes the underlying api.Client.IsSessionAlive.
 func (c *Client) IsSessionAlive(ctx context.Context) (bool, error) {
 	if ac, ok := c.Api.(*api.Client); ok {
 		return ac.IsSessionAlive(ctx)

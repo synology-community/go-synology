@@ -31,6 +31,10 @@ type Api interface {
 		req ProjectStreamRequest,
 	) (*ProjectStreamResponse, error)
 	ProjectStopStream(ctx context.Context, req ProjectStreamRequest) (*ProjectStreamResponse, error)
+	ProjectRestartStream(
+		ctx context.Context,
+		req ProjectStreamRequest,
+	) (*ProjectStreamResponse, error)
 	ProjectStartStream(
 		ctx context.Context,
 		req ProjectStreamRequest,

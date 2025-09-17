@@ -109,6 +109,74 @@ func (c *Client) Credentials() Credentials {
 	return c.ApiCredentials
 }
 
+// Session data to bypass login process
+type Session struct {
+	SessionID string    `json:"sid"`
+	SynoToken string    `json:"syno_token"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+// ExportSession returns the current session structure (SID, token and timestamp).
+func (c *Client) ExportSession() Session {
+	return Session{
+		SessionID: c.ApiCredentials.SessionID,
+		SynoToken: c.ApiCredentials.Token,
+		CreatedAt: time.Now(),
+	}
+}
+
+// ImportSession injects a previously exported session into the client and wires it into the base URL.
+func (c *Client) ImportSession(s Session) {
+	c.ApiCredentials = Credentials{
+		SessionID: s.SessionID,
+		Token:     s.SynoToken,
+	}
+	if c.BaseURL != nil {
+		q := c.BaseURL.Query()
+		if s.SessionID != "" {
+			q.Set("_sid", s.SessionID)
+		}
+		if s.SynoToken != "" {
+			q.Set("SynoToken", s.SynoToken)
+		}
+		c.BaseURL.RawQuery = q.Encode()
+	}
+}
+
+// IsSessionAlive verifies if current session (usually imported) is still valid by calling a info API.
+func (c *Client) IsSessionAlive(ctx context.Context) (bool, error) {
+	if c.BaseURL == nil {
+		return false, errors.New("base url is nil")
+	}
+	if c.ApiCredentials.SessionID == "" && c.ApiCredentials.Token == "" {
+		return false, nil
+	}
+	if _, ok := ctx.Deadline(); !ok {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+	}
+
+	if data, err := c.GetUserInfo(ctx); err == nil {
+		if data.UserName == "" {
+			return false, fmt.Errorf("session probe failed to query user info")
+		}
+		return true, nil
+	} else {
+		var ae ApiError
+		if errors.As(err, &ae) {
+			if ae.Code == 119 {
+				return false, nil
+			}
+			return false, fmt.Errorf("session probe failed with code %d", ae.Code)
+		}
+		return false, err
+	}
+}
+
+var ErrOtpRejected = errors.New("OTP code rejected (invalid or reused)") // special case to handle retries
+var ErrOtpRequired = errors.New("OTP code is required by the server, but was not provided (password was correct)")
+
 // Login runs a login flow to retrieve session token from Synology.
 func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginResponse, error) {
 	username := options.Username
@@ -168,7 +236,14 @@ func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginRespons
 				}
 			}
 		} else {
-			return nil, multierror.Append(err, errors.New("unable to login using token and password"))
+			if apiErr, ok := err.(ApiError); ok && apiErr.Code == 404 {
+				return nil, ErrOtpRejected
+			}
+			if otpSecret != "" {
+				return nil, multierror.Append(err, errors.New("unable to login using TOTP and password"))
+			} else {
+				return nil, multierror.Append(err, errors.New("unable to login using password"))
+			}
 		}
 	} else {
 		if resp.Token != "" {
@@ -501,14 +576,23 @@ func Do[T Response](
 
 func handle[T Response](resp *http.Response, errorSummaries ErrorSummaries) (*T, error) {
 	var synoResponse ApiResponse[T]
+	var synoResponsePartialAuth ApiResponsePartialAuth[T]
 
 	contentType := resp.Header.Get("Content-Type")
 	contentType = strings.Split(contentType, ";")[0]
 
 	switch contentType {
 	case "application/json":
-		if err := json.NewDecoder(resp.Body).Decode(&synoResponse); err != nil {
-			return nil, err
+		if respBody, readErr := io.ReadAll(resp.Body); readErr == nil {
+			if decodeErr := json.NewDecoder(bytes.NewReader(respBody)).Decode(&synoResponse); decodeErr != nil {
+				if decodeErr := json.NewDecoder(bytes.NewReader(respBody)).Decode(&synoResponsePartialAuth); decodeErr == nil {
+					return nil, ErrOtpRequired
+				} else {
+					return nil, errors.New("unable to decode response: " + decodeErr.Error() + "\n\n" + string(respBody))
+				}
+			}
+		} else {
+			return nil, readErr
 		}
 	case "application/octet-stream":
 		resp, err := download(resp.Body)
@@ -535,27 +619,29 @@ func handleErrors[T Response](response ApiResponse[T], knownErrors ErrorSummarie
 		return nil
 	}
 
-	if response.Error.Code == 403 {
-		return PermissionDeniedError(response.Error)
-	}
-
-	if response.Error.Code == 404 {
-		return NotFoundError(response.Error)
-	}
-
 	return response.Error.WithSummaries(knownErrors)
 }
 
 type NotFoundError ApiError
 
 func (e NotFoundError) Error() string {
-	return multierror.Append(fmt.Errorf("not found"), e).Error()
+	msg := "not found"
+	if e.Summary != "" {
+		msg = e.Summary
+	}
+	multierror.Append(fmt.Errorf(msg), e)
+	return msg
 }
 
 type PermissionDeniedError ApiError
 
 func (e PermissionDeniedError) Error() string {
-	return multierror.Append(fmt.Errorf("permission denied"), e).Error()
+	msg := "permission denied"
+	if e.Summary != "" {
+		msg = e.Summary
+	}
+	multierror.Append(fmt.Errorf(msg), e)
+	return msg
 }
 
 func (e PermissionDeniedError) GetToken() (token string, err error) {

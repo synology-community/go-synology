@@ -106,6 +106,12 @@ var (
 		Method:         api.MethodStopStream,
 		ErrorSummaries: CommonErrors,
 	}
+	ProjectRestartStream = api.Method{
+		API:            API_DockerProject,
+		Version:        1,
+		Method:         api.MethodRestartStream,
+		ErrorSummaries: CommonErrors,
+	}
 	ProjectStartStream = api.Method{
 		API:            API_DockerProject,
 		Version:        1,

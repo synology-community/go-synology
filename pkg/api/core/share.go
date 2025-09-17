@@ -28,7 +28,7 @@ type Share struct {
 	Name                    string  `json:"name,omitempty"`
 	QuotaValue              int     `json:"quota_value,omitempty"`
 	RecycleBinAdminOnly     bool    `json:"recycle_bin_admin_only,omitempty"`
-	ShareQuotaLogicalSize   int     `json:"share_quota_logical_size,omitempty"`
+	ShareQuotaLogicalSize   float64 `json:"share_quota_logical_size,omitempty"`
 	ShareQuotaStatus        string  `json:"share_quota_status,omitempty"`
 	ShareQuotaUsed          float64 `json:"share_quota_used,omitempty"`
 	SupportAction           int     `json:"support_action,omitempty"`

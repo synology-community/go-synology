@@ -1,3 +1,4 @@
+// Package virtualization implements an API client for the Virtual Machine Manager.
 package virtualization
 
 import (
@@ -7,6 +8,7 @@ import (
 )
 
 type Api interface {
+	GuestGetByID(ctx context.Context, guest Guest) (*Guest, error)
 	GuestGet(ctx context.Context, guest Guest) (*Guest, error)
 	GuestList(ctx context.Context) (*GuestList, error)
 	GuestCreate(ctx context.Context, guest Guest) (*Guest, error)

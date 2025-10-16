@@ -62,6 +62,7 @@ type GuestList struct {
 }
 
 type GetGuest struct {
+	ID   string `form:"guest_id" url:"guest_id"`
 	Name string `form:"guest_name" url:"guest_name"`
 }
 

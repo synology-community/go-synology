@@ -118,12 +118,17 @@ func (v *Client) TaskGet(ctx context.Context, taskID string) (*Task, error) {
 	}
 }
 
-// GetGuest implements VirtualizationAPI.
+// GuestGetByID implements VirtualizationAPI.
+func (v *Client) GuestGetByID(ctx context.Context, guest Guest) (*Guest, error) {
+	return api.Post[Guest](v.client, ctx, &GetGuest{ID: guest.ID}, methods.GuestGet)
+}
+
+// GuestGet implements VirtualizationAPI.
 func (v *Client) GuestGet(ctx context.Context, guest Guest) (*Guest, error) {
 	return api.Post[Guest](v.client, ctx, &GetGuest{Name: guest.Name}, methods.GuestGet)
 }
 
-// ListGuests implements VirtualizationAPI.
+// GuestList implements VirtualizationAPI.
 func (v *Client) GuestList(ctx context.Context) (*GuestList, error) {
 	return api.Post[GuestList, api.Request](v.client, ctx, nil, methods.GuestList)
 }

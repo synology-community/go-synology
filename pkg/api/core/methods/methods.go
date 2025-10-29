@@ -259,7 +259,49 @@ var (
 		Method:         api.MethodAuth,
 		ErrorSummaries: api.GlobalErrors,
 	}
+	UserCreate = api.Method{
+		API:            Core_User,
+		Version:        1,
+		Method:         api.MethodCreate,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	UserModify = api.Method{
+		API:            Core_User,
+		Version:        1,
+		Method:         api.MethodSet,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	UserDelete = api.Method{
+		API:            Core_User,
+		Version:        1,
+		Method:         api.MethodDelete,
+		ErrorSummaries: api.GlobalErrors,
+	}
 	UserList = api.Method{
+		API:            Core_User,
+		Version:        1,
+		Method:         api.MethodList,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	GroupCreate = api.Method{
+		API:            Core_User,
+		Version:        1,
+		Method:         api.MethodCreate,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	GroupModify = api.Method{
+		API:            Core_User,
+		Version:        1,
+		Method:         api.MethodSet,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	GroupDelete = api.Method{
+		API:            Core_User,
+		Version:        1,
+		Method:         api.MethodDelete,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	GroupList = api.Method{
 		API:            Core_User,
 		Version:        1,
 		Method:         api.MethodList,

@@ -999,3 +999,291 @@ func TestClient_RootEventDelete(t *testing.T) {
 		})
 	}
 }
+
+func TestClient_UserCreate(t *testing.T) {
+	type fields struct {
+		client Api
+	}
+	type args struct {
+		ctx context.Context
+		req UserCreateRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name:   "Create user",
+			fields: fields{client: newClient(t)},
+			args: args{
+				ctx: context.Background(),
+				req: UserCreateRequest{
+					Name:        "test_api_user",
+					Password:    "TestPassword123!",
+					Email:       "testuser@example.com",
+					Description: "Test user for creation test",
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			createResp, err := tt.fields.client.UserCreate(tt.args.ctx, tt.args.req)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("UserCreate error = %v, wantErr %v", err, tt.wantErr)
+			}
+			require.Equal(t, tt.args.req.Name, createResp.User.Name)
+
+			// Cleanup
+			delReq := UserDeleteRequest{Name: tt.args.req.Name}
+			_, _ = tt.fields.client.UserDelete(tt.args.ctx, delReq)
+		})
+	}
+}
+
+func TestClient_UserModify(t *testing.T) {
+	type fields struct {
+		client Api
+	}
+	type args struct {
+		ctx       context.Context
+		createReq UserCreateRequest
+		req       UserModifyRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name:   "Modify user",
+			fields: fields{client: newClient(t)},
+			args: args{
+				ctx: context.Background(),
+				createReq: UserCreateRequest{
+					Name:        "test_api_user_mod",
+					Password:    "TestPassword123!",
+					Email:       "testuser@example.com",
+					Description: "Test user for modify test",
+				},
+				req: UserModifyRequest{
+					Name:        "test_api_user_mod",
+					Description: "Updated description",
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup: create user
+			_, err := tt.fields.client.UserCreate(tt.args.ctx, tt.args.createReq)
+			if err != nil {
+				t.Fatalf("Setup UserCreate failed: %v", err)
+			}
+
+			modResp, err := tt.fields.client.UserModify(tt.args.ctx, tt.args.req)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("UserModify error = %v, wantErr %v", err, tt.wantErr)
+			}
+			require.Equal(t, "Updated description", modResp.User.Description)
+
+			// Cleanup
+			delReq := UserDeleteRequest{Name: tt.args.createReq.Name}
+			_, _ = tt.fields.client.UserDelete(tt.args.ctx, delReq)
+		})
+	}
+}
+
+func TestClient_UserDelete(t *testing.T) {
+	type fields struct {
+		client Api
+	}
+	type args struct {
+		ctx       context.Context
+		createReq UserCreateRequest
+		req       UserDeleteRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name:   "Delete user",
+			fields: fields{client: newClient(t)},
+			args: args{
+				ctx: context.Background(),
+				createReq: UserCreateRequest{
+					Name:        "test_api_user_del",
+					Password:    "TestPassword123!",
+					Email:       "testuser@example.com",
+					Description: "Test user for delete test",
+				},
+				req: UserDeleteRequest{Name: "test_api_user_del"},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup: create user
+			_, err := tt.fields.client.UserCreate(tt.args.ctx, tt.args.createReq)
+			if err != nil {
+				t.Fatalf("Setup UserCreate failed: %v", err)
+			}
+
+			delResp, err := tt.fields.client.UserDelete(tt.args.ctx, tt.args.req)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("UserDelete error = %v, wantErr %v", err, tt.wantErr)
+			}
+			require.True(t, delResp.Success, "UserDelete did not succeed")
+		})
+	}
+}
+
+func TestClient_GroupCreate(t *testing.T) {
+	type fields struct {
+		client Api
+	}
+	type args struct {
+		ctx context.Context
+		req GroupCreateRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name:   "Create group",
+			fields: fields{client: newClient(t)},
+			args: args{
+				ctx: context.Background(),
+				req: GroupCreateRequest{
+					Name:        "test_api_group",
+					Description: "Test group for creation test",
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			createResp, err := tt.fields.client.GroupCreate(tt.args.ctx, tt.args.req)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("GroupCreate error = %v, wantErr %v", err, tt.wantErr)
+			}
+			require.Equal(t, tt.args.req.Name, createResp.Group.Name)
+
+			// Cleanup
+			delReq := GroupDeleteRequest{Name: tt.args.req.Name}
+			_, _ = tt.fields.client.GroupDelete(tt.args.ctx, delReq)
+		})
+	}
+}
+
+func TestClient_GroupModify(t *testing.T) {
+	type fields struct {
+		client Api
+	}
+	type args struct {
+		ctx       context.Context
+		createReq GroupCreateRequest
+		req       GroupModifyRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name:   "Modify group",
+			fields: fields{client: newClient(t)},
+			args: args{
+				ctx: context.Background(),
+				createReq: GroupCreateRequest{
+					Name:        "test_api_group_mod",
+					Description: "Test group for modify test",
+				},
+				req: GroupModifyRequest{
+					Name:        "test_api_group_mod",
+					Description: "Updated group description",
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup: create group
+			_, err := tt.fields.client.GroupCreate(tt.args.ctx, tt.args.createReq)
+			if err != nil {
+				t.Fatalf("Setup GroupCreate failed: %v", err)
+			}
+
+			modResp, err := tt.fields.client.GroupModify(tt.args.ctx, tt.args.req)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("GroupModify error = %v, wantErr %v", err, tt.wantErr)
+			}
+			require.Equal(t, "Updated group description", modResp.Group.Description)
+
+			// Cleanup
+			delReq := GroupDeleteRequest{Name: tt.args.createReq.Name}
+			_, _ = tt.fields.client.GroupDelete(tt.args.ctx, delReq)
+		})
+	}
+}
+
+func TestClient_GroupDelete(t *testing.T) {
+	type fields struct {
+		client Api
+	}
+	type args struct {
+		ctx       context.Context
+		createReq GroupCreateRequest
+		req       GroupDeleteRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name:   "Delete group",
+			fields: fields{client: newClient(t)},
+			args: args{
+				ctx: context.Background(),
+				createReq: GroupCreateRequest{
+					Name:        "test_api_group_del",
+					Description: "Test group for delete test",
+				},
+				req: GroupDeleteRequest{Name: "test_api_group_del"},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup: create group
+			_, err := tt.fields.client.GroupCreate(tt.args.ctx, tt.args.createReq)
+			if err != nil {
+				t.Fatalf("Setup GroupCreate failed: %v", err)
+			}
+
+			delResp, err := tt.fields.client.GroupDelete(tt.args.ctx, tt.args.req)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("GroupDelete error = %v, wantErr %v", err, tt.wantErr)
+			}
+			require.True(t, delResp.Success, "GroupDelete did not succeed")
+		})
+	}
+}

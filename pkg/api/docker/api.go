@@ -11,15 +11,15 @@ type Api interface {
 	) (*CreateContainerResponse, error)
 	ContainerStop(
 		ctx context.Context,
-		req ContainerStopRequest,
+		req ContainerOperationRequest,
 	) (*ContainerStopResponse, error)
 	ContainerStart(
 		ctx context.Context,
-		req ContainerStartRequest,
+		req ContainerOperationRequest,
 	) (*ContainerStartResponse, error)
 	ContainerRestart(
 		ctx context.Context,
-		req ContainerRestartRequest,
+		req ContainerOperationRequest,
 	) (*ContainerRestartResponse, error)
 
 	RegistryList(ctx context.Context, req ListRegistryRequest) (*ListRegistryResponse, error)

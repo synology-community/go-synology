@@ -67,7 +67,7 @@ type CreateContainerResponse struct {
 }
 
 type ContainerOperationRequest struct {
-	Name string `json:"name,omitempty" url:"name"`
+	Name string `json:"name,omitempty" url:"name,omitempty,quoted"`
 }
 
 type ContainerOperationResponse struct {
@@ -78,12 +78,10 @@ type ContainerOperationResponse struct {
 }
 
 type (
-	ContainerStopRequest  = ContainerOperationRequest
 	ContainerStopResponse = ContainerOperationResponse
 )
 
 type (
-	ContainerStartRequest  = ContainerOperationRequest
 	ContainerStartResponse struct {
 		ContainerOperationResponse
 		StartDependentContainer bool `json:"start_dependent_container,omitempty"`
@@ -91,6 +89,5 @@ type (
 )
 
 type (
-	ContainerRestartRequest  = ContainerOperationRequest
 	ContainerRestartResponse = ContainerOperationResponse
 )

@@ -621,17 +621,26 @@ func (c *Client) NetworkGet(ctx context.Context) (*NetworkConfig, error) {
 }
 
 // UserCreate creates a new user.
-func (c *Client) UserCreate(ctx context.Context, req UserCreateRequest) (*UserCreateResponse, error) {
+func (c *Client) UserCreate(
+	ctx context.Context,
+	req UserCreateRequest,
+) (*UserCreateResponse, error) {
 	return api.Post[UserCreateResponse](c.client, ctx, &req, methods.UserCreate)
 }
 
 // UserModify modifies an existing user.
-func (c *Client) UserModify(ctx context.Context, req UserModifyRequest) (*UserModifyResponse, error) {
+func (c *Client) UserModify(
+	ctx context.Context,
+	req UserModifyRequest,
+) (*UserModifyResponse, error) {
 	return api.Post[UserModifyResponse](c.client, ctx, &req, methods.UserModify)
 }
 
 // UserDelete deletes a user.
-func (c *Client) UserDelete(ctx context.Context, req UserDeleteRequest) (*UserDeleteResponse, error) {
+func (c *Client) UserDelete(
+	ctx context.Context,
+	req UserDeleteRequest,
+) (*UserDeleteResponse, error) {
 	return api.Post[UserDeleteResponse](c.client, ctx, &req, methods.UserDelete)
 }
 
@@ -641,17 +650,26 @@ func (c *Client) GroupList(ctx context.Context) (*GroupListResponse, error) {
 }
 
 // GroupCreate creates a new group.
-func (c *Client) GroupCreate(ctx context.Context, req GroupCreateRequest) (*GroupCreateResponse, error) {
+func (c *Client) GroupCreate(
+	ctx context.Context,
+	req GroupCreateRequest,
+) (*GroupCreateResponse, error) {
 	return api.Post[GroupCreateResponse](c.client, ctx, &req, methods.GroupCreate)
 }
 
 // GroupModify modifies an existing group.
-func (c *Client) GroupModify(ctx context.Context, req GroupModifyRequest) (*GroupModifyResponse, error) {
+func (c *Client) GroupModify(
+	ctx context.Context,
+	req GroupModifyRequest,
+) (*GroupModifyResponse, error) {
 	return api.Post[GroupModifyResponse](c.client, ctx, &req, methods.GroupModify)
 }
 
 // GroupDelete deletes a group.
-func (c *Client) GroupDelete(ctx context.Context, req GroupDeleteRequest) (*GroupDeleteResponse, error) {
+func (c *Client) GroupDelete(
+	ctx context.Context,
+	req GroupDeleteRequest,
+) (*GroupDeleteResponse, error) {
 	return api.Post[GroupDeleteResponse](c.client, ctx, &req, methods.GroupDelete)
 }
 

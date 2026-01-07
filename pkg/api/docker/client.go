@@ -189,7 +189,7 @@ func (d *Client) ContainerCreate(
 // ContainerStop implements DockerApi.
 func (d *Client) ContainerStop(
 	ctx context.Context,
-	req ContainerStopRequest,
+	req ContainerOperationRequest,
 ) (*ContainerStopResponse, error) {
 	return api.Post[ContainerStopResponse](d.client, ctx, &req, methods.Stop)
 }
@@ -197,7 +197,7 @@ func (d *Client) ContainerStop(
 // ContainerStart implements DockerApi.
 func (d *Client) ContainerStart(
 	ctx context.Context,
-	req ContainerStartRequest,
+	req ContainerOperationRequest,
 ) (*ContainerStartResponse, error) {
 	return api.Post[ContainerStartResponse](d.client, ctx, &req, methods.Start)
 }
@@ -205,7 +205,7 @@ func (d *Client) ContainerStart(
 // ContainerRestart implements DockerApi.
 func (d *Client) ContainerRestart(
 	ctx context.Context,
-	req ContainerRestartRequest,
+	req ContainerOperationRequest,
 ) (*ContainerRestartResponse, error) {
 	return api.Post[ContainerRestartResponse](d.client, ctx, &req, methods.Restart)
 }

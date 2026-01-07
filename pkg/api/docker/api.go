@@ -9,6 +9,18 @@ type Api interface {
 		ctx context.Context,
 		container CreateContainerRequest,
 	) (*CreateContainerResponse, error)
+	ContainerStop(
+		ctx context.Context,
+		req ContainerStopRequest,
+	) (*ContainerStopResponse, error)
+	ContainerStart(
+		ctx context.Context,
+		req ContainerStartRequest,
+	) (*ContainerStartResponse, error)
+	ContainerRestart(
+		ctx context.Context,
+		req ContainerRestartRequest,
+	) (*ContainerRestartResponse, error)
 
 	RegistryList(ctx context.Context, req ListRegistryRequest) (*ListRegistryResponse, error)
 

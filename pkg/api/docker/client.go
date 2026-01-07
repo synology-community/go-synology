@@ -186,6 +186,30 @@ func (d *Client) ContainerCreate(
 	return api.Post[CreateContainerResponse](d.client, ctx, &req, methods.Create)
 }
 
+// ContainerStop implements DockerApi.
+func (d *Client) ContainerStop(
+	ctx context.Context,
+	req ContainerStopRequest,
+) (*ContainerStopResponse, error) {
+	return api.Post[ContainerStopResponse](d.client, ctx, &req, methods.Stop)
+}
+
+// ContainerStart implements DockerApi.
+func (d *Client) ContainerStart(
+	ctx context.Context,
+	req ContainerStartRequest,
+) (*ContainerStartResponse, error) {
+	return api.Post[ContainerStartResponse](d.client, ctx, &req, methods.Start)
+}
+
+// ContainerRestart implements DockerApi.
+func (d *Client) ContainerRestart(
+	ctx context.Context,
+	req ContainerRestartRequest,
+) (*ContainerRestartResponse, error) {
+	return api.Post[ContainerRestartResponse](d.client, ctx, &req, methods.Restart)
+}
+
 // RegistryList implements DockerApi.
 func (d *Client) RegistryList(
 	ctx context.Context,

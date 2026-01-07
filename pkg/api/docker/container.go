@@ -65,3 +65,32 @@ type CreateContainerResponse struct {
 	Services                []string `json:"services,omitempty"`
 	StartDependentContainer bool     `json:"start_dependent_container,omitempty"`
 }
+
+type ContainerOperationRequest struct {
+	Name string `json:"name,omitempty" url:"name"`
+}
+
+type ContainerOperationResponse struct {
+	CPU           float64 `json:"cpu,omitempty"`
+	Memory        int64   `json:"memory,omitempty"`
+	MemoryPercent float64 `json:"memoryPercent,omitempty"`
+	Name          string  `json:"name,omitempty"`
+}
+
+type (
+	ContainerStopRequest  = ContainerOperationRequest
+	ContainerStopResponse = ContainerOperationResponse
+)
+
+type (
+	ContainerStartRequest  = ContainerOperationRequest
+	ContainerStartResponse struct {
+		ContainerOperationResponse
+		StartDependentContainer bool `json:"start_dependent_container,omitempty"`
+	}
+)
+
+type (
+	ContainerRestartRequest  = ContainerOperationRequest
+	ContainerRestartResponse = ContainerOperationResponse
+)

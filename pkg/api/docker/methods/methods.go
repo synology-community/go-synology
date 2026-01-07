@@ -22,6 +22,24 @@ var (
 			1101: "The number of folders to the parent folder would exceed the system limitation.",
 		}),
 	}
+	Stop = api.Method{
+		API:            API_DockerContainer,
+		Version:        1,
+		Method:         api.MethodStop,
+		ErrorSummaries: CommonErrors,
+	}
+	Start = api.Method{
+		API:            API_DockerContainer,
+		Version:        1,
+		Method:         api.MethodStart,
+		ErrorSummaries: CommonErrors,
+	}
+	Restart = api.Method{
+		API:            API_DockerContainer,
+		Version:        1,
+		Method:         api.MethodRestart,
+		ErrorSummaries: CommonErrors,
+	}
 	Get = api.Method{
 		API:            API_DockerContainer,
 		Version:        1,

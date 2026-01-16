@@ -110,11 +110,17 @@ func Marshal(b *bytes.Buffer, input ...any) (*multipart.Writer, int64, error) {
 					return nil, fileSize, err
 				}
 			case reflect.Int:
-				if err := w.WriteField(formFieldName, strconv.Itoa(int(v.Field(i).Int()))); err != nil {
+				if err := w.WriteField(
+					formFieldName,
+					strconv.Itoa(int(v.Field(i).Int())),
+				); err != nil {
 					return nil, fileSize, err
 				}
 			case reflect.Bool:
-				if err := w.WriteField(formFieldName, strconv.FormatBool(v.Field(i).Bool())); err != nil {
+				if err := w.WriteField(
+					formFieldName,
+					strconv.FormatBool(v.Field(i).Bool()),
+				); err != nil {
 					return nil, fileSize, err
 				}
 			case reflect.Slice:
@@ -126,7 +132,10 @@ func Marshal(b *bytes.Buffer, input ...any) (*multipart.Writer, int64, error) {
 						item := slice.Index(iSlice)
 						res = append(res, item.String())
 					}
-					if err := w.WriteField(formFieldName, "[\""+strings.Join(res, "\",\"")+"\"]"); err != nil {
+					if err := w.WriteField(
+						formFieldName,
+						"[\""+strings.Join(res, "\",\"")+"\"]",
+					); err != nil {
 						return nil, fileSize, err
 					}
 				case reflect.Int:
@@ -135,7 +144,10 @@ func Marshal(b *bytes.Buffer, input ...any) (*multipart.Writer, int64, error) {
 						item := slice.Index(iSlice)
 						res = append(res, strconv.Itoa(int(item.Int())))
 					}
-					if err := w.WriteField(formFieldName, "["+strings.Join(res, ",")+"]"); err != nil {
+					if err := w.WriteField(
+						formFieldName,
+						"["+strings.Join(res, ",")+"]",
+					); err != nil {
 						return nil, fileSize, err
 					}
 				}
@@ -163,17 +175,26 @@ func Marshal(b *bytes.Buffer, input ...any) (*multipart.Writer, int64, error) {
 							case "name":
 								fileName = embStruct.Field(j).String()
 							default:
-								if err := w.WriteField(fieldName, embStruct.Field(j).String()); err != nil {
+								if err := w.WriteField(
+									fieldName,
+									embStruct.Field(j).String(),
+								); err != nil {
 									return nil, fileSize, err
 								}
 							}
 						default:
-							if err := w.WriteField(fieldName, embStruct.Field(j).String()); err != nil {
+							if err := w.WriteField(
+								fieldName,
+								embStruct.Field(j).String(),
+							); err != nil {
 								return nil, fileSize, err
 							}
 						}
 					case reflect.Int:
-						if err := w.WriteField(fieldName, strconv.Itoa(int(embStruct.Field(j).Int()))); err != nil {
+						if err := w.WriteField(
+							fieldName,
+							strconv.Itoa(int(embStruct.Field(j).Int())),
+						); err != nil {
 							return nil, fileSize, err
 						}
 					}

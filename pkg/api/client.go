@@ -246,7 +246,10 @@ func (c *Client) Login(ctx context.Context, options LoginOptions) (*LoginRespons
 				return nil, ErrOtpRejected
 			}
 			if otpSecret != "" {
-				return nil, multierror.Append(err, errors.New("unable to login using TOTP and password"))
+				return nil, multierror.Append(
+					err,
+					errors.New("unable to login using TOTP and password"),
+				)
 			} else {
 				return nil, multierror.Append(err, errors.New("unable to login using password"))
 			}
@@ -406,7 +409,10 @@ func postFile[TResp Response](
 		}
 
 		req.Header.Add("Content-Length", fmt.Sprintf("%d", fs))
-		req.Header.Add("Content-Type", fmt.Sprintf("multipart/form-data; boundary=%s", w.Boundary()))
+		req.Header.Add(
+			"Content-Type",
+			fmt.Sprintf("multipart/form-data; boundary=%s", w.Boundary()),
+		)
 
 		return Do[TResp](c, req, errorSummaries)
 	}
@@ -590,11 +596,17 @@ func handle[T Response](resp *http.Response, errorSummaries ErrorSummaries) (*T,
 	switch contentType {
 	case "application/json":
 		if respBody, readErr := io.ReadAll(resp.Body); readErr == nil {
-			if decodeErr := json.NewDecoder(bytes.NewReader(respBody)).Decode(&synoResponse); decodeErr != nil {
-				if decodeErr := json.NewDecoder(bytes.NewReader(respBody)).Decode(&synoResponsePartialAuth); decodeErr == nil {
+			if decodeErr := json.NewDecoder(bytes.NewReader(respBody)).
+				Decode(&synoResponse); decodeErr != nil {
+				if decodeErr := json.NewDecoder(bytes.NewReader(respBody)).
+					Decode(&synoResponsePartialAuth); decodeErr == nil {
 					return nil, ErrOtpRequired
 				} else {
-					return nil, errors.New("unable to decode response: " + decodeErr.Error() + "\n\n" + string(respBody))
+					return nil, errors.New(
+						"unable to decode response: " + decodeErr.Error() + "\n\n" + string(
+							respBody,
+						),
+					)
 				}
 			}
 		} else {

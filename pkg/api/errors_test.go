@@ -157,7 +157,11 @@ func TestApiError_UnmarshalJSON(t *testing.T) {
 					assert.Equal(t, "Unknown error code", apiError.Summary)
 				}
 			} else {
-				assert.Empty(t, apiError.Summary, "Summary should not be populated for zero error code")
+				assert.Empty(
+					t,
+					apiError.Summary,
+					"Summary should not be populated for zero error code",
+				)
 			}
 		})
 	}

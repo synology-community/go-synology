@@ -722,7 +722,11 @@ func TestClient_EventGet(t *testing.T) {
 				if result == nil {
 					t.Errorf("Client.EventGet() returned nil result")
 				} else if result.Name != tt.args.name {
-					t.Errorf("Client.EventGet() returned wrong name: got %v, want %v", result.Name, tt.args.name)
+					t.Errorf(
+						"Client.EventGet() returned wrong name: got %v, want %v",
+						result.Name,
+						tt.args.name,
+					)
 				}
 			}
 

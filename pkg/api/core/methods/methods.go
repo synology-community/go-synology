@@ -5,6 +5,7 @@ import (
 )
 
 const (
+	Core_AppPortal_ReverseProxy = "SYNO.Core.AppPortal.ReverseProxy"
 	Core_Event                  = "SYNO.Core.EventScheduler"
 	Core_Event_Root             = "SYNO.Core.EventScheduler.Root"
 	Core_Network                = "SYNO.Core.Network"
@@ -25,6 +26,31 @@ const (
 )
 
 var (
+	ReverseProxyList = api.Method{
+		API:            Core_AppPortal_ReverseProxy,
+		Version:        1,
+		Method:         api.MethodList,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	ReverseProxyDelete = api.Method{
+		API:            Core_AppPortal_ReverseProxy,
+		Version:        1,
+		Method:         api.MethodDelete,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	ReverseProxyCreate = api.Method{
+		API:            Core_AppPortal_ReverseProxy,
+		Version:        1,
+		Method:         api.MethodCreate,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	ReverseProxyModify = api.Method{
+		API:            Core_AppPortal_ReverseProxy,
+		Version:        1,
+		Method:         api.MethodUpdate,
+		ErrorSummaries: api.GlobalErrors,
+	}
+
 	SystemInfo = api.Method{
 		API:            Core_System,
 		Version:        1,

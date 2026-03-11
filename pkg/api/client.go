@@ -76,7 +76,9 @@ func New(o Options) (Api, error) {
 
 	baseURL, err := url.Parse(o.Host)
 
-	baseURL.Scheme = "https"
+	if !o.AllowHTTP {
+		baseURL.Scheme = "https"
+	}
 	baseURL.Path = API_BASE
 
 	if err != nil {
@@ -424,6 +426,11 @@ func List[T Response](c Api, ctx context.Context, method Method) (*T, error) {
 
 func Void[TReq Request](c Api, ctx context.Context, r *TReq, method Method) error {
 	_, err := Get[Request](c, ctx, r, method)
+	return err
+}
+
+func PostVoid[TReq Request](c Api, ctx context.Context, r *TReq, method Method) error {
+	_, err := Post[Request](c, ctx, r, method)
 	return err
 }
 

@@ -70,9 +70,9 @@ type Api interface {
 
 	UserCreate(ctx context.Context, req UserCreateRequest) (*UserCreateResponse, error)
 	UserModify(ctx context.Context, req UserModifyRequest) (*UserModifyResponse, error)
-	UserDelete(ctx context.Context, req UserDeleteRequest) (*UserDeleteResponse, error)
+	UserDelete(ctx context.Context, req UserDeleteRequest) error
 	GroupCreate(ctx context.Context, req GroupCreateRequest) (*GroupCreateResponse, error)
 	GroupModify(ctx context.Context, req GroupModifyRequest) (*GroupModifyResponse, error)
-	GroupDelete(ctx context.Context, req GroupDeleteRequest) (*GroupDeleteResponse, error)
+	GroupDelete(ctx context.Context, req GroupDeleteRequest) error
 	GroupList(ctx context.Context) (*GroupListResponse, error)
 }

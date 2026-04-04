@@ -26,6 +26,7 @@ type Image struct {
 	Storages    Storages  `url:"storages,omitempty"        json:"storages"`
 	Type        ImageType `url:"type,omitempty"            json:"type"`
 	AutoClean   bool      `url:"auto_clean_task,omitempty" json:"-"`
+	UsedSize    int64     `url:"-"                         json:"used_size"`
 }
 
 type ImageList struct {

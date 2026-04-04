@@ -322,8 +322,12 @@ func PostFileUpload[TResp Response](
 }
 
 func mergeQueries(qs ...any) (url.Values, error) {
-	res := map[string][]string{}
+	res := make(url.Values)
 	for _, q := range qs {
+		if uv, ok := q.(url.Values); ok {
+			maps.Copy(res, uv)
+			continue
+		}
 		qq, err := query.Values(q)
 		if err != nil {
 			return nil, err
@@ -342,7 +346,7 @@ func getQuery(c Api, p ...any) (string, error) {
 	ps = append(ps, c.BaseUrl().Query())
 	ps = append(ps, p...)
 
-	q, err := mergeQueries(ps)
+	q, err := mergeQueries(ps...)
 	if err != nil {
 		return "", err
 	}

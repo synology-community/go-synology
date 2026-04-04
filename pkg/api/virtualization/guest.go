@@ -43,18 +43,19 @@ func (s VNICs) EncodeValues(k string, v *url.Values) error {
 }
 
 type Guest struct {
-	ID          string   `url:"guest_id,omitempty"     json:"guest_id"`
-	Name        string   `url:"guest_name,omitempty"   json:"guest_name"`
-	Description string   `url:"description,omitempty"  json:"description"`
-	Status      string   `url:"status,omitempty"       json:"status"`
-	StorageID   string   `url:"storage_id,omitempty"   json:"storage_id"`
-	StorageName string   `url:"storage_name,omitempty" json:"storage_name"`
-	AutoRun     int64    `url:"autorun,omitempty"      json:"autorun"`
-	VcpuNum     int64    `url:"vcpu_num,omitempty"     json:"vcpu_num"`
-	VramSize    int64    `url:"vram_size,omitempty"    json:"vram_size"`
-	Disks       VDisks   `url:"vdisks,omitempty"       json:"vdisks"`
-	Networks    VNICs    `url:"vnics,omitempty"        json:"vnics"`
-	IsoImages   []string `url:"iso_images,omitempty"   json:"iso_images,omitempty" form:"iso_images,omitempty"`
+	ID            string   `url:"guest_id,omitempty"        json:"guest_id"`
+	Name          string   `url:"guest_name,omitempty"      json:"guest_name"`
+	Description   string   `url:"description,omitempty"     json:"description"`
+	Status        string   `url:"status,omitempty"          json:"status"`
+	StorageID     string   `url:"storage_id,omitempty"      json:"storage_id"`
+	StorageName   string   `url:"storage_name,omitempty"    json:"storage_name"`
+	AutoRun       int64    `url:"autorun,omitempty"         json:"autorun"`
+	VcpuNum       int64    `url:"vcpu_num,omitempty"        json:"vcpu_num"`
+	VramSize      int64    `url:"vram_size,omitempty"       json:"vram_size"`
+	Disks         VDisks   `url:"vdisks,omitempty"          json:"vdisks"`
+	Networks      VNICs    `url:"vnics,omitempty"           json:"vnics"`
+	IsoImages     []string `url:"iso_images,omitempty"      json:"iso_images,omitempty" form:"iso_images,omitempty"`
+	AutoCleanTask bool     `url:"auto_clean_task,omitempty"`
 }
 
 type GuestList struct {
@@ -67,13 +68,14 @@ type GetGuest struct {
 }
 
 type GuestUpdate struct {
-	ID          string    `url:"guest_id"              json:"guest_id"`
-	Name        string    `url:"guest_name"            json:"guest_name"`
-	Description string    `url:"description,omitempty" json:"description"`
-	IsoImages   IsoImages `url:"iso_images"            json:"iso_images"`
-	AutoRun     int64     `url:"autorun"               json:"autorun"`
-	VcpuNum     int64     `url:"vcpu_num,omitempty"    json:"vcpu_num"`
-	VramSize    int64     `url:"vram_size,omitempty"   json:"vram_size"`
+	ID          string    `url:"guest_id"                 json:"guest_id"`
+	Name        string    `url:"guest_name"               json:"guest_name"`
+	NewName     string    `url:"new_guest_name,omitempty" json:"-"`
+	Description string    `url:"description,omitempty"    json:"description"`
+	IsoImages   IsoImages `url:"iso_images"               json:"iso_images"`
+	AutoRun     int64     `url:"autorun"                  json:"autorun"`
+	VcpuNum     int64     `url:"vcpu_num,omitempty"       json:"vcpu_num"`
+	VramSize    int64     `url:"vram_size,omitempty"      json:"vram_size"`
 }
 
 type GuestUpdateResponse struct{}

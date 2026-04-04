@@ -30,4 +30,5 @@ type Api interface {
 	TaskGet(ctx context.Context, taskID string) (*Task, error)
 
 	StorageList(ctx context.Context) (*StorageList, error)
+	NetworkList(ctx context.Context) (*NetworkList, error)
 }

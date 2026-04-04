@@ -46,6 +46,10 @@ func (v *Client) ImageUploadAndCreate(
 		return nil, err
 	}
 
+	if resp == nil {
+		return nil, fmt.Errorf("upload_and_create returned empty response")
+	}
+
 	return v.TaskGet(ctx, resp.TaskID)
 }
 
@@ -66,7 +70,12 @@ func (v *Client) GuestUpdate(ctx context.Context, guest GuestUpdate) error {
 
 // StorageList implements VirtualizationAPI.
 func (v *Client) StorageList(ctx context.Context) (*StorageList, error) {
-	return api.List[StorageList](v.client, ctx, methods.StorageList)
+	return api.Post[StorageList, api.Request](v.client, ctx, nil, methods.StorageList)
+}
+
+// NetworkList implements Api.
+func (v *Client) NetworkList(ctx context.Context) (*NetworkList, error) {
+	return api.Post[NetworkList, api.Request](v.client, ctx, nil, methods.NetworkList)
 }
 
 // ImageCreate implements VirtualizationAPI.
@@ -133,7 +142,7 @@ func (v *Client) GuestList(ctx context.Context) (*GuestList, error) {
 	return api.Post[GuestList, api.Request](v.client, ctx, nil, methods.GuestList)
 }
 
-// GuestCreate implements VirtualizationAPI.
+// GuestCreate implements Api. Sends only the documented create parameters.
 func (v *Client) GuestCreate(ctx context.Context, guest Guest) (*Guest, error) {
 	resp, err := api.Post[TaskRef](v.client, ctx, &guest, methods.GuestCreate)
 	if err != nil {
@@ -145,9 +154,10 @@ func (v *Client) GuestCreate(ctx context.Context, guest Guest) (*Guest, error) {
 		return nil, err
 	}
 
-	guest.ID = task.TaskInfo.GuestID
-
-	return &guest, nil
+	return &Guest{
+		ID:   task.TaskInfo.GuestID,
+		Name: guest.Name,
+	}, nil
 }
 
 // GuestDelete implements VirtualizationAPI.

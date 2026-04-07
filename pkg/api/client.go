@@ -14,7 +14,6 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
@@ -452,8 +451,6 @@ func Post[TResp Response, TReq Request](
 		return nil, err
 	}
 
-	fmt.Fprintf(os.Stderr, "[DEBUG] POST %s body: %s\n", method.API, qu.Encode())
-
 	u := c.BaseUrl().JoinPath(method.API)
 	u.RawQuery = ""
 
@@ -603,7 +600,6 @@ func handle[T Response](resp *http.Response, errorSummaries ErrorSummaries) (*T,
 	switch contentType {
 	case "application/json", "text/html", "text/plain", "":
 		if respBody, readErr := io.ReadAll(resp.Body); readErr == nil {
-			fmt.Fprintf(os.Stderr, "[DEBUG] Response body (%s): %s\n", resp.Request.URL, string(respBody))
 			if decodeErr := json.NewDecoder(bytes.NewReader(respBody)).
 				Decode(&synoResponse); decodeErr != nil {
 				if decodeErr := json.NewDecoder(bytes.NewReader(respBody)).

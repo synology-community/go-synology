@@ -17,11 +17,11 @@ type VDisk struct {
 }
 
 type VNIC struct {
-	ID     string `url:"network_id"   json:"network_id,omitempty"`
-	Name   string `url:"network_name" json:"network_name,omitempty"`
-	Mac    string `url:"mac"          json:"mac,omitempty"`
-	Model  int64  `url:"-"            json:"model,omitempty"`
-	VnicID string `url:"-"            json:"vnic_id,omitempty"`
+	ID     string `url:"network_id"      json:"network_id,omitempty"`
+	Name   string `url:"network_name"    json:"network_name,omitempty"`
+	Mac    string `url:"mac"             json:"mac,omitempty"`
+	Model  int64  `url:"model,omitempty" json:"model,omitempty"`
+	VnicID string `url:"model,omitempty" json:"vnic_id,omitempty"`
 }
 
 type (

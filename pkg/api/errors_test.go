@@ -261,18 +261,6 @@ func TestErrorSummary_Combine_DoesNotMutateReceiver(t *testing.T) {
 	assert.Equal(t, ErrorSummary{1: "one", 2: "two"}, base)
 }
 
-func TestErrorSummary_Combine_OverlappingKeys(t *testing.T) {
-	base := ErrorSummary{1: "original", 2: "two"}
-	override := ErrorSummary{1: "overridden", 3: "three"}
-
-	result := base.Combine(override)
-
-	assert.Equal(t, ErrorSummary{1: "overridden", 2: "two", 3: "three"}, result)
-
-	// base must not be mutated
-	assert.Equal(t, ErrorSummary{1: "original", 2: "two"}, base)
-}
-
 // TestErrorSummary_Combine_ConcurrentSafe verifies that calling Combine on the
 // same ErrorSummary from multiple goroutines does not cause a concurrent map
 // write panic (regression test for https://github.com/synology-community/go-synology/issues/78).

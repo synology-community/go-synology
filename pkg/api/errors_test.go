@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -245,6 +246,40 @@ func TestApiError_UnmarshalJSON_PreservesOtherFields(t *testing.T) {
 		[]ErrorFields{{Code: 407, Fields: map[string]any{"new": "value"}}},
 		apiError.Errors,
 	) // Should be updated
+}
+
+func TestErrorSummary_Combine_DoesNotMutateReceiver(t *testing.T) {
+	base := ErrorSummary{1: "one", 2: "two"}
+	extra := ErrorSummary{3: "three"}
+
+	result := base.Combine(extra)
+
+	// result should contain all entries
+	assert.Equal(t, ErrorSummary{1: "one", 2: "two", 3: "three"}, result)
+
+	// base must not be mutated
+	assert.Equal(t, ErrorSummary{1: "one", 2: "two"}, base)
+}
+
+// TestErrorSummary_Combine_ConcurrentSafe verifies that calling Combine on the
+// same ErrorSummary from multiple goroutines does not cause a concurrent map
+// write panic (regression test for https://github.com/synology-community/go-synology/issues/78).
+func TestErrorSummary_Combine_ConcurrentSafe(t *testing.T) {
+	base := GlobalErrors()
+	extra := ErrorSummary{99999: "custom"}
+
+	const goroutines = 20
+	var wg sync.WaitGroup
+	wg.Add(goroutines)
+
+	for range goroutines {
+		go func() {
+			defer wg.Done()
+			_ = base.Combine(extra)
+		}()
+	}
+
+	wg.Wait()
 }
 
 func TestApiError_UnmarshalJSON_ErrorHandling(t *testing.T) {

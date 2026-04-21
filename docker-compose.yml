@@ -1,7 +1,7 @@
 services:
   dsm:
     container_name: dsm
-    image: vdsm/virtual-dsm
+    image: vdsm/virtual-dsm:7.50
     environment:
       DISK_SIZE: "16G"
     # devices:
@@ -11,6 +11,6 @@ services:
     ports:
       - 5000:5000
     volumes:
-      - /var/dsm:/storage
+      - ./dsm:/storage
     stop_grace_period: 2m
     network_mode: bridge

@@ -131,9 +131,11 @@ type ProjectCleanStreamRequest struct {
 }
 
 type ProjectCleanStreamResponse string
+func (ProjectCleanStreamResponse) IsStream() {}
 
 type ProjectStreamRequest struct {
 	ID string `url:"id,omitempty,quoted"`
 }
 
 type ProjectStreamResponse string
+func (ProjectStreamResponse) IsStream() {}

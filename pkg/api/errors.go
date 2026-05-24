@@ -644,11 +644,14 @@ var loginErrors ErrorSummaries = func() ErrorSummary {
 }
 
 func (es ErrorSummary) Combine(params ...ErrorSummary) ErrorSummary {
+	result := make(ErrorSummary, len(es))
+	maps.Copy(result, es)
+
 	for _, p := range params {
-		maps.Copy(es, p)
+		maps.Copy(result, p)
 	}
 
-	return es
+	return result
 }
 
 // ErrorDescriber defines interface to report all known errors to particular object.

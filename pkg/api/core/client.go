@@ -673,6 +673,26 @@ func (c *Client) GroupDelete(
 	return api.Post[GroupDeleteResponse](c.client, ctx, &req, methods.GroupDelete)
 }
 
+// List reverse proxies
+func (c *Client) ReverseProxyList(ctx context.Context) (*ReverseProxyListResponse, error) {
+	return api.Post[ReverseProxyListResponse](c.client, ctx, &ReverseProxyListRequest{}, methods.ReverseProxyList)
+}
+
+// ReverseProxyCreate creates a new reverse proxy entry in login portal
+func (c *Client) ReverseProxyCreate(ctx context.Context, req ReverseProxyCreateRequest) (*ReverseProxyCreateResponse, error) {
+	return api.Post[ReverseProxyCreateResponse](c.client, ctx, &req, methods.ReverseProxyCreate)
+}
+
+// ReverseProxyModify modifies an existing reverse proxy entry.
+func (c *Client) ReverseProxyModify(ctx context.Context, req ReverseProxyModifyRequest) (*ReverseProxyModifyResponse, error) {
+	return api.Post[ReverseProxyModifyResponse](c.client, ctx, &req, methods.ReverseProxyModify)
+}
+
+// ReverseProxyDelete deletes an exisiting reverse proxy entry.
+func (c *Client) ReverseProxyDelete(ctx context.Context, req ReverseProxyDeleteRequest) (*ReverseProxyDeleteResponse, error) {
+	return api.Post[ReverseProxyDeleteResponse](c.client, ctx, &req, methods.ReverseProxyDelete)
+}
+
 func New(client api.Api) Api {
 	return &Client{client: client}
 }

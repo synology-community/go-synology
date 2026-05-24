@@ -637,11 +637,8 @@ func (c *Client) UserModify(
 }
 
 // UserDelete deletes a user.
-func (c *Client) UserDelete(
-	ctx context.Context,
-	req UserDeleteRequest,
-) (*UserDeleteResponse, error) {
-	return api.Post[UserDeleteResponse](c.client, ctx, &req, methods.UserDelete)
+func (c *Client) UserDelete(ctx context.Context, req UserDeleteRequest) error {
+	return api.PostVoid(c.client, ctx, &req, methods.UserDelete)
 }
 
 // GroupList lists all groups.
@@ -666,11 +663,8 @@ func (c *Client) GroupModify(
 }
 
 // GroupDelete deletes a group.
-func (c *Client) GroupDelete(
-	ctx context.Context,
-	req GroupDeleteRequest,
-) (*GroupDeleteResponse, error) {
-	return api.Post[GroupDeleteResponse](c.client, ctx, &req, methods.GroupDelete)
+func (c *Client) GroupDelete(ctx context.Context, req GroupDeleteRequest) error {
+	return api.PostVoid(c.client, ctx, &req, methods.GroupDelete)
 }
 
 func New(client api.Api) Api {

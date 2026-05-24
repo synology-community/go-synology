@@ -20,6 +20,7 @@ const (
 	Core_System                 = "SYNO.Core.System"
 	Core_Task_Root              = "SYNO.Core.TaskScheduler.Root"
 	Core_TaskScheduler          = "SYNO.Core.TaskScheduler"
+	Core_Group                  = "SYNO.Core.Group"
 	Core_User                   = "SYNO.Core.User"
 	DSM_PortEnable              = "SYNO.DSM.PortEnable"
 )
@@ -284,25 +285,25 @@ var (
 		ErrorSummaries: api.GlobalErrors,
 	}
 	GroupCreate = api.Method{
-		API:            Core_User,
+		API:            Core_Group,
 		Version:        1,
 		Method:         api.MethodCreate,
 		ErrorSummaries: api.GlobalErrors,
 	}
 	GroupModify = api.Method{
-		API:            Core_User,
+		API:            Core_Group,
 		Version:        1,
 		Method:         api.MethodSet,
 		ErrorSummaries: api.GlobalErrors,
 	}
 	GroupDelete = api.Method{
-		API:            Core_User,
+		API:            Core_Group,
 		Version:        1,
 		Method:         api.MethodDelete,
 		ErrorSummaries: api.GlobalErrors,
 	}
 	GroupList = api.Method{
-		API:            Core_User,
+		API:            Core_Group,
 		Version:        1,
 		Method:         api.MethodList,
 		ErrorSummaries: api.GlobalErrors,

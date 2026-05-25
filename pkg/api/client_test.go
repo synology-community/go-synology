@@ -1,7 +1,10 @@
 package api
 
+
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"os"
 	"testing"
@@ -9,6 +12,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/synology-community/go-synology/pkg/api/docker"
 	"github.com/synology-community/go-synology/pkg/util"
 )
 
@@ -237,3 +241,30 @@ func TestHandleErrors(t *testing.T) {
 		})
 	}
 }
+
+func TestHandleStreamResponse(t *testing.T) {
+	expectedBody := "bar Pulling\nNetwork foo_default Creating\nExit Code: 0"
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		_, _ = w.Write([]byte(expectedBody))
+	}))
+	defer server.Close()
+
+	c, err := New(Options{
+		Host:       server.URL,
+		VerifyCert: false,
+	})
+	require.NoError(t, err)
+
+	// We simulate the Do[T] flow by calling handle[T] directly
+	// since Do just calls handle.
+	resp, err := server.Client().Get(server.URL)
+	require.NoError(t, err)
+	defer resp.Body.Close()
+
+	// Test with ProjectStreamResponse (which implements IsStream)
+	res, err := handle[docker.ProjectStreamResponse](resp, nil)
+	require.NoError(t, err)
+	assert.Equal(t, expectedBody, string(*res))
+}
+

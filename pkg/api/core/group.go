@@ -2,7 +2,7 @@ package core
 
 // Group represents a Synology DSM group.
 type Group struct {
-	ID          string `json:"gid,omitempty"`
+	ID          int    `json:"gid,omitempty"`
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
 }
@@ -27,17 +27,12 @@ type GroupCreateRequest struct {
 
 // GroupCreateResponse for creating a group.
 type GroupCreateResponse struct {
-	Group Group `json:"group,omitempty"`
+	Group
 }
 
 // GroupDeleteRequest for deleting a group.
 type GroupDeleteRequest struct {
 	Name string `url:"name"`
-}
-
-// GroupDeleteResponse for deleting a group.
-type GroupDeleteResponse struct {
-	Success bool `json:"success"`
 }
 
 // GroupModifyRequest for modifying a group.
@@ -49,5 +44,5 @@ type GroupModifyRequest struct {
 
 // GroupModifyResponse for modifying a group.
 type GroupModifyResponse struct {
-	Group Group `json:"group,omitempty"`
+	Group
 }

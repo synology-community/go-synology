@@ -9,7 +9,7 @@ type PasswordConfirmResponse struct {
 }
 
 type User struct {
-	ID          string `json:"uid,omitempty"`
+	ID          int    `json:"uid,omitempty"`
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
 	Email       string `json:"email,omitempty"`
@@ -42,17 +42,12 @@ type UserCreateRequest struct {
 
 // UserCreateResponse for creating a user.
 type UserCreateResponse struct {
-	User User `json:"user,omitempty"`
+	User
 }
 
 // UserDeleteRequest for deleting a user.
 type UserDeleteRequest struct {
 	Name string `url:"name"`
-}
-
-// UserDeleteResponse for deleting a user.
-type UserDeleteResponse struct {
-	Success bool `json:"success"`
 }
 
 // UserModifyRequest for modifying a user.
@@ -72,5 +67,5 @@ type UserModifyRequest struct {
 
 // UserModifyResponse for modifying a user.
 type UserModifyResponse struct {
-	User User `json:"user,omitempty"`
+	User
 }

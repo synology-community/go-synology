@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"reflect"
 	"strings"
 	"time"
 
@@ -591,6 +592,18 @@ func Do[T Response](
 }
 
 func handle[T Response](resp *http.Response, errorSummaries ErrorSummaries) (*T, error) {
+	var zero T
+	if _, ok := any(zero).(interface{ IsStream() }); ok {
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		v := reflect.New(reflect.TypeOf(zero)).Elem()
+		v.SetString(string(body))
+		out := v.Interface().(T)
+		return &out, nil
+	}
+
 	var synoResponse ApiResponse[T]
 	var synoResponsePartialAuth ApiResponsePartialAuth[T]
 

@@ -75,4 +75,9 @@ type Api interface {
 	GroupModify(ctx context.Context, req GroupModifyRequest) (*GroupModifyResponse, error)
 	GroupDelete(ctx context.Context, req GroupDeleteRequest) (*GroupDeleteResponse, error)
 	GroupList(ctx context.Context) (*GroupListResponse, error)
+
+	ReverseProxyList(ctx context.Context) (*ReverseProxyListResponse, error)
+	ReverseProxyCreate(ctx context.Context, req ReverseProxyCreateRequest) (*ReverseProxyCreateResponse, error)
+	ReverseProxyModify(ctx context.Context, req ReverseProxyModifyRequest) (*ReverseProxyModifyResponse, error)
+	ReverseProxyDelete(ctx context.Context, req ReverseProxyDeleteRequest) (*ReverseProxyDeleteResponse, error)
 }

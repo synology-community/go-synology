@@ -77,7 +77,16 @@ type Api interface {
 	GroupList(ctx context.Context) (*GroupListResponse, error)
 
 	ReverseProxyList(ctx context.Context) (*ReverseProxyListResponse, error)
-	ReverseProxyCreate(ctx context.Context, req ReverseProxyCreateRequest) (*ReverseProxyCreateResponse, error)
-	ReverseProxyModify(ctx context.Context, req ReverseProxyModifyRequest) (*ReverseProxyModifyResponse, error)
-	ReverseProxyDelete(ctx context.Context, req ReverseProxyDeleteRequest) (*ReverseProxyDeleteResponse, error)
+	ReverseProxyCreate(
+		ctx context.Context,
+		req ReverseProxyCreateRequest,
+	) (*ReverseProxyCreateResponse, error)
+	ReverseProxyModify(
+		ctx context.Context,
+		req ReverseProxyModifyRequest,
+	) (*ReverseProxyModifyResponse, error)
+	ReverseProxyDelete(
+		ctx context.Context,
+		req ReverseProxyDeleteRequest,
+	) (*ReverseProxyDeleteResponse, error)
 }

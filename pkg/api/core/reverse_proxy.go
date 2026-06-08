@@ -52,8 +52,7 @@ type ReverseProxyModify struct {
 	Key  string `json:"_key"`
 }
 
-type ReverseProxyListRequest struct {
-}
+type ReverseProxyListRequest struct{}
 
 type ReverseProxyListResponse struct {
 	Entries []ReverseProxy `json:"entries,omitempty"`
@@ -64,23 +63,20 @@ type ReverseProxyCreateRequest struct {
 	Additional []string           `url:"additional,omitempty"`
 }
 
-// ReverseProxyCreateResponse for creating a reverse proxy entry
-type ReverseProxyCreateResponse struct {
-}
+// ReverseProxyCreateResponse for creating a reverse proxy entry.
+type ReverseProxyCreateResponse struct{}
 
-// ReverseProxyDeleteRequest for deleting a reverse proxy entry
+// ReverseProxyDeleteRequest for deleting a reverse proxy entry.
 type ReverseProxyDeleteRequest struct {
 	UUIDs []string `url:"uuids,json"`
 }
 
-// ReverseProxyDeleteResponse for deleting a reverse proxy entry
-type ReverseProxyDeleteResponse struct {
-}
+// ReverseProxyDeleteResponse for deleting a reverse proxy entry.
+type ReverseProxyDeleteResponse struct{}
 
 type ReverseProxyModifyRequest struct {
 	Entry ReverseProxyModify `url:"entry,json"`
 }
 
 // ReverseProxyModifyResponse for modifying a reverse proxy entry.
-type ReverseProxyModifyResponse struct {
-}
+type ReverseProxyModifyResponse struct{}

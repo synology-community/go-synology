@@ -131,7 +131,7 @@ type Encoder interface {
 func Values(v any) (url.Values, error) {
 	values := make(url.Values)
 	val := reflect.ValueOf(v)
-	for val.Kind() == reflect.Ptr {
+	for val.Kind() == reflect.Pointer {
 		if val.IsNil() {
 			return values, nil
 		}
@@ -209,7 +209,7 @@ func reflectValue(values url.Values, val reflect.Value, scope string) error {
 		}
 
 		// recursively dereference pointers. break on nil pointers
-		for sv.Kind() == reflect.Ptr {
+		for sv.Kind() == reflect.Pointer {
 			if sv.IsNil() {
 				break
 			}
@@ -309,7 +309,7 @@ func valueString(v reflect.Value, opts tagOptions, sf reflect.StructField) strin
 
 // valueString returns the string representation of a value.
 func valueStringInner(v reflect.Value, opts tagOptions, sf reflect.StructField) string {
-	for v.Kind() == reflect.Ptr {
+	for v.Kind() == reflect.Pointer {
 		if v.IsNil() {
 			return ""
 		}
@@ -366,7 +366,7 @@ func isEmptyValue(v reflect.Value) bool {
 		return v.Uint() == 0
 	case reflect.Float32, reflect.Float64:
 		return v.Float() == 0
-	case reflect.Interface, reflect.Ptr:
+	case reflect.Interface, reflect.Pointer:
 		return v.IsNil()
 	}
 

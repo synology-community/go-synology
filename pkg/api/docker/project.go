@@ -131,6 +131,7 @@ type ProjectCleanStreamRequest struct {
 }
 
 type ProjectCleanStreamResponse string
+
 func (ProjectCleanStreamResponse) IsStream() {}
 
 type ProjectStreamRequest struct {
@@ -138,4 +139,5 @@ type ProjectStreamRequest struct {
 }
 
 type ProjectStreamResponse string
+
 func (ProjectStreamResponse) IsStream() {}

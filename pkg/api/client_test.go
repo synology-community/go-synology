@@ -1,6 +1,5 @@
 package api
 
-
 import (
 	"context"
 	"net/http"
@@ -12,9 +11,16 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/synology-community/go-synology/pkg/api/docker"
 	"github.com/synology-community/go-synology/pkg/util"
 )
+
+// streamResponse is a local stand-in for a streaming response type (e.g.
+// docker.ProjectStreamResponse). It implements IsStream so handle[T] takes the
+// raw-body path. Defined locally to avoid an import cycle (the docker package
+// imports this one).
+type streamResponse string
+
+func (streamResponse) IsStream() {}
 
 // func newClient(t *testing.T) Api {
 // 	c, err := New(Options{
@@ -250,7 +256,7 @@ func TestHandleStreamResponse(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c, err := New(Options{
+	_, err := New(Options{
 		Host:       server.URL,
 		VerifyCert: false,
 	})
@@ -260,11 +266,10 @@ func TestHandleStreamResponse(t *testing.T) {
 	// since Do just calls handle.
 	resp, err := server.Client().Get(server.URL)
 	require.NoError(t, err)
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
-	// Test with ProjectStreamResponse (which implements IsStream)
-	res, err := handle[docker.ProjectStreamResponse](resp, nil)
+	// Test with a streaming response type (which implements IsStream)
+	res, err := handle[streamResponse](resp, nil)
 	require.NoError(t, err)
 	assert.Equal(t, expectedBody, string(*res))
 }
-

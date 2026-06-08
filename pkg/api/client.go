@@ -601,14 +601,18 @@ func Do[T Response](
 func handle[T Response](resp *http.Response, errorSummaries ErrorSummaries) (*T, error) {
 	var zero T
 	if _, ok := any(zero).(interface{ IsStream() }); ok {
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
+		// Stream responses carry the raw body. This only works for
+		// string-kinded types; anything else falls through to the normal
+		// decoding paths below rather than panicking in reflect.SetString.
+		if t := reflect.TypeOf(zero); t.Kind() == reflect.String {
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			if out, ok := reflect.ValueOf(string(body)).Convert(t).Interface().(T); ok {
+				return &out, nil
+			}
 		}
-		v := reflect.New(reflect.TypeOf(zero)).Elem()
-		v.SetString(string(body))
-		out := v.Interface().(T)
-		return &out, nil
 	}
 
 	var synoResponse ApiResponse[T]

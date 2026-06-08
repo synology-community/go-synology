@@ -51,7 +51,7 @@ func Marshal(b *bytes.Buffer, input ...any) (*multipart.Writer, int64, error) {
 
 		var v reflect.Value
 
-		if reflect.TypeOf(r).Kind() == reflect.Ptr {
+		if reflect.TypeOf(r).Kind() == reflect.Pointer {
 			v = reflect.Indirect(reflect.ValueOf(r))
 		} else {
 			v = reflect.ValueOf(r)

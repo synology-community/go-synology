@@ -49,7 +49,10 @@ func newClient(t *testing.T) Api {
 }
 
 func TestClient_PackageSettingGet(t *testing.T) {
-	skipIfVirtualDSM(t, "requires specific DSM environment (packages, network access, or hardcoded paths)")
+	skipIfVirtualDSM(
+		t,
+		"requires specific DSM environment (packages, network access, or hardcoded paths)",
+	)
 	type fields struct {
 		client Api
 	}
@@ -94,7 +97,10 @@ func TestClient_PackageSettingGet(t *testing.T) {
 }
 
 func TestClient_PackageInstall(t *testing.T) {
-	skipIfVirtualDSM(t, "requires specific DSM environment (packages, network access, or hardcoded paths)")
+	skipIfVirtualDSM(
+		t,
+		"requires specific DSM environment (packages, network access, or hardcoded paths)",
+	)
 	type fields struct {
 		client Api
 	}
@@ -169,7 +175,10 @@ func TestClient_PackageInstall(t *testing.T) {
 }
 
 func TestClient_ContentLength(t *testing.T) {
-	skipIfVirtualDSM(t, "requires specific DSM environment (packages, network access, or hardcoded paths)")
+	skipIfVirtualDSM(
+		t,
+		"requires specific DSM environment (packages, network access, or hardcoded paths)",
+	)
 	type fields struct {
 		client Api
 	}
@@ -211,7 +220,10 @@ func TestClient_ContentLength(t *testing.T) {
 }
 
 func TestClient_PackageFeed(t *testing.T) {
-	skipIfVirtualDSM(t, "requires specific DSM environment (packages, network access, or hardcoded paths)")
+	skipIfVirtualDSM(
+		t,
+		"requires specific DSM environment (packages, network access, or hardcoded paths)",
+	)
 	type fields struct {
 		client Api
 	}
@@ -282,7 +294,10 @@ func TestClient_PackageFeed(t *testing.T) {
 }
 
 func TestClient_SystemInfo(t *testing.T) {
-	skipIfVirtualDSM(t, "requires specific DSM environment (packages, network access, or hardcoded paths)")
+	skipIfVirtualDSM(
+		t,
+		"requires specific DSM environment (packages, network access, or hardcoded paths)",
+	)
 	type fields struct {
 		client Api
 	}
@@ -478,7 +493,10 @@ func TestNew(t *testing.T) {
 }
 
 func TestClient_PackageFind(t *testing.T) {
-	skipIfVirtualDSM(t, "requires specific DSM environment (packages, network access, or hardcoded paths)")
+	skipIfVirtualDSM(
+		t,
+		"requires specific DSM environment (packages, network access, or hardcoded paths)",
+	)
 	type fields struct {
 		client Api
 	}
@@ -525,7 +543,10 @@ func TestClient_PackageFind(t *testing.T) {
 }
 
 func TestClient_PackageInstallUpload(t *testing.T) {
-	skipIfVirtualDSM(t, "requires specific DSM environment (packages, network access, or hardcoded paths)")
+	skipIfVirtualDSM(
+		t,
+		"requires specific DSM environment (packages, network access, or hardcoded paths)",
+	)
 	type fields struct {
 		client Api
 	}
@@ -1066,7 +1087,7 @@ func TestClient_UserCreate(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("UserCreate error = %v, wantErr %v", err, tt.wantErr)
 			}
-			require.Equal(t, tt.args.req.Name, createResp.User.Name)
+			require.Equal(t, tt.args.req.Name, createResp.Name)
 
 			// Cleanup
 			delReq := UserDeleteRequest{Name: tt.args.req.Name}
@@ -1122,7 +1143,7 @@ func TestClient_UserModify(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("UserModify error = %v, wantErr %v", err, tt.wantErr)
 			}
-			require.Equal(t, "test_api_user_mod", modResp.User.Name)
+			require.Equal(t, "test_api_user_mod", modResp.Name)
 
 			// Cleanup
 			delReq := UserDeleteRequest{Name: tt.args.createReq.Name}
@@ -1212,7 +1233,7 @@ func TestClient_GroupCreate(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("GroupCreate error = %v, wantErr %v", err, tt.wantErr)
 			}
-			require.Equal(t, tt.args.req.Name, createResp.Group.Name)
+			require.Equal(t, tt.args.req.Name, createResp.Name)
 
 			// Cleanup
 			delReq := GroupDeleteRequest{Name: tt.args.req.Name}
@@ -1265,7 +1286,7 @@ func TestClient_GroupModify(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("GroupModify error = %v, wantErr %v", err, tt.wantErr)
 			}
-			require.Equal(t, "test_api_group_mod", modResp.Group.Name)
+			require.Equal(t, "test_api_group_mod", modResp.Name)
 
 			// Cleanup
 			delReq := GroupDeleteRequest{Name: tt.args.createReq.Name}

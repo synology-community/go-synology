@@ -498,15 +498,16 @@ func GetQuery[TResp any](c Api, ctx context.Context, r any, method Method) (*TRe
 		return nil, err
 	}
 
-	url := c.BaseUrl()
+	u2 := c.BaseUrl()
 
-	qu := maps.Clone(url.Query())
-	maps.Copy(aq, qu)
-	maps.Copy(aq, dq)
+	qu := maps.Clone(u2.Query())
+	maps.Copy(qu, aq)
+	maps.Copy(qu, dq)
 
-	u := c.BaseUrl()
+	u := new(url.URL)
+	*u = *u2
 
-	u.RawQuery = aq.Encode()
+	u.RawQuery = qu.Encode()
 
 	// Only set a timeout if one isn't already set
 	var cancel context.CancelFunc

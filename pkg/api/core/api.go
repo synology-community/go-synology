@@ -68,6 +68,11 @@ type Api interface {
 
 	NetworkGet(ctx context.Context) (*NetworkConfig, error)
 
+	OpenVPNClientProfileCreate(
+		ctx context.Context,
+		req OpenVPNClientProfileRequest,
+	) (*OpenVPNClientProfileResponse, error)
+
 	UserCreate(ctx context.Context, req UserCreateRequest) (*UserCreateResponse, error)
 	UserModify(ctx context.Context, req UserModifyRequest) (*UserModifyResponse, error)
 	UserDelete(ctx context.Context, req UserDeleteRequest) error

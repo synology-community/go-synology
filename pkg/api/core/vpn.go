@@ -35,6 +35,9 @@ type OpenVPNClientProfileRequest struct {
 	Reconnect      bool      `form:"reconnect"`
 }
 
+// DSM's create response carries no useful data (not even the new profile's
+// id) — confirmed empirically, so the id must be discovered afterwards via
+// OpenVPNClientProfileList.
 type OpenVPNClientProfileResponse struct{}
 
 func (c *Client) OpenVPNClientProfileCreate(
@@ -46,5 +49,57 @@ func (c *Client) OpenVPNClientProfileCreate(
 		ctx,
 		&req,
 		methods.NetworkVPNOpenVPNWithConfCreate,
+	)
+}
+
+// OpenVPNClientProfile is a single profile entry as returned by
+// SYNO.Core.Network.VPN.OpenVPNWithConf, method list.
+type OpenVPNClientProfile struct {
+	ID             string `json:"id"`
+	ConfigName     string `json:"confname"`
+	User           string `json:"user"`
+	Server         string `json:"server"`
+	DefaultGateway bool   `json:"defgw"`
+	NAT            bool   `json:"nat"`
+	Reconnect      bool   `json:"reconnect"`
+	Protocol       string `json:"prtl"`
+	Status         string `json:"status,omitempty"`
+}
+
+type OpenVPNClientProfileListRequest struct {
+	Additional []string `url:"additional,omitempty,json"`
+}
+
+type OpenVPNClientProfileListResponse []OpenVPNClientProfile
+
+// OpenVPNClientProfileList lists all OpenVPN client profiles configured on
+// the DSM VPN Client. Use this to discover a profile's id (needed for
+// OpenVPNClientProfileDelete), since create doesn't return it.
+func (c *Client) OpenVPNClientProfileList(
+	ctx context.Context,
+) (*OpenVPNClientProfileListResponse, error) {
+	return api.Get[OpenVPNClientProfileListResponse](
+		c.client,
+		ctx,
+		&OpenVPNClientProfileListRequest{Additional: []string{"status"}},
+		methods.NetworkVPNOpenVPNWithConfList,
+	)
+}
+
+// OpenVPNClientProfileDeleteRequest deletes a profile by id (e.g.
+// "o1786051381"), as returned by OpenVPNClientProfileList.
+type OpenVPNClientProfileDeleteRequest struct {
+	ID string `url:"id,quoted"`
+}
+
+// OpenVPNClientProfileDelete deletes an existing OpenVPN client profile.
+// Endpoint: SYNO.Core.Network.VPN.OpenVPNWithConf, method delete. Like
+// create, this is undocumented; captured from DSM's own VPN Client UI.
+func (c *Client) OpenVPNClientProfileDelete(ctx context.Context, id string) error {
+	return api.Void(
+		c.client,
+		ctx,
+		&OpenVPNClientProfileDeleteRequest{ID: id},
+		methods.NetworkVPNOpenVPNWithConfDelete,
 	)
 }

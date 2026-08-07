@@ -347,4 +347,16 @@ var (
 		Method:         api.MethodCreate,
 		ErrorSummaries: api.GlobalErrors,
 	}
+	NetworkVPNOpenVPNWithConfList = api.Method{
+		API:            Core_Network_VPN_OpenVPNWithConf,
+		Version:        1,
+		Method:         api.MethodList,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	NetworkVPNOpenVPNWithConfDelete = api.Method{
+		API:            Core_Network_VPN_OpenVPNWithConf,
+		Version:        1,
+		Method:         api.MethodDelete,
+		ErrorSummaries: api.GlobalErrors,
+	}
 )

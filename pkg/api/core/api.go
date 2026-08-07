@@ -72,6 +72,8 @@ type Api interface {
 		ctx context.Context,
 		req OpenVPNClientProfileRequest,
 	) (*OpenVPNClientProfileResponse, error)
+	OpenVPNClientProfileList(ctx context.Context) (*OpenVPNClientProfileListResponse, error)
+	OpenVPNClientProfileDelete(ctx context.Context, id string) error
 
 	UserCreate(ctx context.Context, req UserCreateRequest) (*UserCreateResponse, error)
 	UserModify(ctx context.Context, req UserModifyRequest) (*UserModifyResponse, error)

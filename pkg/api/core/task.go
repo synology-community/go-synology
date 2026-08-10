@@ -29,7 +29,7 @@ type TaskRequest struct {
 	Schedule           TaskSchedule `url:"schedule,json,omitempty"      json:"schedule,omitempty"`
 	Extra              TaskExtra    `url:"extra,json,omitempty"         json:"extra,omitempty"`
 	Type               string       `url:"type,omitempty"               json:"type,omitempty"`
-	Enable             bool         `url:"enable,omitempty"             json:"enable,omitempty"`
+	Enable             bool         `url:"enable"                       json:"enable,omitempty"`
 	ID                 *int64       `url:"id,omitempty"                 json:"id,omitempty"`
 	SynoConfirmPWToken string       `url:"SynoConfirmPWToken,omitempty" json:"SynoConfirmPWToken,omitempty"`
 }

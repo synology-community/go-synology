@@ -9,6 +9,9 @@ type Api interface {
 		ctx context.Context,
 		container CreateContainerRequest,
 	) (*CreateContainerResponse, error)
+	ContainerGet(ctx context.Context, name string) (*ContainerGetResponse, error)
+	ContainerList(ctx context.Context, req ContainerListRequest) (*ContainerListResponse, error)
+	ContainerDelete(ctx context.Context, req ContainerDeleteRequest) error
 	ContainerStop(
 		ctx context.Context,
 		req ContainerOperationRequest,
@@ -23,6 +26,8 @@ type Api interface {
 	) (*ContainerRestartResponse, error)
 
 	RegistryList(ctx context.Context, req ListRegistryRequest) (*ListRegistryResponse, error)
+	RegistryCreate(ctx context.Context, req RegistryCreateRequest) error
+	RegistryDelete(ctx context.Context, req RegistryDeleteRequest) error
 
 	ImagePullStart(ctx context.Context, req ImagePullStartRequest) (*ImagePullStartResponse, error)
 	ImagePullStatus(

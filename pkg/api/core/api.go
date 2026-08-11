@@ -40,6 +40,7 @@ type Api interface {
 	ShareGet(ctx context.Context, name string) (*ShareGetResponse, error)
 	ShareGetByID(ctx context.Context, id string) (*Share, error)
 	ShareCreate(ctx context.Context, share ShareInfo) error
+	ShareModify(ctx context.Context, req ShareModifyRequest) error
 	ShareDelete(ctx context.Context, name string) error
 	VolumeList(ctx context.Context) (*VolumeListResponse, error)
 

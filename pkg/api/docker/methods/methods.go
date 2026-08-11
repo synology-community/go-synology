@@ -64,6 +64,18 @@ var (
 		Method:         api.MethodGet,
 		ErrorSummaries: CommonErrors,
 	}
+	RegistryCreate = api.Method{
+		API:            API_DockerRegistry,
+		Version:        1,
+		Method:         api.MethodCreate,
+		ErrorSummaries: CommonErrors,
+	}
+	RegistryDelete = api.Method{
+		API:            API_DockerRegistry,
+		Version:        1,
+		Method:         api.MethodDelete,
+		ErrorSummaries: CommonErrors,
+	}
 	ImagePullStart = api.Method{
 		API:            API_DockerImage,
 		Version:        1,

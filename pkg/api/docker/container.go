@@ -91,3 +91,43 @@ type (
 type (
 	ContainerRestartResponse = ContainerOperationResponse
 )
+
+// ContainerListRequest lists containers. DSM requires limit/offset; -1 means all.
+type ContainerListRequest struct {
+	Limit  int64 `url:"limit"`
+	Offset int64 `url:"offset"`
+}
+
+// ContainerListItem is one row from SYNO.Docker.Container list.
+// Only fields the provider needs are typed; DSM also returns nested State and
+// NetworkSettings objects which json.Unmarshal ignores when untyped here.
+type ContainerListItem struct {
+	ID     string `json:"id,omitempty"`
+	Name   string `json:"name,omitempty"`
+	Image  string `json:"image,omitempty"`
+	Status string `json:"status,omitempty"`
+}
+
+// ContainerListResponse is the list payload.
+type ContainerListResponse struct {
+	Containers []ContainerListItem `json:"containers,omitempty"`
+}
+
+// ContainerGetRequest fetches one container by name.
+type ContainerGetRequest struct {
+	Name string `url:"name"`
+}
+
+// ContainerGetResponse holds the live profile and docker details for a container.
+type ContainerGetResponse struct {
+	Profile Container      `json:"profile,omitempty"`
+	Details map[string]any `json:"details,omitempty"`
+}
+
+// ContainerDeleteRequest removes a container by name.
+// Name is quoted like start/stop. Force is sent as a JSON boolean string
+// (json.dumps style) which is what the community Python client uses.
+type ContainerDeleteRequest struct {
+	Name  string `url:"name,quoted"`
+	Force bool   `url:"force"`
+}

@@ -186,6 +186,29 @@ func (d *Client) ContainerCreate(
 	return api.Post[CreateContainerResponse](d.client, ctx, &req, methods.Create)
 }
 
+// ContainerGet implements DockerApi.
+func (d *Client) ContainerGet(ctx context.Context, name string) (*ContainerGetResponse, error) {
+	return api.Post[ContainerGetResponse](d.client, ctx, &ContainerGetRequest{
+		Name: name,
+	}, methods.Get)
+}
+
+// ContainerList implements DockerApi.
+func (d *Client) ContainerList(
+	ctx context.Context,
+	req ContainerListRequest,
+) (*ContainerListResponse, error) {
+	if req.Limit == 0 {
+		req.Limit = -1
+	}
+	return api.Post[ContainerListResponse](d.client, ctx, &req, methods.List)
+}
+
+// ContainerDelete implements DockerApi.
+func (d *Client) ContainerDelete(ctx context.Context, req ContainerDeleteRequest) error {
+	return api.PostVoid(d.client, ctx, &req, methods.Delete)
+}
+
 // ContainerStop implements DockerApi.
 func (d *Client) ContainerStop(
 	ctx context.Context,
@@ -216,6 +239,16 @@ func (d *Client) RegistryList(
 	req ListRegistryRequest,
 ) (*ListRegistryResponse, error) {
 	return api.Post[ListRegistryResponse](d.client, ctx, &req, methods.RegistryList)
+}
+
+// RegistryCreate implements DockerApi.
+func (d *Client) RegistryCreate(ctx context.Context, req RegistryCreateRequest) error {
+	return api.PostVoid(d.client, ctx, &req, methods.RegistryCreate)
+}
+
+// RegistryDelete implements DockerApi.
+func (d *Client) RegistryDelete(ctx context.Context, req RegistryDeleteRequest) error {
+	return api.PostVoid(d.client, ctx, &req, methods.RegistryDelete)
 }
 
 // NetworkList implements DockerApi.

@@ -17,7 +17,8 @@ type User struct {
 }
 
 type UserListRequest struct {
-	Additional []string `url:"additional,omitempty"`
+	// DSM expects a JSON array string, not repeated form fields.
+	Additional []string `url:"additional,json,omitempty"`
 }
 
 type UserListResponse struct {

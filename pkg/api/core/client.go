@@ -463,6 +463,10 @@ func (c Client) ShareCreate(ctx context.Context, share ShareInfo) error {
 	}, methods.ShareCreate)
 }
 
+func (c Client) ShareModify(ctx context.Context, req ShareModifyRequest) error {
+	return api.Void(c.client, ctx, &req, methods.ShareModify)
+}
+
 func (c Client) ShareDelete(ctx context.Context, name string) error {
 	return api.Void(c.client, ctx, &ShareDeleteRequest{
 		Name: name,
@@ -612,7 +616,7 @@ func (c *Client) TaskRun(ctx context.Context, ids ...int64) error {
 
 func (c *Client) UserList(ctx context.Context) (*UserListResponse, error) {
 	return api.Get[UserListResponse](c.client, ctx, &UserListRequest{
-		Additional: []string{"uid"},
+		Additional: []string{"uid", "email", "description", "expired"},
 	}, methods.UserList)
 }
 
@@ -643,7 +647,9 @@ func (c *Client) UserDelete(ctx context.Context, req UserDeleteRequest) error {
 
 // GroupList lists all groups.
 func (c *Client) GroupList(ctx context.Context) (*GroupListResponse, error) {
-	return api.Get[GroupListResponse](c.client, ctx, &GroupListRequest{}, methods.GroupList)
+	return api.Get[GroupListResponse](c.client, ctx, &GroupListRequest{
+		Additional: []string{"name", "description", "gid"},
+	}, methods.GroupList)
 }
 
 // GroupCreate creates a new group.

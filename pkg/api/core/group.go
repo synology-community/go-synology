@@ -9,7 +9,8 @@ type Group struct {
 
 // GroupListRequest for listing groups.
 type GroupListRequest struct {
-	Additional []string `url:"additional,omitempty"`
+	// DSM expects a JSON array string, not repeated form fields.
+	Additional []string `url:"additional,json,omitempty"`
 }
 
 // GroupListResponse for listing groups.

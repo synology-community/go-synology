@@ -67,6 +67,9 @@ type ShareInfo struct {
 	Name                string `json:"name,omitempty"`
 	VolPath             string `json:"vol_path,omitempty"`
 	Desc                string `json:"desc,omitempty"`
+	Hidden              bool   `json:"hidden,omitempty"`
+	EnableRecycleBin    bool   `json:"enable_recycle_bin,omitempty"`
+	RecycleBinAdminOnly bool   `json:"recycle_bin_admin_only,omitempty"`
 	EnableShareCow      bool   `json:"enable_share_cow,omitempty"`
 	EnableShareCompress bool   `json:"enable_share_compress,omitempty"`
 	NameOrg             string `json:"name_org,omitempty"`
@@ -79,4 +82,10 @@ type ShareCreateRequest struct {
 
 type ShareDeleteRequest struct {
 	Name string `url:"name"`
+}
+
+// ShareModifyRequest updates an existing shared folder via SYNO.Core.Share method set.
+type ShareModifyRequest struct {
+	Name      string    `url:"name"`
+	ShareInfo ShareInfo `url:"shareinfo,json"`
 }

@@ -469,6 +469,52 @@ func (c Client) ShareDelete(ctx context.Context, name string) error {
 	}, methods.ShareDelete)
 }
 
+// SharePermissionList lists permission rows for one share. Unlike
+// SharePermissionSet, DSM accepts this called directly.
+func (c Client) SharePermissionList(
+	ctx context.Context,
+	share string,
+	userGroupType string,
+) (*SharePermissionListResponse, error) {
+	return api.Get[SharePermissionListResponse](c.client, ctx, &SharePermissionListRequest{
+		Name:          share,
+		UserGroupType: userGroupType,
+	}, methods.SharePermissionList)
+}
+
+// SharePermissionSet updates permission rows for one share. perms need only
+// contain the rows being changed -- see SharePermissionSetEntry.
+//
+// SYNO.Core.Share.Permission set returns 403 when called directly, with or
+// without parameters, so this wraps it in a SYNO.Entry.Request compound
+// envelope -- the only shape verified to work against the live NAS (PLAT-705).
+// A compound envelope can report success:true while the wrapped sub-request
+// failed, so the result is passed through api.CompoundError before this
+// returns nil; do not remove that check.
+func (c Client) SharePermissionSet(
+	ctx context.Context,
+	share string,
+	userGroupType string,
+	perms []SharePermissionSetEntry,
+) error {
+	elem := api.CompoundElement{
+		API:     methods.Core_Share_Permission,
+		Method:  methods.SharePermissionSet.Method,
+		Version: methods.SharePermissionSet.Version,
+		Params: sharePermissionSetParams{
+			Name:          share,
+			UserGroupType: userGroupType,
+			Permissions:   perms,
+		},
+	}
+
+	resp, err := api.PostCompound(c.client, ctx, []api.CompoundElement{elem}, "sequential", false)
+	if err != nil {
+		return err
+	}
+	return api.CompoundError(resp)
+}
+
 func (c Client) VolumeList(ctx context.Context) (*VolumeListResponse, error) {
 	return api.Post[VolumeListResponse](c.client, ctx, &VolumeListRequest{
 		Limit:    -1,

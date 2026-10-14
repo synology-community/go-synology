@@ -41,6 +41,17 @@ type Api interface {
 	ShareGetByID(ctx context.Context, id string) (*Share, error)
 	ShareCreate(ctx context.Context, share ShareInfo) error
 	ShareDelete(ctx context.Context, name string) error
+	SharePermissionList(
+		ctx context.Context,
+		share string,
+		userGroupType string,
+	) (*SharePermissionListResponse, error)
+	SharePermissionSet(
+		ctx context.Context,
+		share string,
+		userGroupType string,
+		perms []SharePermissionSetEntry,
+	) error
 	VolumeList(ctx context.Context) (*VolumeListResponse, error)
 
 	TaskList(ctx context.Context, req ListTaskRequest) (*ListTaskResponse, error)

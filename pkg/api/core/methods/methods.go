@@ -5,25 +5,26 @@ import (
 )
 
 const (
-	Core_AppPortal_ReverseProxy = "SYNO.Core.AppPortal.ReverseProxy"
-	Core_Event                  = "SYNO.Core.EventScheduler"
-	Core_Event_Root             = "SYNO.Core.EventScheduler.Root"
-	Core_Network                = "SYNO.Core.Network"
-	Core_Package                = "SYNO.Core.Package"
-	Core_Package_Feed           = "SYNO.Core.Package.Feed"
-	Core_Package_Installation   = "SYNO.Core.Package.Installation"
-	Core_Package_Server         = "SYNO.Core.Package.Server"
-	Core_Package_Setting        = "SYNO.Core.Package.Setting"
-	Core_Package_Uninstallation = "SYNO.Core.Package.Uninstallation"
-	Core_Password_Confirm       = "SYNO.Core.User.PasswordConfirm"
-	Core_Share                  = "SYNO.Core.Share"
-	Core_Storage_Volume         = "SYNO.Core.Storage.Volume"
-	Core_System                 = "SYNO.Core.System"
-	Core_Task_Root              = "SYNO.Core.TaskScheduler.Root"
-	Core_TaskScheduler          = "SYNO.Core.TaskScheduler"
-	Core_Group                  = "SYNO.Core.Group"
-	Core_User                   = "SYNO.Core.User"
-	DSM_PortEnable              = "SYNO.DSM.PortEnable"
+	Core_AppPortal_ReverseProxy      = "SYNO.Core.AppPortal.ReverseProxy"
+	Core_Event                       = "SYNO.Core.EventScheduler"
+	Core_Event_Root                  = "SYNO.Core.EventScheduler.Root"
+	Core_Network                     = "SYNO.Core.Network"
+	Core_Network_VPN_OpenVPNWithConf = "SYNO.Core.Network.VPN.OpenVPNWithConf"
+	Core_Package                     = "SYNO.Core.Package"
+	Core_Package_Feed                = "SYNO.Core.Package.Feed"
+	Core_Package_Installation        = "SYNO.Core.Package.Installation"
+	Core_Package_Server              = "SYNO.Core.Package.Server"
+	Core_Package_Setting             = "SYNO.Core.Package.Setting"
+	Core_Package_Uninstallation      = "SYNO.Core.Package.Uninstallation"
+	Core_Password_Confirm            = "SYNO.Core.User.PasswordConfirm"
+	Core_Share                       = "SYNO.Core.Share"
+	Core_Storage_Volume              = "SYNO.Core.Storage.Volume"
+	Core_System                      = "SYNO.Core.System"
+	Core_Task_Root                   = "SYNO.Core.TaskScheduler.Root"
+	Core_TaskScheduler               = "SYNO.Core.TaskScheduler"
+	Core_Group                       = "SYNO.Core.Group"
+	Core_User                        = "SYNO.Core.User"
+	DSM_PortEnable                   = "SYNO.DSM.PortEnable"
 )
 
 var (
@@ -338,6 +339,24 @@ var (
 		API:            Core_Network,
 		Version:        2,
 		Method:         api.MethodGet,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	NetworkVPNOpenVPNWithConfCreate = api.Method{
+		API:            Core_Network_VPN_OpenVPNWithConf,
+		Version:        1,
+		Method:         api.MethodCreate,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	NetworkVPNOpenVPNWithConfList = api.Method{
+		API:            Core_Network_VPN_OpenVPNWithConf,
+		Version:        1,
+		Method:         api.MethodList,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	NetworkVPNOpenVPNWithConfDelete = api.Method{
+		API:            Core_Network_VPN_OpenVPNWithConf,
+		Version:        1,
+		Method:         api.MethodDelete,
 		ErrorSummaries: api.GlobalErrors,
 	}
 )

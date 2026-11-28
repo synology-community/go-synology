@@ -17,6 +17,7 @@ const (
 	Core_Package_Uninstallation = "SYNO.Core.Package.Uninstallation"
 	Core_Password_Confirm       = "SYNO.Core.User.PasswordConfirm"
 	Core_Share                  = "SYNO.Core.Share"
+	Core_Share_Permission       = "SYNO.Core.Share.Permission"
 	Core_Storage_Volume         = "SYNO.Core.Storage.Volume"
 	Core_System                 = "SYNO.Core.System"
 	Core_Task_Root              = "SYNO.Core.TaskScheduler.Root"
@@ -170,6 +171,26 @@ var (
 		API:            Core_Share,
 		Version:        1,
 		Method:         api.MethodDelete,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	// SharePermissionList lists a share's permission rows (SYNO.Core.Share.Permission
+	// list). Unlike SharePermissionSet, DSM accepts this called directly.
+	SharePermissionList = api.Method{
+		API:            Core_Share_Permission,
+		Version:        1,
+		Method:         api.MethodList,
+		ErrorSummaries: api.GlobalErrors,
+	}
+	// SharePermissionSet names SYNO.Core.Share.Permission set's api/method/version.
+	// It is never POSTed directly with this Method value -- DSM returns 403 for a
+	// direct call regardless of parameters. It exists so the compound-envelope
+	// element built in core.Client.SharePermissionSet has one place to source
+	// those three fields from, same as every other declared Method here. See
+	// PLAT-705 and api.CompoundElement.
+	SharePermissionSet = api.Method{
+		API:            Core_Share_Permission,
+		Version:        1,
+		Method:         api.MethodSet,
 		ErrorSummaries: api.GlobalErrors,
 	}
 	VolumeList = api.Method{
